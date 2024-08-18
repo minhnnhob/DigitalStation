@@ -11,7 +11,7 @@ const Home = () => {
   useEffect(() => {
     dispatch(fetchWorkouts());
     // eslint-disable-next-line
-  }, [workouts]);
+  }, []);
 
   return (
     <div className="home">
