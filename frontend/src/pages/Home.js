@@ -1,30 +1,24 @@
-import { useEffect, useState } from "react";
-
+import { useSelector, useDispatch } from "react-redux";
 import WorkoutDetails from "../components/WorkoutDetails";
 import WorkoutForm from "../components/WorkoutForm";
+import { fetchWorkouts } from "../store/slices/workoutSlice";
+import { useEffect } from "react";
 
 const Home = () => {
-  const [workouts, setWorkouts] = useState(null);
+  const {workouts} = useSelector((state) => state.workout);
 
+  const dispatch = useDispatch();
   useEffect(() => {
-    const fetchdata = async () => {
-      const response = await fetch("http://localhost:4000/api/workouts");
-      const data = await response.json();
-      console.log(data);
-      if (response.ok) {
-        setWorkouts(data);
-      }
-    };
-    fetchdata();
-  }, []);
+    dispatch(fetchWorkouts());
+    // eslint-disable-next-line
+  }, [workouts]);
 
   return (
     <div className="home">
       <div className="workouts">
-        {workouts &&
-          workouts.map((workout) => (
-            <WorkoutDetails key={workout._id} workout={workout} />
-          ))}
+        {workouts.map((workout) => (
+          <WorkoutDetails key={workout._id} workout={workout} />
+        ))}
       </div>
       <WorkoutForm />
     </div>

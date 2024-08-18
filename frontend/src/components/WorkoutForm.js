@@ -1,58 +1,64 @@
 import { useState } from "react";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { addWorkout } from "../store/slices/workoutSlice";
 
 const WorkoutForm = () => {
-    const [title, setTitle] = useState("");
-    const [load, setLoad] = useState("");
-    const [reps, setReps] = useState("");
-    const [error, setError] = useState(null);
+  const [title, setTitle] = useState("");
+  const [load, setLoad] = useState("");
+  const [reps, setReps] = useState("");
+  const [error, setError] = useState(null);
+  
+  const dispatch = useDispatch();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const workout = { title, load, reps };
 
-        const workout = { title, load, reps };
-        const response = await fetch("http://localhost:4000/api/workouts", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(workout),
-        });
-
-        const json = await response.json();
-
-        if(!response.ok){
-            setError(json.message);
-            console.log(json.message);
-        }
-
-        if(response.ok){
-            setTitle("");
-            setLoad("");
-            setReps("");
-            setError(null);
-            console.log(json);
-        }
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/workouts",
+        workout
+      );
+      console.log(response.data);
+      if (response.status === 200) {
+        setTitle("");
+        setLoad("");
+        setReps("");
+        setError(null);
+        dispatch(addWorkout(response.data));
+      }
+    } catch (error) {
+      setError("Something went wrong");
+      setTimeout(() => {
+        setError(null);
+      }, 3000);
     }
+
+    
+  };
+
+ 
 
   return (
     <form className="create" onSubmit={handleSubmit}>
       <h3>Add a new workout</h3>
 
-      <label for="">Excersize Title</label>
+      <label htmlFor="">Excersize Title</label>
       <input
         type="text"
         onChange={(e) => setTitle(e.target.value)}
         value={title}
       />
 
-      <label for="">Load</label>
+      <label htmlFor="">Load</label>
       <input
         type="number"
         onChange={(e) => setLoad(e.target.value)}
         value={load}
       />
 
-      <label for="">Reps</label>
+      <label htmlFor="">Reps</label>
       <input
         type="number"
         onChange={(e) => setReps(e.target.value)}
@@ -61,7 +67,6 @@ const WorkoutForm = () => {
 
       <button type="submit">Add Workout</button>
       {error && <div className="error">{error}</div>}
-
     </form>
   );
 };
