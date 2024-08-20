@@ -8,8 +8,15 @@ const cros = require('cors');
 
 const app = express();
 
+//cross origin resource sharing
+
+const corsOptions = {
+    origin: 'http://localhost:3000', // Your frontend origin
+    credentials: true, // Allow credentials
+  };
+
 //middleware
-app.use(cros());
+app.use(cros(corsOptions));
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -21,6 +28,10 @@ app.use((req, res, next) => {
 
 app.use('/api/workouts', workoutsRouter);
 app.use('/api/users', userRouter);
+
+
+
+
 
 //connect to mongodb
 mongoose.connect(process.env.MONGO_URI)

@@ -1,13 +1,10 @@
 import { useState } from "react";
-import { useDispatch ,useSelector} from "react-redux";
-import { login } from "../store/slices/userSlice";
+import { useDispatch } from "react-redux";
+import { register } from "../store/slices/userSlice";
 
-const Login = () => {
-  const error = useSelector((state) => state.user.error);
-
+const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
 
   const dispatch = useDispatch();
 
@@ -15,13 +12,14 @@ const Login = () => {
     e.preventDefault();
 
     const Newuser = { email, password };
-    await dispatch(login(Newuser));
-  
+    dispatch(register(Newuser));
+
+    console.log(Newuser);
   };
 
   return (
-    <form className="login" onSubmit={handleSubmit}>
-      <h3>Log in</h3>
+    <form className="register" onSubmit={handleSubmit}>
+      <h3>Register</h3>
       <label htmlFor="email">Email</label>
       <input
         type="email"
@@ -38,10 +36,9 @@ const Login = () => {
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <button>Log in</button>
-      {error && <div className="error">{error}</div>}
+      <button>Register</button>
     </form>
   );
 };
 
-export default Login;
+export default Register;

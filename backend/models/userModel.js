@@ -49,28 +49,6 @@ userSchema.statics.register = async function (email, password) {
   return user;
 };
 
-//Login Function
-userSchema.statics.login = async function (email, password) {
-  //validation
-  if (!email || !password) {
-    throw Error("Email and password are required");
-  }
-
-  const user = await this.findOne({ email });
-
-  if (!user) {
-    throw new Error("User not found");
-  }
-
-  const match = await bcrypt.compare(password, user.password);
-
-  if (!match) {
-    throw new Error("Invalid login credentials");
-  }
-
-  return user;
-};
-
 userSchema.statics.login = async function (email, password) {
   //validation
   if (!email || !password) {
@@ -90,5 +68,8 @@ userSchema.statics.login = async function (email, password) {
   }
   return user;
 };
+
+
+
 
 module.exports = mongoose.model("User", userSchema);
