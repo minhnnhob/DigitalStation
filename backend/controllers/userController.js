@@ -7,17 +7,17 @@ const generateToken = (_id) => {
   });
 };
 
-const getUserById = async (req, res) => {
-  const id = req.params.id;
+// const getUserById = async (req, res) => {
+//   const id = req.params.id;
 
-  try {
-    const user = await User.findById(id);
+//   try {
+//     const user = await User.findById(id);
 
-    res.status(200).json(user);
-  } catch (error) {
-    res.status(404).json({ error: error.message });
-  }
-};
+//     res.status(200).json(user);
+//   } catch (error) {
+//     res.status(404).json({ error: error.message });
+//   }
+// };
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -55,4 +55,4 @@ const logoutUser = async (req, res) => {
   res.clearCookie("token").json({ message: "Logged out" });
 };
 
-module.exports = { loginUser, registerUser, logoutUser, getUserById };
+module.exports = { loginUser, registerUser, logoutUser };

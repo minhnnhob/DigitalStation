@@ -8,7 +8,7 @@ const {
 
 const router = express.Router();
 
-router.get("/:id", getUserById);
+// router.get("/:id", getUserById);
 
 router.post("/login", loginUser);
 

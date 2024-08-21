@@ -16,7 +16,7 @@ const Login = () => {
 
     const Newuser = { email, password };
     await dispatch(login(Newuser));
-  
+    console.log(Newuser);
   };
 
   return (

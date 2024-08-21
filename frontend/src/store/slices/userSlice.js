@@ -42,21 +42,26 @@ const register = createAsyncThunk("user/register", async (user) => {
 });
 
 const logout = createAsyncThunk("user/logout", async () => {
-  await axios.post("http://localhost:4000/api/auth/logout", null, {
-    withCredentials: true,
-  });
-});
-
-const fetchCurrentUser = createAsyncThunk("user/fetchCurrentUser", async () => {
+  localStorage.removeItem("user");
   try {
-    const response = await axios.get(
-      "http://localhost:4000/users/66bdb7c0b76a90fc4b0296e4",
-      
-    );
-    return response.data;
+    await axios.get("http://localhost:4000/api/users/logout", {
+      withCredentials: true,
+    });
+    console.log("logged out");
+    
   } catch (error) {
     throw new Error(error.message);
   }
+  
+
+});
+
+const fetchCurrentUser = createAsyncThunk("user/fetchCurrentUser", async () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  console.log(user);  
+  return user;
+
+
 });
 
 const userSlice = createSlice({
@@ -90,6 +95,20 @@ const userSlice = createSlice({
       state.role = action.payload.role;
     });
     builder.addCase(register.rejected, (state, action) => {
+      state.loading = false;
+    });
+
+    builder.addCase(logout.pending, (state, action) => {
+      state.loading = true;
+    });
+    builder.addCase(logout.fulfilled, (state, action) => {
+      state.loading = false;
+      state.loggedIn = false;
+      state.id = null;
+      state.email = null;
+      state.role = null;
+    });
+    builder.addCase(logout.rejected, (state, action) => {
       state.loading = false;
     });
   },
