@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useDispatch ,useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { login } from "../store/slices/userSlice";
 
 const Login = () => {
@@ -8,15 +8,15 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-
   const dispatch = useDispatch();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const Newuser = { email, password };
-    await dispatch(login(Newuser));
-    console.log(Newuser);
+    const currUser = { email, password };
+    dispatch(login(currUser));
+    window.location.href = "/";
+    // console.log(currUser);
   };
 
   return (

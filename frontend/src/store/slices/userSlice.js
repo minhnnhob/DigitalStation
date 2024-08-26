@@ -19,7 +19,7 @@ const login = createAsyncThunk("user/login", async (user) => {
       { withCredentials: true }
     );
     console.log(response.data);
-    localStorage.setItem("user", JSON.stringify(response.data));
+    
     return response.data;
   } catch (error) {
     user.error = error.response.data;
@@ -42,7 +42,7 @@ const register = createAsyncThunk("user/register", async (user) => {
 });
 
 const logout = createAsyncThunk("user/logout", async () => {
-  localStorage.removeItem("user");
+  
   try {
     await axios.get("http://localhost:4000/api/users/logout", {
       withCredentials: true,

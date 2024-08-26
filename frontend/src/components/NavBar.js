@@ -1,16 +1,24 @@
 import { Link } from "react-router-dom";
 import { logout } from "../store/slices/userSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
 
 const NavBar = () => {
-  const {loggedIn} = useSelector((state) => state.user);
-  const {email} = useSelector((state) => state.user);
+  const { email } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
-  const handleLogout = async () => {
-    await dispatch(logout());
-    console.log(email);
+  const handleLogout = () => {
+    dispatch(logout());
+    window.location.href = "/login";
+
+    // Perform any additional actions after logout, such as redirecting to a different page or clearing local storage
   };
+  const token = document.cookie.replace(
+    /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+    "$1"
+  );
+
+  useEffect(() => {}, [token]);
 
   // Use the 'user' variable to conditionally render components or perform other actions based on the user's state
 
@@ -21,9 +29,9 @@ const NavBar = () => {
           <h1>Workout Buddy</h1>
         </Link>
         <nav>
-          {loggedIn ? (
+          {token ? (
             <div>
-              <span>{loggedIn ? email : ""}</span>
+              <span>{token ? email : ""}</span>
               <button onClick={handleLogout}>Log out</button>
             </div>
           ) : (

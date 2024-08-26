@@ -9,7 +9,9 @@ const initialState = {
 
 const fetchWorkouts = createAsyncThunk("workout/fetchWorkouts", async () => {
   try {
-    const response = await axios.get("http://localhost:4000/api/workouts/");
+    const response = await axios.get("http://localhost:4000/api/workouts/", {
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
     throw new Error(error.message);
@@ -24,9 +26,9 @@ const workoutState = createSlice({
       state.workouts = [action.payload, ...state.workouts];
     },
     deleteWorkout: (state, action) => {
-        state.workouts = state.workouts.filter(
-            (workout) => workout._id !== action.payload
-        );
+      state.workouts = state.workouts.filter(
+        (workout) => workout._id !== action.payload
+      );
     },
   },
   extraReducers: (builder) => {
