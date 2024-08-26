@@ -18,12 +18,12 @@ const login = createAsyncThunk("user/login", async (user) => {
       user,
       { withCredentials: true }
     );
-    console.log(response.data);
-    
+    // console.log(response.data);
+    window.location.href = "/";
     return response.data;
   } catch (error) {
     user.error = error.response.data;
-    throw new Error(error.response.data); 
+    throw new Error(error.response.data);
   }
 });
 
@@ -42,26 +42,20 @@ const register = createAsyncThunk("user/register", async (user) => {
 });
 
 const logout = createAsyncThunk("user/logout", async () => {
-  
   try {
     await axios.get("http://localhost:4000/api/users/logout", {
       withCredentials: true,
     });
     console.log("logged out");
-    
   } catch (error) {
     throw new Error(error.message);
   }
-  
-
 });
 
 const fetchCurrentUser = createAsyncThunk("user/fetchCurrentUser", async () => {
   const user = JSON.parse(localStorage.getItem("user"));
-  console.log(user);  
+  console.log(user);
   return user;
-
-
 });
 
 const userSlice = createSlice({
@@ -81,7 +75,6 @@ const userSlice = createSlice({
     });
     builder.addCase(login.rejected, (state, action) => {
       state.loading = false;
-   
     });
 
     builder.addCase(register.pending, (state, action) => {

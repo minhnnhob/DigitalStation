@@ -3,14 +3,15 @@ import { deleteWorkout } from "../store/slices/workoutSlice";
 
 import axios from "axios";
 const WorkoutDetails = ({ workout }) => {
-
-
   const dispatch = useDispatch();
   const handleDelete = async () => {
     const id = workout._id;
     try {
       const response = await axios.delete(
-        `http://localhost:4000/api/workouts/${id}`
+        `http://localhost:4000/api/workouts/${id}`,
+        {
+          withCredentials: true,
+        }
       );
 
       if (response.status === 200) {
@@ -20,8 +21,6 @@ const WorkoutDetails = ({ workout }) => {
       console.log(error);
     }
   };
-
- 
 
   return (
     <div className=" workout-details">
@@ -39,8 +38,6 @@ const WorkoutDetails = ({ workout }) => {
         <div className="button" onClick={handleDelete}>
           Delete
         </div>
-     
-     
       </span>
     </div>
   );

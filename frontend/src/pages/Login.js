@@ -14,8 +14,8 @@ const Login = () => {
     e.preventDefault();
 
     const currUser = { email, password };
-    dispatch(login(currUser));
-    window.location.href = "/";
+    await dispatch(login(currUser));
+    
     // console.log(currUser);
   };
 

@@ -19,7 +19,7 @@ const WorkoutForm = () => {
     try {
       const response = await axios.post(
         "http://localhost:4000/api/workouts",
-        workout
+        workout,{withCredentials: true}
       );
       console.log(response.data);
       if (response.status === 200) {
