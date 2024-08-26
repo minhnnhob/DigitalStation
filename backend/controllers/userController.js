@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 
 const generateToken = (_id) => {
   return jwt.sign({ _id: _id }, process.env.JWT_SECRET, {
-    expiresIn: "30d",
+    expiresIn: "1h",
   });
 };
 
@@ -29,7 +29,9 @@ const loginUser = async (req, res) => {
 
     const token = generateToken(user._id);
 
-    res.status(200).json({ email, token });
+    res.cookie( "token", token);
+
+    res.status(200).json({ email, userId: user._id, token });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -52,6 +54,7 @@ const registerUser = async (req, res) => {
 };
 
 const logoutUser = async (req, res) => {
+  
   res.clearCookie("token").json({ message: "Logged out" });
 };
 
