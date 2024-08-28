@@ -7,17 +7,21 @@ const generateToken = (_id) => {
   });
 };
 
-// const getUserById = async (req, res) => {
-//   const id = req.params.id;
+getAuthUser = async (req, res) => {
+  res.status(200).json(req.user);
+};
 
-//   try {
-//     const user = await User.findById(id);
+const getUserById = async (req, res) => {
+  const id = req.params.id;
 
-//     res.status(200).json(user);
-//   } catch (error) {
-//     res.status(404).json({ error: error.message });
-//   }
-// };
+  try {
+    const user = await User.findById(id);
+
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(404).json({ error: error.message });
+  }
+};
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -29,7 +33,7 @@ const loginUser = async (req, res) => {
 
     const token = generateToken(user._id);
 
-    res.cookie( "token", token);
+    res.cookie("token", token);
 
     res.status(200).json({ email, userId: user._id, token });
   } catch (error) {
@@ -54,8 +58,13 @@ const registerUser = async (req, res) => {
 };
 
 const logoutUser = async (req, res) => {
-  
   res.clearCookie("token").json({ message: "Logged out" });
 };
 
-module.exports = { loginUser, registerUser, logoutUser };
+module.exports = {
+  loginUser,
+  registerUser,
+  logoutUser,
+  getUserById,
+  getAuthUser,
+};

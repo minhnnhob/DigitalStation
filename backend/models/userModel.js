@@ -15,6 +15,31 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+
+  profilePicture:{
+    type: String,
+    default: "",
+  },
+  
+  bio: {
+    type: String,
+  },
+  socialLinks: {
+    website: String,
+    twitter: String,
+    instagram: String,
+  },
+  followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+  following: [{ type: Schema.Types.ObjectId, ref: "User" }],
+  feedPreferences: [String],
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 //Register Function

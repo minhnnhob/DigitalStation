@@ -19,7 +19,7 @@ const login = createAsyncThunk("user/login", async (user) => {
       { withCredentials: true }
     );
     // console.log(response.data);
-    window.location.href = "/";
+
     return response.data;
   } catch (error) {
     user.error = error.response.data;
@@ -34,6 +34,7 @@ const register = createAsyncThunk("user/register", async (user) => {
       user,
       { withCredentials: true }
     );
+
     return response.data;
   } catch (error) {
     console.log(error.response.data);
@@ -46,6 +47,7 @@ const logout = createAsyncThunk("user/logout", async () => {
     await axios.get("http://localhost:4000/api/users/logout", {
       withCredentials: true,
     });
+
     console.log("logged out");
   } catch (error) {
     throw new Error(error.message);
@@ -53,9 +55,14 @@ const logout = createAsyncThunk("user/logout", async () => {
 });
 
 const fetchCurrentUser = createAsyncThunk("user/fetchCurrentUser", async () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  console.log(user);
-  return user;
+  try {
+    const response = await axios.get("http://localhost:4000/api/users/", {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 });
 
 const userSlice = createSlice({
@@ -63,6 +70,25 @@ const userSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
+    builder.addCase(fetchCurrentUser.pending, (state, action) => {
+      state.fetchCurrentUserLoading = true;
+    });
+    builder.addCase(fetchCurrentUser.fulfilled, (state, action) => {
+      state.fetchCurrentUserLoading = false;
+      state.loggedIn = true;
+      state.id = action.payload.id;
+      state.email = action.payload.email;
+      state.role = action.payload.role;
+    });
+
+    builder.addCase(fetchCurrentUser.rejected, (state, action) => {
+      state.fetchCurrentUserLoading = false;
+      state.loggedIn = false;
+      state.id = null;
+      state.email = null;
+      state.role = null;
+    });
+
     builder.addCase(login.pending, (state, action) => {
       state.loading = true;
     });

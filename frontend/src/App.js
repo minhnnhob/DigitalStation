@@ -6,11 +6,18 @@ import { Provider } from "react-redux";
 
 import Register from "./pages/Register";
 import Login from "./pages/Login";
+import { useEffect } from "react";
 
 // redux
 import store from "./store/index";
+import { fetchCurrentUser } from "./store/slices/userSlice";
 
 function App() {
+  useEffect(() => {
+    store.dispatch(fetchCurrentUser());
+    // eslint-disable-next-line
+  }, []);
+
   return (
     <div className="App">
       <Provider store={store}>
@@ -22,7 +29,6 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
             </Routes>
-          
           </div>
         </BrowserRouter>
       </Provider>
