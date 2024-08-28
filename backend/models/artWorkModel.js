@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 
-const Schema = mongoose.Schema;
-
-const artworkSchema = new Schema({
+const ArtworkSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
@@ -10,15 +8,20 @@ const artworkSchema = new Schema({
   description: {
     type: String,
   },
-  imageUrl: {
-    type: String,
-    required: true,
-  },
-  thumbnailUrl: {
-    type: String,
-  },
+  files: [
+    {
+      fileUrl: {
+        type: String,
+        required: true,
+      },
+      fileType: {
+        type: String,
+        required: true,
+      },
+    },
+  ],
   artist: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
@@ -26,31 +29,9 @@ const artworkSchema = new Schema({
     type: String,
     required: true,
   },
-  tags: [String],
-  likes: {
-    type: Number,
-    default: 0,
-  },
-  likedBy: [{ type: Schema.Types.ObjectId, ref: "User" }],
-  views: {
-    type: Number,
-    default: 0,
-  },
-  comments: [
-    {
-      userId: { type: Schema.Types.ObjectId, ref: "User" },
-      comment: String,
-      createdAt: { type: Date, default: Date.now },
-    },
-  ],
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
+  tags: {
+    type: [String],
   },
 });
 
-module.exports = mongoose.model("Artwork", artworkSchema);
+module.exports = mongoose.model("Artwork", ArtworkSchema);
