@@ -12,6 +12,7 @@ import { useEffect } from "react";
 // redux
 import store from "./store/index";
 import { fetchCurrentUser, fetchUserInfo } from "./store/slices/userSlice";
+import NotFound from "./components/notFound/NotFound";
 
 function App() {
   useEffect(() => {
@@ -30,7 +31,9 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/edit-profile" element={<Profile />} />
+              <Route path="/profile" element={<Profile />} />
+                <Route path="/profile/resume" element={<Profile />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
         </BrowserRouter>

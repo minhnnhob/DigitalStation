@@ -20,7 +20,7 @@ const ProfileMenu = ({ visible, onClose, handleLogout }) => {
           <div className="profile-links">
             <Link to="/profile">View Profile</Link>
             <span> · </span>
-            <Link to="/edit-profile">Edit Profile</Link>
+            <Link to="/profile">Edit Profile</Link>
           </div>
         </div>
       </div>

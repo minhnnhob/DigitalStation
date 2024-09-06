@@ -16,12 +16,12 @@ const ProfileSidebar = () => {
       <h2>PROFILE</h2>
       <ul>
         <li>
-          <NavLink to="/edit-profile" className={({ isActive }) => (isActive ? 'active' : '')}>
+          <NavLink to="/profile" className={({ isActive }) => (isActive ? 'active' : '')}>
             <FaUserCircle /> Profile
           </NavLink>
         </li>
         <li>
-          <NavLink to="/resume" className={({ isActive }) => (isActive ? 'active' : '')}>
+          <NavLink to="/profile/resume" className={({ isActive }) => (isActive ? 'active' : '')}>
             <FaFileAlt /> Resume
           </NavLink>
         </li>
