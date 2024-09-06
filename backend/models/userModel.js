@@ -53,7 +53,7 @@ const userSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  isVe
+
 });
 
 //Register Function
