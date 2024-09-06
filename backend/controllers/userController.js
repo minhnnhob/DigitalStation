@@ -7,19 +7,66 @@ const generateToken = (_id) => {
   });
 };
 
-getAuthUser = async (req, res) => {
-  res.status(200).json(req.user);
+const getAuthUser = async (req, res) => {
+  try {
+    // Assuming `req.user` contains the authenticated user's information.
+    const user = req.user;
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const userData = await User.findById(req.user._id);
+
+    // Structure the response to include only the necessary user details
+
+    res.status(200).json({
+      id: userData._id,
+      email: userData.email,
+      role: userData.role,
+      name: userData.name,
+    });
+
+  } catch (error) {
+    console.error("Error fetching authenticated user:", error.message);
+    res.status(500).json({ error: "Server Error" });
+  }
 };
 
 const getUserById = async (req, res) => {
   const id = req.params.id;
 
   try {
-    const user = await User.findById(id);
+    const user = await User.findById(id).select(
+      "name , email , email name profilePicture followers following feedPreferences headline city country"
+    );
 
-    res.status(200).json(user);
+    followersCount = user.followers.length;
+    followingCount = user.following.length;
+    
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    userData = {
+      id: user._id,
+      email: user.email,
+      name: user.name,
+      profilePicture: user.profilePicture,
+      followers: user.followers,
+      following: user.following,
+      feedPreferences: user.feedPreferences,
+      headline: user.headline,
+      city: user.city,
+      country: user.country,
+      followersCount,
+      followingCount,
+    }
+
+    console.log(userData);
+   
+    res.status(200).json( userData);
   } catch (error) {
-    res.status(404).json({ error: error.message });
+    res.status(500).json({ error: "Server Error" });
   }
 };
 
@@ -61,10 +108,30 @@ const logoutUser = async (req, res) => {
   res.clearCookie("token").json({ message: "Logged out" });
 };
 
+const updateUser = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const updates = req.body;
+    const user = await User.findByIdAndUpdate(id, updates, {
+      new: true,
+      runValidators: true,
+    });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    //
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(404).json({ error: error.message });
+  }
+};
+
 module.exports = {
   loginUser,
   registerUser,
   logoutUser,
   getUserById,
   getAuthUser,
+  updateUser,
 };

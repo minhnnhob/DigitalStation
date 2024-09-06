@@ -4,6 +4,8 @@ import { deleteWorkout } from "../store/slices/workoutSlice";
 import axios from "axios";
 const WorkoutDetails = ({ workout }) => {
   const dispatch = useDispatch();
+
+  
   const handleDelete = async () => {
     const id = workout._id;
     try {

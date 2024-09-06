@@ -5,6 +5,10 @@ const validator = require("validator");
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
+  name:{
+    type: String,
+    required: true
+  },
   email: {
     type: String,
     required: true,
@@ -21,9 +25,18 @@ const userSchema = new Schema({
     default: "",
   },
   
-  bio: {
+  headline: {
     type: String,
   },
+
+  city: {
+    type: String,
+  },
+  country: {
+    type: String
+  },
+
+  
   socialLinks: {
     website: String,
     twitter: String,

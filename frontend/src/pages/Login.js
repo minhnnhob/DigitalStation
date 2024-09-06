@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../store/slices/userSlice";
+import {MdAirlineSeatIndividualSuite } from "react-icons/md";
 
 const Login = () => {
   const error = useSelector((state) => state.user.error);
@@ -14,32 +15,75 @@ const Login = () => {
     e.preventDefault();
 
     const currUser = { email, password };
-    dispatch(login(currUser));
+    await dispatch(login(currUser));
     window.location.href = "/";
   };
 
   return (
-    <form className="login" onSubmit={handleSubmit}>
-      <h3>Log in</h3>
-      <label htmlFor="email">Email</label>
+    <div className="login-container">
+    <div className="login-header">
+      {/* <img
+        // eslint-disable-next-line no-octal-escape
+        src="C:\Users\Minh\Desktop\meme\395607885_328163166489231_1975222285711124102_n.jpg"
+        alt="Logo"
+        className="login-logo"
+      /> */}
+      <MdAirlineSeatIndividualSuite />  
+    </div>
+
+    <form className="login-form" onSubmit={handleSubmit}>
+      <h2 className="login-title">Sign In</h2>
+{/* 
+      <div className="social-login">
+        <button type="button" className="social-button epic-button">
+          Sign In with Epic Games
+        </button>
+        <button type="button" className="social-button google-button">
+          Sign In with Google
+        </button>
+        <button type="button" className="social-button facebook-button">
+          Sign In with Facebook
+        </button>
+      </div>
+
+      <div className="divider">
+        <span>Or</span>
+      </div> */}
+
+      <label htmlFor="email" className="login-label">Email address</label>
       <input
         type="email"
         id="email"
+        className="login-input"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
 
-      <label htmlFor="password">Password</label>
+      <label htmlFor="password" className="login-label">Password</label>
       <input
         type="password"
         id="password"
+        className="login-input"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <button>Log in</button>
+      <button className="login-button">Login</button>
       {error && <div className="error">{error}</div>}
+
+      <div className="login-footer">
+        <a href="/forgot-password" className="forgot-password">
+          Forgot password?
+        </a>
+        <p>
+          Don't have an account?{" "}
+          <a href="/sign-up" className="sign-up-link">
+            Sign Up here
+          </a>
+        </p>
+      </div>
     </form>
+  </div>
   );
 };
 

@@ -7,9 +7,22 @@ const initialState = {
   loggedIn: false,
   id: null,
   email: null,
-  role: null,
+  name: null,
+  userInfor: [],
   error: null,
 };
+
+const fetchUserInfo = createAsyncThunk("user/fetchUserInfo", async (id) => {
+  try {
+    const response = await axios.get(`http://localhost:4000/api/users/${id}`, {
+      withCredentials: true,
+    });
+   
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response.data);
+  }
+});
 
 const login = createAsyncThunk("user/login", async (user) => {
   try {
@@ -23,6 +36,20 @@ const login = createAsyncThunk("user/login", async (user) => {
     return response.data;
   } catch (error) {
     user.error = error.response.data;
+    throw new Error(error.response.data);
+  }
+});
+
+// Update user profile
+const updateUser = createAsyncThunk("user/updateUser", async (updatedUser) => {
+  try {
+    const response = await axios.patch(
+      `http://localhost:4000/api/users/${updatedUser.id}`,
+      updatedUser,
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
     throw new Error(error.response.data);
   }
 });
@@ -70,6 +97,20 @@ const userSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
+    builder.addCase(fetchUserInfo.pending, (state, action) => {
+      state.loading = true;
+    });
+
+    builder.addCase(fetchUserInfo.fulfilled, (state, action) => {
+      state.loading = false;
+      state.userInfor = action.payload;
+    });
+
+    builder.addCase(fetchUserInfo.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message;
+    });
+
     builder.addCase(fetchCurrentUser.pending, (state, action) => {
       state.fetchCurrentUserLoading = true;
     });
@@ -78,7 +119,7 @@ const userSlice = createSlice({
       state.loggedIn = true;
       state.id = action.payload.id;
       state.email = action.payload.email;
-      state.role = action.payload.role;
+      state.name = action.payload.name;
     });
 
     builder.addCase(fetchCurrentUser.rejected, (state, action) => {
@@ -86,7 +127,7 @@ const userSlice = createSlice({
       state.loggedIn = false;
       state.id = null;
       state.email = null;
-      state.role = null;
+      state.name = null;
     });
 
     builder.addCase(login.pending, (state, action) => {
@@ -134,4 +175,4 @@ const userSlice = createSlice({
 });
 
 export default userSlice.reducer;
-export { login, register, logout, fetchCurrentUser };
+export { login, register, logout, fetchCurrentUser, fetchUserInfo ,updateUser};
