@@ -1,10 +1,38 @@
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
+const VfToken = require("../models/vfTokenModel");
 
 const generateToken = (_id) => {
   return jwt.sign({ _id: _id }, process.env.JWT_SECRET, {
     expiresIn: "1h",
   });
+};
+
+const getVerifyToken = async (req, res) => {
+  const id = req.params.id;
+  console.log(id);
+  try {
+    const user = await User.findOne({ _id: id });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const token = await VfToken.findOne({
+      userId: id,
+      tokenVf: req.params.token,
+    });
+    if (!token) {
+      return res.status(404).json({ error: "Token not found" });
+    }
+
+    await User.updateOne({ _id: user._id }, { isVerified: true });
+    await token.deleteOne({ userId: user._id });
+    res.status(200).json({ message: "Email verified" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Server Error" });
+  }
 };
 
 const getAuthUser = async (req, res) => {
@@ -25,7 +53,6 @@ const getAuthUser = async (req, res) => {
       role: userData.role,
       name: userData.name,
     });
-
   } catch (error) {
     console.error("Error fetching authenticated user:", error.message);
     res.status(500).json({ error: "Server Error" });
@@ -42,7 +69,6 @@ const getUserById = async (req, res) => {
 
     followersCount = user.followers.length;
     followingCount = user.following.length;
-    
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -60,11 +86,11 @@ const getUserById = async (req, res) => {
       country: user.country,
       followersCount,
       followingCount,
-    }
+    };
 
     console.log(userData);
-   
-    res.status(200).json( userData);
+
+    res.status(200).json(userData);
   } catch (error) {
     res.status(500).json({ error: "Server Error" });
   }
@@ -96,9 +122,12 @@ const registerUser = async (req, res) => {
 
     // create jwt token
 
-    const token = generateToken(user._id);
+    // const token = generateToken(user._id);
 
-    res.status(200).json({ email, token });
+    res.status(201).json({
+      message:
+        "An email has been sent to your email address. Please verify your email address to complete registration.",
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -134,4 +163,5 @@ module.exports = {
   getUserById,
   getAuthUser,
   updateUser,
+  getVerifyToken,
 };

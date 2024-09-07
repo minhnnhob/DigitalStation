@@ -1,13 +1,16 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
+const VfToken = require("../models/vfTokenModel");
+const sendEmail = require("../utils/sendEmail");
+const crypto = require("crypto");
 
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-  name:{
+  name: {
     type: String,
-    required: true
+    // required: true,
   },
   email: {
     type: String,
@@ -20,11 +23,11 @@ const userSchema = new Schema({
     required: true,
   },
 
-  profilePicture:{
+  profilePicture: {
     type: String,
     default: "",
   },
-  
+
   headline: {
     type: String,
   },
@@ -33,10 +36,9 @@ const userSchema = new Schema({
     type: String,
   },
   country: {
-    type: String
+    type: String,
   },
 
-  
   socialLinks: {
     website: String,
     twitter: String,
@@ -53,7 +55,10 @@ const userSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 //Register Function
@@ -83,7 +88,20 @@ userSchema.statics.register = async function (email, password) {
   const salt = bcrypt.genSaltSync(10);
   const hash = bcrypt.hashSync(password, salt);
 
-  const user = this.create({ email, password: hash });
+  const user = await this.create({
+    email,
+    password: hash,
+  });
+
+  const tokenVf = await new VfToken({
+    userId: user._id,
+    tokenVf: crypto.randomBytes(32).toString("hex"),
+  }).save();
+
+  // await tokenVf.save();
+
+  const url = `http://localhost:4000/api/users/${user._id}/verify/${tokenVf.tokenVf}`;
+  await sendEmail(user.email, "Verify your email", url);
 
   return user;
 };
@@ -104,6 +122,20 @@ userSchema.statics.login = async function (email, password) {
 
   if (!match) {
     throw new Error("Inncorect password");
+  }
+
+  if (!user.isVerified) {
+    const token = await VfToken.findOne({ userId: user._id });
+
+    if (!token) {
+      const tokenVf = await new VfToken({
+        userId: user._id,
+        tokenVf: crypto.randomBytes(32).toString("hex"),
+      }).save();
+      const url = `http://localhost:4000/api/users/${user._id}/verify/${tokenVf.tokenVf}`;
+      await sendEmail(user.email, "Verify your email", url);
+    }
+    throw new Error("An Email sent your account please check");
   }
   return user;
 };

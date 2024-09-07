@@ -7,6 +7,7 @@ const {
   getUserById,
   getAuthUser,
   updateUser,
+  getVerifyToken,
 } = require("../controllers/userController");
 
 const router = express.Router();
@@ -17,7 +18,7 @@ router.post("/register", registerUser);
 
 router.get("/logout", logoutUser);
 
-
+router.get("/:id/verify/:token", getVerifyToken);
 
 router.use(requireAuth);
 
