@@ -4,7 +4,7 @@ const User = require("../models/userModel");
 const requireAuth = async (req, res, next) => {
   // Get the token from the cookies
 
-  const authorization  = req.headers.cookie;
+  const authorization = req.headers.cookie;
   console.log(authorization);
 
   if (!authorization) {

@@ -4,6 +4,7 @@ const validator = require("validator");
 const VfToken = require("../models/vfTokenModel");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
+require("dotenv").config()
 
 const Schema = mongoose.Schema;
 
@@ -100,7 +101,7 @@ userSchema.statics.register = async function (email, password) {
 
   // await tokenVf.save();
 
-  const url = `http://localhost:4000/api/users/${user._id}/verify/${tokenVf.tokenVf}`;
+  const url = `${process.env.API_ENDPOINT}/api/users/${user._id}/verify/${tokenVf.tokenVf}`;
   await sendEmail(user.email, "Verify your email", url);
 
   return user;
@@ -132,7 +133,7 @@ userSchema.statics.login = async function (email, password) {
         userId: user._id,
         tokenVf: crypto.randomBytes(32).toString("hex"),
       }).save();
-      const url = `http://localhost:4000/api/users/${user._id}/verify/${tokenVf.tokenVf}`;
+      const url = `${process.env.API_ENDPOINT}/api/users/${user._id}/verify/${tokenVf.tokenVf}`;
       await sendEmail(user.email, "Verify your email", url);
     }
     throw new Error("An Email sent your account please check");
