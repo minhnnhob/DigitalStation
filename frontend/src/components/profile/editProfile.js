@@ -41,8 +41,8 @@ const EditProfile = () => {
       setHeadline(userInfor.headline);
       setCity(userInfor.city);
       setCountry(userInfor.country);
-      // setAvatar(userInfor.avatar);
-      // setCoverImage(userInfor.coverImage);
+      setAvatar(userInfor.profilePicture);
+      setCoverImage(userInfor.coverPicture);
     }
   }, [dispatch, userInfor]);
   const [name, setName] = useState();
@@ -52,27 +52,32 @@ const EditProfile = () => {
   const [avatar, setAvatar] = useState(
     "https://cdna.artstation.com/p/users/avatars/003/335/420/medium/f33bfbdbaae4201808d02ed394bc4c6c.jpg?1629021119"
   );
-  // const [coverImage, setCoverImage] = useState("/path-to-cover.jpg");
+  const [coverImage, setCoverImage] = useState("https://res.cloudinary.com/dxlq68xw1/image/upload/v1725770041/451382335_3746255072277503_6453816386501113159_n_frdrtm.jpg");
   // if (loading) return <p>Loading...</p>;
   // if (error) return <p>Error: {error}</p>;
 
   const handleAvatarChange = (e) => {
     setAvatar(URL.createObjectURL(e.target.files[0]));
+
+    
   };
 
   const handleCoverImageChange = (e) => {
-    // setCoverImage(URL.createObjectURL(e.target.files[0]));
+    setCoverImage(URL.createObjectURL(e.target.files[0]));
   };
 
   const handleSave = (e) => {
     // Save profile changes logic here
     e.preventDefault();
+    
     const updateUserDt = {
       id: id,
       name: name,
       headline: headline,
       city: city,
       country: country,
+      profilePicture: avatar,
+      coverPicture: coverImage,
     };
     try {
       dispatch(updateUser(updateUserDt));
@@ -133,21 +138,21 @@ const EditProfile = () => {
             <div>
               <img src={avatar} alt="Avatar" className="avatarProfile" />
             </div>
-            <button className="upload-avatar-btn">
+            {/* <button className="upload-avatar-btn"> */}
               Upload New Avatar
               <input type="file" onChange={handleAvatarChange} />
-            </button>
+            {/* </button> */}
             {/* </div> */}
 
             {/* <div> */}
             <div
               className="cover-image"
-              // style={{ backgroundImage: `url(${coverImage})` }}
+              style={{ backgroundImage: `url(${coverImage})` }}
             >
-              <button className="change-cover-btn">
+              {/* <button className="change-cover-btn"> */}
                 Change cover image (1920x640)
                 <input type="file" onChange={handleCoverImageChange} />
-              </button>
+              {/* </button> */}
             </div>
 
             {/* </div> */}
