@@ -8,6 +8,7 @@ const {
   getAuthUser,
   updateUser,
   getVerifyToken,
+  upload,
 } = require("../controllers/userController");
 
 const router = express.Router();
@@ -24,7 +25,7 @@ router.use(requireAuth);
 
 router.get('/',getAuthUser);
 
-router.patch("/:id", updateUser);
+router.patch("/:id",upload, updateUser);
 router.get("/:id", getUserById);
 
 module.exports = router;

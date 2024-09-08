@@ -1,6 +1,35 @@
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const VfToken = require("../models/vfTokenModel");
+const cloudinary = require("cloudinary").v2;
+const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => {
+    let folder = "profilePicture"; // Default folder for user uploads
+
+    // Determine which folder to store the file in based on file field
+    if (file.mimetype.fieldname=== "profilePicture") {
+      folder = "profilePicture";
+    } else if (file.fieldname === "coverPicture") {
+      folder = "coverPicture";
+    }
+
+    return {
+      folder: folder,
+      public_id: file.originalname.split(".")[0], // Store with the original file name (excluding extension)
+      resource_type: "auto", // Automatically detect resource type (image, video, etc.)
+    };
+  },
+});
+
+// Set up multer with Cloudinary storage for profile and cover pictures
+const upload = multer({ storage: storage }).fields([
+  { name: "profilePicture", maxCount: 1 },
+  { name: "coverPicture", maxCount: 1 },
+]);
 
 const generateToken = (_id) => {
   return jwt.sign({ _id: _id }, process.env.JWT_SECRET, {
@@ -139,20 +168,65 @@ const logoutUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    const id = req.params.id;
-    const updates = req.body;
-    const user = await User.findByIdAndUpdate(id, updates, {
-      new: true,
-      runValidators: true,
-    });
+    const  id  = req.params.id; // Get userId from the URL parameters
+    const { name, headline, city, country } = req.body; // Extract other fields from the request body
+    let profilePicture, coverPicture; // Variables to store URLs for uploaded images
+
+    // Find the user by ID
+    const user = await User.findById(id);
+
+    // Check if the user exists
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    //
-    res.status(200).json(user);
+    // Check if the user is authorized to update this profile (you may want to add more checks here)
+    if (user._id.toString() !== req.user.id) {
+      return res.status(403).json({ error: "Unauthorized to update this profile" });
+    }
+
+    // If files are present in the request, upload them to Cloudinary
+    if (req.files) {
+      // Upload profile picture if present
+      if (req.files.profilePicture) {
+        const profilePic = req.files.profilePicture[0];
+        const profileUploadResult = await cloudinary.uploader.upload(profilePic.path, {
+          folder: "profilePictures",
+        });
+        profilePicture = profileUploadResult.secure_url;
+      }
+
+      // Upload cover picture if present
+      if (req.files.coverPicture) {
+        const coverPic = req.files.coverPicture[0];
+        const coverUploadResult = await cloudinary.uploader.upload(coverPic.path, {
+          folder: "coverPictures",
+        });
+        coverPicture = coverUploadResult.secure_url;
+      }
+    }
+
+    // Prepare updates with the new data
+    const updates = {
+      name: name || user.name,
+      headline: headline || user.headline,
+      city: city || user.city,
+      country: country || user.country,
+      profilePicture: profilePicture || user.profilePicture,
+      coverPicture: coverPicture || user.coverPicture,
+    };
+
+    // Update the user document with new information
+    const updatedUser = await User.findByIdAndUpdate(id, updates, {
+      new: true, // Return the updated document
+      runValidators: true, // Ensure validators are run for updated fields
+    });
+
+    // Return the updated user information
+    res.status(200).json(updatedUser);
   } catch (error) {
-    res.status(404).json({ error: error.message });
+    console.error("Error updating user:", error.message);
+    res.status(500).json({ error: "Server Error" });
   }
 };
 
@@ -164,4 +238,5 @@ module.exports = {
   getAuthUser,
   updateUser,
   getVerifyToken,
+  upload
 };
