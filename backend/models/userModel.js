@@ -29,6 +29,11 @@ const userSchema = new Schema({
     default: "",
   },
 
+  coverPicture: {
+    type: String,
+    default: "",
+  },
+
   headline: {
     type: String,
   },
