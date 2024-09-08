@@ -11,9 +11,9 @@ const EditProfile = () => {
       <main className="main-content">
         <Routes>
           <Route path="/" element={<ProfileForm />} />
-          <Route path="/resume" element={<ProfileForm />} />
+          {/* <Route path="/resume" element={<ProfileForm />} /> */}
         </Routes>
-        <ProfileForm />
+       
       </main>
     </div>
   );
