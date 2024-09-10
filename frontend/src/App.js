@@ -1,9 +1,16 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  createBrowserRouter,
+  createRoutesFromElements,
+  RouterProvider,
+} from "react-router-dom";
 // pages & components
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import NavBar from "./components/NavBar/NavBar";
-import { Provider, useSelector } from "react-redux";
+import { Provider } from "react-redux";
 
 import Register from "./pages/Register";
 import Login from "./pages/Login";
@@ -11,8 +18,12 @@ import { useEffect } from "react";
 
 // redux
 import store from "./store/index";
-import { fetchCurrentUser, fetchUserInfo } from "./store/slices/userSlice";
+import { fetchCurrentUser } from "./store/slices/userSlice";
 import NotFound from "./components/notFound/NotFound";
+//layouts
+import RootLayout from "./layouts/RootLayout";
+import ProfileLayout from "./layouts/ProfileLayout";
+import ProfileForm from "./components/profile/editProfile";
 
 function App() {
   useEffect(() => {
@@ -21,22 +32,33 @@ function App() {
     // eslint-disable-next-line
   }, []);
 
+  const router = createBrowserRouter(
+    createRoutesFromElements(
+      <Route path="/" element={<RootLayout />}>
+        <Route index element={<Home />} />
+        <Route path="login" element={<Login />} />
+        <Route path="register" element={<Register />} />
+        <Route path="profile" element={<ProfileLayout />}>
+          <Route index element={<ProfileForm />} />
+        </Route>
+      </Route>
+    )
+  );
+
   return (
     <div className="App">
       <Provider store={store}>
-        <BrowserRouter>
-          <NavBar />
-          <div className="pages">
-            <Routes>
+        {/* <BrowserRouter> */}
+        <RouterProvider router={router}></RouterProvider>
+        {/* <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/profile" element={<Profile />} />
-                <Route path="/profile/resume" element={<Profile />} />
+              <Route path="/profile/resume" element={<Profile />} />
               <Route path="*" element={<NotFound />} />
-            </Routes>
-          </div>
-        </BrowserRouter>
+            </Routes> */}
+        {/* </BrowserRouter> */}
       </Provider>
     </div>
   );

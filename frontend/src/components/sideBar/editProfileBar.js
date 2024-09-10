@@ -3,11 +3,14 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { FaUserCircle, FaFileAlt, FaUserFriends, FaSlidersH, FaKey, FaEnvelopeOpenText, FaShieldVirus, FaWallet } from 'react-icons/fa';
 
+import { useSelector } from 'react-redux';
 const ProfileSidebar = () => {
+  const {userInfor} = useSelector(state => state.user);
+
   return (
     <aside className="sidebar">
       <div className="profile-section">
-        <img src="https://cdna.artstation.com/p/users/avatars/003/335/420/medium/f33bfbdbaae4201808d02ed394bc4c6c.jpg?1629021119" alt="Profile Avatar" className="profile-pic" />
+        <img src={userInfor.profilePicture} alt="Profile Avatar" className="profile-pic" />
         <div className="profile-info">
           <span className="profile-name">minh nguyễn</span>
           <span className="profile-membership">Member since August 2021</span>
@@ -17,7 +20,7 @@ const ProfileSidebar = () => {
       <ul>
         <li>
           <NavLink to="/profile" className={({ isActive }) => (isActive ? 'active' : '')}>
-            <FaUserCircle /> Profile
+            <FaUserCircle /> Information
           </NavLink>
         </li>
         <li>

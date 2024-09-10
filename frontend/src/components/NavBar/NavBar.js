@@ -14,7 +14,7 @@ import ProfileMenu from "../profileMenu/ProfileMenu";
 const NavBar = () => {
   const [menuVisible, setMenuVisible] = useState(false);
   const loggedIn = useSelector((state) => state.user.loggedIn);
-  const email = useSelector((state) => state.user.email);
+  const {userInfor} = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const handleLogout = () => {
@@ -55,7 +55,7 @@ const NavBar = () => {
             {loggedIn ? (
               <>
                 <img
-                  src="https://cdna.artstation.com/p/users/avatars/003/335/420/medium/f33bfbdbaae4201808d02ed394bc4c6c.jpg?1629021119"
+                  src={userInfor.profilePicture}
                   alt="Profile"
                   className="profile-pic"
                   onClick={toggleMenu}
