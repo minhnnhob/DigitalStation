@@ -8,8 +8,7 @@ import {
 } from "react-router-dom";
 // pages & components
 import Home from "./pages/Home";
-import Profile from "./pages/Profile";
-import NavBar from "./components/NavBar/NavBar";
+
 import { Provider } from "react-redux";
 
 import Register from "./pages/Register";
@@ -19,7 +18,7 @@ import { useEffect } from "react";
 // redux
 import store from "./store/index";
 import { fetchCurrentUser } from "./store/slices/userSlice";
-import NotFound from "./components/notFound/NotFound";
+
 //layouts
 import RootLayout from "./layouts/RootLayout";
 import ProfileLayout from "./layouts/ProfileLayout";

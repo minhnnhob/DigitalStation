@@ -41,18 +41,7 @@ const login = createAsyncThunk("user/login", async (user) => {
 });
 
 // Update user profile
-const updateUser = createAsyncThunk("user/updateUser", async (updatedUser) => {
-  try {
-    const response = await axios.patch(
-      `http://localhost:4000/api/users/${updatedUser.id}`,
-      updatedUser,
-      { withCredentials: true }
-    );
-    return response.data;
-  } catch (error) {
-    throw new Error(error.response.data);
-  }
-});
+
 
 const register = createAsyncThunk("user/register", async (user) => {
   try {
@@ -95,7 +84,13 @@ const fetchCurrentUser = createAsyncThunk("user/fetchCurrentUser", async () => {
 const userSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {},
+  reducers: {
+    updateUser(state, action) {
+      state.userInfor = action.payload;
+      state.profilePicture = action.payload.profilePicture;
+      
+    }
+  },
   extraReducers: (builder) => {
     builder.addCase(fetchUserInfo.pending, (state, action) => {
       state.loading = true;
@@ -175,4 +170,5 @@ const userSlice = createSlice({
 });
 
 export default userSlice.reducer;
-export { login, register, logout, fetchCurrentUser, fetchUserInfo ,updateUser};
+export const { updateUser } = userSlice.actions;
+export { login, register, logout, fetchCurrentUser, fetchUserInfo };
