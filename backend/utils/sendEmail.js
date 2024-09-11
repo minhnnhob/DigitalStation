@@ -9,8 +9,8 @@ const sendEmail = async (email,subject,text) => {
             service: 'gmail',
             secure: true,
             auth: {
-                user: process.env.EMAIL,//"digitalstationnote@gmail.com",
-                pass: process.env.PASSWORD //"iauc mzfs wxem rwfw"
+                user: process.env.EMAIL,
+                pass: process.env.PASSWORD ,
             }
         });
         const mailOptions = {

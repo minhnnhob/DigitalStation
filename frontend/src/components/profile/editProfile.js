@@ -8,10 +8,17 @@ import {
   updateUser,
 } from "../../store/slices/userSlice";
 import axios from "axios";
-
+import toast from "react-hot-toast";
+import { Loading } from "../loading/Loading";
 const EditProfile = () => {
   const dispatch = useDispatch();
   const { id, userInfor, loading, error } = useSelector((state) => state.user);
+
+  const [loadingl, setLoadingl] = useState(loading);
+
+  useEffect(() => {
+    setLoadingl(loading);
+  }, [dispatch]);
 
   const [name, setName] = useState(userInfor.name || "");
   const [headline, setHeadline] = useState(userInfor.headline || "");
@@ -91,18 +98,19 @@ const EditProfile = () => {
       if (response.status === 200) {
         console.log("User updated successfully");
         dispatch(updateUser(response.data));
+
+        toast.success("Profile updated successfully");
       }
     } catch (error) {
-      console.log("Error updating user:", error);
+      toast.error("Profile update failed");
       // setTimeout(() => {
 
       // }, 2000);
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <Loading/>;
   if (error) return <p>Error: {error}</p>;
-
   return (
     <>
       <h1 className="profile-h-edit">Edit Profile</h1>

@@ -10,6 +10,7 @@ const initialState = {
   name: null,
   userInfor: [],
   error: null,
+  profilePicture: null,
 };
 
 const fetchUserInfo = createAsyncThunk("user/fetchUserInfo", async (id) => {
@@ -115,6 +116,7 @@ const userSlice = createSlice({
       state.id = action.payload.id;
       state.email = action.payload.email;
       state.name = action.payload.name;
+      state.profilePicture = action.payload.profilePicture;
     });
 
     builder.addCase(fetchCurrentUser.rejected, (state, action) => {

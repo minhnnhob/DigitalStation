@@ -9,9 +9,9 @@ const Home = () => {
         <div>
           <ArtworkList />
         </div>
-        <div>
+        {/* <div>
           <ArtworkForm />
-        </div>
+        </div> */}
       </div>
     </AuthorizedPages>
   );

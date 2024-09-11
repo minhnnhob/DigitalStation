@@ -30,21 +30,21 @@ const ArtworkDetails = ({ artwork }) => {
 
   return (
     <div className="artwork-card">
-    <div className="artwork-image-container">
-      <img
-        src={artwork.files[0]?.fileUrl} // Display the first file URL as a thumbnail
-        alt={artwork.title}
-        className="artwork-image"
-      />
+      <div className="artwork-image-container">
+        <img
+          src={artwork.files[0]?.fileUrl} // Display the first file URL as a thumbnail
+          alt={artwork.title}
+          className="artwork-image"
+        />
+      </div>
+      {/* <div className="artwork-info">
+        <h3 className="artwork-title">{artwork.title}</h3> 
+        <p className="artwork-artist">{artwork.artist.name}</p>
+        <button onClick={handleDelete} className="delete-button">
+          Delete
+        </button>
+      </div> */}
     </div>
-    <div className="artwork-info">
-      <h3 className="artwork-title">{artwork.title}</h3>
-      <p className="artwork-artist">{artwork.artist.name}</p>
-      <button onClick={handleDelete} className="delete-button">
-        Delete
-      </button>
-    </div>
-  </div>
   );
 };
 

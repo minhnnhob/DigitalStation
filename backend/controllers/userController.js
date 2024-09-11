@@ -81,6 +81,7 @@ const getAuthUser = async (req, res) => {
       email: userData.email,
       role: userData.role,
       name: userData.name,
+      profilePicture: userData.profilePicture,
     });
   } catch (error) {
     console.error("Error fetching authenticated user:", error.message);

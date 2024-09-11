@@ -334,15 +334,15 @@ button {
 
 .artwork-gallery {
   display: grid;
-  grid-template-columns: repeat(4, minmax(200px, 2fr));
-  gap: 16px;
-  padding: 20px;
+  grid-template-columns: repeat(5, minmax(200px, 2fr));
+  gap: 3px;
+  padding: 10px;
   background-color: #121212; /* Dark background */
 }
 
 .artwork-card {
   background-color: #1c1c1c; /* Slightly lighter background for cards */
-  border-radius: 8px;
+  border-radius: 2px;
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s, box-shadow 0.3s;
@@ -689,4 +689,43 @@ a svg {
   background: var(--background);
   margin: 20px;
   border-bottom: 1px solid #333;
+}
+
+/* loading */
+
+/* From Uiverse.io by SelfMadeSystem */ 
+.loader {
+  width: 12em;
+  height: 12em;
+}
+
+.loader path {
+  stroke: #000;
+  stroke-width: 0.6px;
+  animation: dashArray 4s ease-in-out infinite,
+    dashOffset 4s linear infinite;
+}
+
+@keyframes dashArray {
+  0% {
+    stroke-dasharray: 0 1 359 0;
+  }
+
+  50% {
+    stroke-dasharray: 0 359 1 0;
+  }
+
+  100% {
+    stroke-dasharray: 359 1 0 0;
+  }
+}
+
+@keyframes dashOffset {
+  0% {
+    stroke-dashoffset: 365;
+  }
+
+  100% {
+    stroke-dashoffset: 5;
+  }
 }

@@ -1,6 +1,4 @@
 import {
-  BrowserRouter,
-  Routes,
   Route,
   createBrowserRouter,
   createRoutesFromElements,
@@ -47,17 +45,7 @@ function App() {
   return (
     <div className="App">
       <Provider store={store}>
-        {/* <BrowserRouter> */}
         <RouterProvider router={router}></RouterProvider>
-        {/* <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/profile/resume" element={<Profile />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes> */}
-        {/* </BrowserRouter> */}
       </Provider>
     </div>
   );

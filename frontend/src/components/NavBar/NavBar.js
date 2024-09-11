@@ -11,10 +11,11 @@ import {
 import { useState } from "react";
 import ProfileMenu from "../profileMenu/ProfileMenu";
 
+
 const NavBar = () => {
   const [menuVisible, setMenuVisible] = useState(false);
   const loggedIn = useSelector((state) => state.user.loggedIn);
-  const {userInfor} = useSelector((state) => state.user);
+  const {profilePicture} = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const handleLogout = () => {
@@ -51,11 +52,11 @@ const NavBar = () => {
             <span className="notification-count">179</span>
           </div>
           <FaShoppingCart className="icon" />
-          <div className="user-profile">
+          <div className="">
             {loggedIn ? (
               <>
                 <img
-                  src={userInfor.profilePicture}
+                  src={profilePicture}
                   alt="Profile"
                   className="profile-pic"
                   onClick={toggleMenu}
