@@ -13,14 +13,16 @@ const initialState = {
 const fetchArtworks = createAsyncThunk(
   "artwork/fetchArtworks",
   async (_, { rejectWithValue }) => {
-    console.log();
+   
     try {
       const response = await axios.get("http://localhost:4000/api/artworks", {
         withCredentials: true,
       });
       // console.log(response.data);
       return response.data;
+      
     } catch (error) {
+      console.log("ERRo in SLICE")
       return rejectWithValue(error.response.data);
     }
   }

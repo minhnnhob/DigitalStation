@@ -5,7 +5,7 @@ import { Toaster } from "react-hot-toast";
 
 export default function ProfileLayout() {
   return (
-    <div className="container">
+    <div className="container flex justify-center min-w-full">
       <Sidebar />
       <main className="main-content">
         <Outlet />

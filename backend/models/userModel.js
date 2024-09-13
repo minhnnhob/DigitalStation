@@ -50,8 +50,8 @@ const userSchema = new Schema({
     twitter: String,
     instagram: String,
   },
-  followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
-  following: [{ type: Schema.Types.ObjectId, ref: "User" }],
+  // followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+  // following: [{ type: Schema.Types.ObjectId, ref: "User" }],
   feedPreferences: [String],
   createdAt: {
     type: Date,

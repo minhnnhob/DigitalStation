@@ -9,16 +9,17 @@ import {
 } from "../../store/slices/userSlice";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { Loading } from "../loading/Loading";
+import Loading from "../loading/Loading";
+import { showNotification, hideNotification } from "../../store/slices/notificationSlice";
+
+
+
+
 const EditProfile = () => {
   const dispatch = useDispatch();
-  const { id, userInfor, loading, error } = useSelector((state) => state.user);
+  const { id, userInfor } = useSelector((state) => state.user);
 
-  const [loadingl, setLoadingl] = useState(loading);
-
-  useEffect(() => {
-    setLoadingl(loading);
-  }, [dispatch]);
+  const [loadingl, setLoadingl] = useState(false);
 
   const [name, setName] = useState(userInfor.name || "");
   const [headline, setHeadline] = useState(userInfor.headline || "");
@@ -46,11 +47,7 @@ const EditProfile = () => {
     }
   }, [dispatch, id]);
 
-  // console.log(userInfor.name);
-  //
 
-  // if (loading) return <p>Loading...</p>;
-  // if (error) return <p>Error: {error}</p>;
   useEffect(() => {
     if (userInfor) {
       setName(userInfor.name || "");
@@ -61,6 +58,7 @@ const EditProfile = () => {
       setCoverImage(userInfor.coverPicture || "");
     }
   }, [dispatch, userInfor]);
+
   const handleAvatarChange = (e) => {
     setAvatar(URL.createObjectURL(e.target.files[0]));
     setProfilePicture(e.target.files[0]);
@@ -82,7 +80,7 @@ const EditProfile = () => {
     fromData.append("country", country);
     fromData.append("profilePicture", profilePicture);
     fromData.append("coverPicture", coverPicture);
-
+    setLoadingl(true);
     try {
       const response = await axios.patch(
         `http://localhost:4000/api/users/${id}`,
@@ -98,25 +96,34 @@ const EditProfile = () => {
       if (response.status === 200) {
         console.log("User updated successfully");
         dispatch(updateUser(response.data));
-
-        toast.success("Profile updated successfully");
+        dispatch(showNotification({ type: "success", message: "Profile updated successfully" }));
+        setTimeout(() => {
+          dispatch(hideNotification());
+        }, 3000);
       }
     } catch (error) {
-      toast.error("Profile update failed");
-      // setTimeout(() => {
-
-      // }, 2000);
+      dispatch(showNotification({ type: "error", message: "Profile update failed" }));
+      setTimeout(() => {
+        dispatch(hideNotification());
+      }, 3000);
     }
+    setLoadingl(false);
   };
 
-  if (loading) return <Loading/>;
-  if (error) return <p>Error: {error}</p>;
+  if (loadingl) {
+    return (
+      <div className="profile-container w-1/2">
+        <Loading />
+      </div>
+    );
+  }
+
   return (
     <>
-      <h1 className="profile-h-edit">Edit Profile</h1>
-      <div className="profile-container">
+      <h1 className="profile-h-edit ">Edit Profile</h1>
+      <div className="profile-container bg-bg-df">
         <div className="profile-content">
-          <div className="profile-info">
+          <div className="profile-info ">
             <label>
               Name
               <input

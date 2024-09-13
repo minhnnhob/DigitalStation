@@ -21,6 +21,7 @@ import { fetchCurrentUser } from "./store/slices/userSlice";
 import RootLayout from "./layouts/RootLayout";
 import ProfileLayout from "./layouts/ProfileLayout";
 import ProfileForm from "./components/profile/editProfile";
+import Notification from "./components/notification/Notification";
 
 function App() {
   useEffect(() => {
@@ -46,6 +47,7 @@ function App() {
     <div className="App">
       <Provider store={store}>
         <RouterProvider router={router}></RouterProvider>
+        <Notification />
       </Provider>
     </div>
   );

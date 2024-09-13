@@ -1,5 +1,5 @@
 import AuthorizedPages from "../components/authorization/AuthorizedPages";
-import ArtworkForm from "../components/artwork/ArtworkForm";
+
 import ArtworkList from "../components/artwork/ArtworkList";
 
 const Home = () => {

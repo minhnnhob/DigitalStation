@@ -87,12 +87,15 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     updateUser(state, action) {
+      state.loading = true;
       state.userInfor = action.payload;
       state.profilePicture = action.payload.profilePicture;
-      
+      state.loading = false;
     }
   },
   extraReducers: (builder) => {
+
+
     builder.addCase(fetchUserInfo.pending, (state, action) => {
       state.loading = true;
     });
