@@ -13,16 +13,26 @@ const initialState = {
 const fetchArtworks = createAsyncThunk(
   "artwork/fetchArtworks",
   async (_, { rejectWithValue }) => {
-   
     try {
-      const response = await axios.get("http://localhost:4000/api/artworks", {
+      const response = await axios.get("http://localhost:4000/api/artworks");
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+const fetchArtworkUser = createAsyncThunk(
+  "artwork/fetchArtworkUser",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get("http://localhost:4000/api/artworks/explore", {
         withCredentials: true,
       });
-      // console.log(response.data);
+
       return response.data;
-      
     } catch (error) {
-      console.log("ERRo in SLICE")
       return rejectWithValue(error.response.data);
     }
   }
@@ -56,9 +66,24 @@ const artworkState = createSlice({
         state.loading = false;
         state.error = action.payload;
       });
+    
+    builder
+      .addCase(fetchArtworkUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchArtworkUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.artworks = action.payload.artworks;
+      })
+      .addCase(fetchArtworkUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
 export default artworkState.reducer;
-export const { updateArtwork, deleteArtwork,createArtwork } = artworkState.actions;
-export { fetchArtworks };
+export const { updateArtwork, deleteArtwork, createArtwork } =
+  artworkState.actions;
+export { fetchArtworks,fetchArtworkUser };

@@ -22,6 +22,7 @@ import RootLayout from "./layouts/RootLayout";
 import ProfileLayout from "./layouts/ProfileLayout";
 import ProfileForm from "./components/profile/editProfile";
 import Notification from "./components/notification/Notification";
+import Explore from "./pages/Explore";
 
 function App() {
   useEffect(() => {
@@ -33,7 +34,7 @@ function App() {
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path="/" element={<RootLayout />}>
-        <Route index element={<Home />} />
+        <Route index element={<Explore />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route path="profile" element={<ProfileLayout />}>

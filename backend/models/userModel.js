@@ -50,9 +50,11 @@ const userSchema = new Schema({
     twitter: String,
     instagram: String,
   },
-  // followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
-  // following: [{ type: Schema.Types.ObjectId, ref: "User" }],
-  feedPreferences: [String],
+
+  interestedTopics: [{
+    type: Schema.Types.ObjectId,
+    ref: "Topic",
+  }],
   createdAt: {
     type: Date,
     default: Date.now,
@@ -64,6 +66,12 @@ const userSchema = new Schema({
   isVerified: {
     type: Boolean,
     default: false,
+  },
+
+  role: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user",
   },
 });
 

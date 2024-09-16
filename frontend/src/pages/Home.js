@@ -4,16 +4,16 @@ import ArtworkList from "../components/artwork/ArtworkList";
 
 const Home = () => {
   return (
-    <AuthorizedPages>
+    // <AuthorizedPages>
       <div style={{ display: "flex",width:"100%" }}>
         <div>
-          <ArtworkList />
+          {/* <ArtworkList /> */}
         </div>
         {/* <div>
           <ArtworkForm />
         </div> */}
       </div>
-    </AuthorizedPages>
+    // </AuthorizedPages>
   );
 };
 export default Home;

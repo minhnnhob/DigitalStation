@@ -1,5 +1,6 @@
 const Artwork = require("../models/artWorkModel");
 const Tag = require("../models/tagsModel");
+const UserActivity = require("../models/userActivityModel");
 const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
@@ -27,14 +28,236 @@ const storage = new CloudinaryStorage({
 // Set up multer with Cloudinary storage for multiple files
 const upload = multer({ storage: storage });
 
+const getPublicArtworkForExplore = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 20,
+      sort = "recent",
+      topicId,
+      tags,
+      search,
+      userId,
+    } = req.query;
+
+    const query = {};
+
+    // Apply topic filter if provided
+    if (topicId) query.topicId = topic;
+
+    // Apply tag filter if provided
+    if (tags) query.tags = { $in: tags.split(",") };
+
+    // Apply search filter if provided
+    if (search) query.$text = { $search: search };
+
+    let sortOption = {};
+    switch (sort) {
+      case "popular":
+        sortOption = { likesCount: -1 };
+        break;
+      case "trending":
+        sortOption = { viewsCount: -1, createdAt: -1 };
+        break;
+      case "staff-picks":
+        query.isStaffPick = true;
+        sortOption = { createdAt: -1 };
+        break;
+      case "random":
+        // Random sort handling
+        break;
+      case "recent":
+      default:
+        sortOption = { createdAt: -1 };
+    }
+
+    let artworks;
+    const totalArtworks = await Artwork.countDocuments(query);
+
+    if (sort === "random") {
+      artworks = await Artwork.aggregate([
+        { $match: query },
+        { $sample: { size: parseInt(limit) } },
+      ]);
+    } else {
+      artworks = await Artwork.find(query)
+        .sort(sortOption)
+        .skip((page - 1) * limit)
+        .limit(parseInt(limit))
+        .populate("artist", "name profilePicture")
+        .populate("topicId", "name")
+        .lean();
+    }
+
+    res.status(200).json({
+      artworks,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(totalArtworks / limit),
+      totalArtworks,
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: "Server Error" });
+  }
+};
+
+const getUserRecommentExplore = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 20,
+      sort = "recent",
+      topic,
+      tags,
+      search,
+      userId,
+    } = req.query;
+
+    const query = {};
+
+    // Apply topic filter if provided
+    // if (topic) {
+    //   query.topicId = topic;
+    // }
+    if (userId) {
+      query.userId = userId;
+    }
+    // Apply tag filter if provided
+    if (tags) {
+      query.tags = { $in: tags.split(",") };
+    }
+
+    // Apply search filter if provided
+    if (search) {
+      query.$text = { $search: search };
+    }
+
+    // Determine sort order
+    let sortOption = {};
+    switch (sort) {
+      case "popular":
+        sortOption = { likesCount: -1 };
+        break;
+      case "trending":
+        sortOption = { viewsCount: -1, createdAt: -1 };
+        break;
+      case "staff-picks":
+        query.isStaffPick = true;
+        sortOption = { createdAt: -1 };
+        break;
+      case "random":
+        // Handle random sort differently
+        break;
+      case "recent":
+      default:
+        sortOption = { createdAt: -1 };
+    }
+
+    let artworks;
+    const totalArtworks = await Artwork.countDocuments(query);
+
+    if (sort === "random") {
+      artworks = await Artwork.aggregate([
+        { $match: query },
+        { $sample: { size: parseInt(limit) } },
+      ]);
+    } else {
+      artworks = await Artwork.find(query)
+        .sort(sortOption)
+        .skip((page - 1) * limit)
+        .limit(parseInt(limit))
+        .populate("artist", "name profilePicture")
+        .populate("topicId", "name")
+        .lean();
+    }
+
+    // Enhance artwork data
+    artworks = await Promise.all(
+      artworks.map(async (artwork) => {
+        const enhancedArtwork = {
+          ...artwork,
+          filePreview: artwork.files[0]?.fileUrl,
+          fileCount: artwork.files.length,
+          topicName: artwork.topicId?.name,
+        };
+
+        // Check if the logged-in user has liked this artwork
+        const userLike = await UserActivity.findOne({
+          userId,
+          artworkId: artwork._id,
+          activityType: "like",
+        });
+        enhancedArtwork.isLiked = !!userLike;
+
+        // Check if the logged-in user follows the artist
+        const userFollow = await UserActivity.findOne({
+          userId,
+          followedUserId: artwork.artist._id,
+          activityType: "follow",
+        });
+        enhancedArtwork.isArtistFollowed = !!userFollow;
+
+        return enhancedArtwork;
+      })
+    );
+
+    // Get personalized recommendations for logged-in users
+    let recommendations = [];
+
+    const userInterests = await UserActivity.aggregate([
+      { $match: { userId: userId } },
+      { $group: { _id: "$artworkId", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 10 },
+    ]);
+
+    const interestIds = userInterests.map((interest) => interest._id);
+
+    recommendations = await Artwork.find({
+      _id: { $nin: interestIds },
+      $or: [
+        {
+          topicId: {
+            $in: await Artwork.distinct("topicId", {
+              _id: { $in: interestIds },
+            }),
+          },
+        },
+        {
+          tags: {
+            $in: await Artwork.distinct("tags", {
+              _id: { $in: interestIds },
+            }),
+          },
+        },
+      ],
+    })
+      .limit(5)
+      .populate("artist", "name profilePicture")
+      .lean();
+
+    res.status(200).json({
+      artworks,
+      recommendations,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(totalArtworks / limit),
+      totalArtworks,
+     
+    });
+  } catch (error) {
+    console.error("Error in getArtworksForExplore:", error);
+    res.status(500).json({ error: "Server Error" });
+  }
+};
+
 const getArtworks = async (req, res) => {
   try {
-    const { domain, artistId, page = 1, limit = 10 } = req.query;
+    const { topicId, artistId, page = 1, limit = 10 } = req.query;
 
     // Create a query object based on the optional filters
     const query = {};
-    if (domain) {
-      query.domain = domain;
+    if (topicId) {
+      query.topicId = topicId;
     }
     if (artistId) {
       query.artist = artistId;
@@ -69,10 +292,12 @@ const getArtworks = async (req, res) => {
 // Optimized addArtwork function
 const addArtwork = async (req, res) => {
   try {
-    const { title, description, artistId, domain, tags } = req.body;
+    // const { title, description, artistId, topicId, tags } = req.body;
+    const { title, description, artistId, tags } = req.body;
 
     // Ensure the required fields are provided
-    if (!title || !req.files || !artistId || !domain) {
+    if (!title || !req.files || !artistId) {
+      //(!title || !req.files || !artistId || !topicId)
       return res
         .status(400)
         .json({ error: "Title, files, artist, and domain are required." });
@@ -97,7 +322,7 @@ const addArtwork = async (req, res) => {
       description,
       files: fileUploads,
       artist: artistId,
-      domain,
+      // topicId:topicId,
       tags: tagsArray,
     });
 
@@ -221,4 +446,6 @@ module.exports = {
   getArtworkById,
   getArtworks,
   upload,
+  getPublicArtworkForExplore,
+  getUserRecommentExplore,
 };

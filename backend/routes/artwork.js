@@ -6,12 +6,16 @@ const {
   deleteArtwork,
   getArtworks,
   getArtworkById,
+  getPublicArtworkForExplore,
+  getUserRecommentExplore
 } = require("../controllers/artWorkController");
 const { upload } = require("../controllers/artWorkController");
 
 // Route to add new artwork with multiple file uploads
 // Route to get all artwork
-router.get("/", getArtworks);
+router.get("/", getPublicArtworkForExplore);
+
+router.get("/explore",getUserRecommentExplore ); 
 
 // Route to get artwork by ID
 router.get("/:artworkId", getArtworkById);

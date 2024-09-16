@@ -8,7 +8,7 @@ import axios from "axios";
 const ArtworkForm = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [domain, setDomain] = useState("");
+  const [topicId, setTopicId] = useState("");
   const [tags, setTags] = useState("");
   const [files, setFiles] = useState([]);
   const [error, setError] = useState(null);
@@ -29,7 +29,7 @@ const ArtworkForm = () => {
     formData.append("title", title);
     formData.append("description", description);
     formData.append("artistId", id);
-    formData.append("domain", domain);
+    // formData.append("topicId", topicId);
     formData.append("tags", tags);
     Array.from(files).forEach((file) => formData.append("files", file));
 
@@ -91,12 +91,12 @@ const ArtworkForm = () => {
         value={artistId}
       /> */}
 
-      <label>Domain</label>
+      {/* <label>Topic</label>
       <input
         type="text"
-        onChange={(e) => setDomain(e.target.value)}
-        value={domain}
-      />
+        onChange={(e) => setTopicId(e.target.value)}
+        value={topicId}
+      /> */}
 
       <label>Tags</label>
       <input
