@@ -7,6 +7,8 @@ const artworkRouter = require("./routes/artwork");
 const topicRouter = require("./routes/topic");
 const tagRouter = require("./routes/tags");
 const followerRouter = require("./routes/followers");
+const likeRouter = require("./routes/like");
+const commentRouter = require("./routes/comment");
 
 const cros = require("cors");
 const db = require("./config/db");
@@ -40,6 +42,8 @@ app.use("/api/artworks", artworkRouter);
 app.use("/api/topics", topicRouter);
 app.use("/api/tags", tagRouter);
 app.use("/api/follow", followerRouter);
+app.use("/api/like", likeRouter);
+app.use("/api/comments", commentRouter);
 
 
 //connect to mongodb
