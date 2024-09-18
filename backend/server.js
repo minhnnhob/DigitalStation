@@ -9,6 +9,7 @@ const tagRouter = require("./routes/tags");
 const followerRouter = require("./routes/followers");
 const likeRouter = require("./routes/like");
 const commentRouter = require("./routes/comment");
+const artnotiRouter = require("./routes/artnoti");
 
 const cros = require("cors");
 const db = require("./config/db");
@@ -44,6 +45,7 @@ app.use("/api/tags", tagRouter);
 app.use("/api/follow", followerRouter);
 app.use("/api/like", likeRouter);
 app.use("/api/comments", commentRouter);
+app.use("/api/notification", artnotiRouter);
 
 
 //connect to mongodb
