@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+const Schema = mongoose.Schema;
+
 const topicSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -10,6 +12,10 @@ const topicSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
+  },
+  imageUrl: {
+    type: String,
+    // required: true,  // Add image field for each topic
   },
   tags: [
     {
@@ -23,4 +29,4 @@ const topicSchema = new mongoose.Schema({
   },
 });
 
-const Topic = mongoose.model("Topic", topicSchema);
+module.exports = mongoose.model("Topic", topicSchema);

@@ -115,24 +115,21 @@ const getUserRecommentExplore = async (req, res) => {
 
     const query = {};
 
-    // Apply topic filter if provided
-    // if (topic) {
-    //   query.topicId = topic;
-    // }
+    
     if (userId) {
       query.userId = userId;
     }
-    // Apply tag filter if provided
+    
     if (tags) {
       query.tags = { $in: tags.split(",") };
     }
 
-    // Apply search filter if provided
+ 
     if (search) {
       query.$text = { $search: search };
     }
 
-    // Determine sort order
+   
     let sortOption = {};
     switch (sort) {
       case "popular":
@@ -232,7 +229,7 @@ const getUserRecommentExplore = async (req, res) => {
         },
       ],
     })
-      .limit(5)
+      .limit(10)
       .populate("artist", "name profilePicture")
       .lean();
 
@@ -244,6 +241,7 @@ const getUserRecommentExplore = async (req, res) => {
       totalArtworks,
      
     });
+    
   } catch (error) {
     console.error("Error in getArtworksForExplore:", error);
     res.status(500).json({ error: "Server Error" });
