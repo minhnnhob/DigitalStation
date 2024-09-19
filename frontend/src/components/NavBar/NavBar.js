@@ -23,7 +23,7 @@ const NavBar = () => {
     setMenuVisible(!menuVisible);
   };
   return (
-    <header className=" bg-bg-df py-2.5 px-2 min-w-sm ">
+    <header className=" bg-bg-df py-2.5 px-2 min-w-sm sticky top-0 z-30 ">
       <div className="flex justify-between  items-center  mx-auto px-5  w-full ">
 
         <div className="flex text-gray-color ml-5 text-3xl font-black items-start min-w-max">

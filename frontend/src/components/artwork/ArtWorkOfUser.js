@@ -16,11 +16,10 @@ const ArtworkOfUser = ({ artworksUser }) => {
       setArtworks(artworksUser.artworks);
     }
   }, [artworksUser]);
- 
 
   if (artworks.length === 0) {
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-[#121212] text-white">
+      <div className="flex flex-col items-center justify-center h-screen bg-[#121212] text-white">
         <div className="flex flex-col items-center">
           {/* Image placeholder (you can replace this with an actual image) */}
           <div className="w-40 h-40 bg-gray-700 rounded-lg flex items-center justify-center">
@@ -37,28 +36,26 @@ const ArtworkOfUser = ({ artworksUser }) => {
               />
             </svg>
           </div>
-  
+
           {/* Text Section */}
           <h1 className="mt-8 text-3xl font-semibold">Upload your artwork</h1>
           <p className="mt-4 text-center text-gray-400 max-w-md">
             Fill your portfolio with projects you are proud of. Get feedback on
             your work and build your industry network.
           </p>
-  
+
           {/* Button */}
           <button className="mt-8 px-6 py-2 bg-white text-black rounded-md shadow-lg hover:bg-gray-300">
             Upload a project
           </button>
         </div>
-      </div>);
+      </div>
+    );
   }
 
   if (loading) return <Loading />;
 
   if (error) return <p>Error: {error}</p>;
-  console.log(artworks);
-
-  
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-0.5 p-2 bg-[#121212]">

@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const Follower = require("../models/followersModel");
 const jwt = require("jsonwebtoken");
 const VfToken = require("../models/vfTokenModel");
 const cloudinary = require("cloudinary").v2;
@@ -97,6 +98,9 @@ const getUserById = async (req, res) => {
       " email name profilePicture coverPicture interestedTopics headline city country socialLinks"
     );
 
+    const followers = await Follower.countDocuments({ followingId: id });
+    const following = await Follower.countDocuments({ followerId: id });
+
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -111,6 +115,9 @@ const getUserById = async (req, res) => {
       city: user.city,
       country: user.country,
       socialLinks: user.socialLinks,
+
+      followersCount: followers,
+      followingCount: following,
       
     };
 

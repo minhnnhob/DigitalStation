@@ -309,7 +309,7 @@ button {
 }
 
 button {
-  background-color: var(--primary);
+  /* background-color: var(--primary); */
   color: white;
   border: none;
   padding: 5px 10px;
@@ -319,7 +319,7 @@ button {
 }
 
 button:hover {
-  background-color: #ff2e2e;
+  /* background-color: #ff2e2e; */
 }
 /* Profile Menu */
 .profile-menu-overlay {
@@ -332,7 +332,7 @@ button:hover {
   display: flex;
   justify-content: flex-end;
   align-items: flex-start;
-  z-index: 1000;
+  z-index: 3000;
 }
 
 .profile-menu {
