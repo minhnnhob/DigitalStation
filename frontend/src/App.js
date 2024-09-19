@@ -5,7 +5,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 // pages & components
-import Home from "./pages/Home";
+
 
 import { Provider } from "react-redux";
 
@@ -23,6 +23,7 @@ import ProfileLayout from "./layouts/ProfileLayout";
 import ProfileForm from "./components/profile/editProfile";
 import Notification from "./components/notification/Notification";
 import Explore from "./pages/Explore";
+import PortfolioPage from "./pages/Portfolio";
 
 function App() {
   useEffect(() => {
@@ -37,7 +38,8 @@ function App() {
         <Route index element={<Explore />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
-        <Route path="profile" element={<ProfileLayout />}>
+        <Route path= "portfolio" element={<PortfolioPage/>}/>
+        <Route path="edit-profile" element={<ProfileLayout />}>
           <Route index element={<ProfileForm />} />
         </Route>
       </Route>

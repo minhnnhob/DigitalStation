@@ -41,7 +41,7 @@ const ArtworkList = () => {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <div className="grid grid-cols-[repeat(5,_minmax(200px,_2fr))] gap-0.5 p-2 bg-[#121212]">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-0.5 p-2 bg-[#121212]">
       {artworks.map((artwork) => (
         <ArtworkCart key={artwork._id} artwork={artwork} />
       ))}

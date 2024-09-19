@@ -115,21 +115,18 @@ const getUserRecommentExplore = async (req, res) => {
 
     const query = {};
 
-    
     if (userId) {
       query.userId = userId;
     }
-    
+
     if (tags) {
       query.tags = { $in: tags.split(",") };
     }
 
- 
     if (search) {
       query.$text = { $search: search };
     }
 
-   
     let sortOption = {};
     switch (sort) {
       case "popular":
@@ -239,44 +236,34 @@ const getUserRecommentExplore = async (req, res) => {
       currentPage: parseInt(page),
       totalPages: Math.ceil(totalArtworks / limit),
       totalArtworks,
-     
     });
-    
   } catch (error) {
     console.error("Error in getArtworksForExplore:", error);
     res.status(500).json({ error: "Server Error" });
   }
 };
-
+//getArtworks of own user
 const getArtworks = async (req, res) => {
   try {
-    const { topicId, artistId, page = 1, limit = 10 } = req.query;
+    const userId = req.params.userId;
+    const { page = 1, limit = 10 } = req.query;
 
-    // Create a query object based on the optional filters
-    const query = {};
-    if (topicId) {
-      query.topicId = topicId;
-    }
-    if (artistId) {
-      query.artist = artistId;
-    }
-
-    // Calculate pagination parameters
     const skip = (page - 1) * limit;
 
     // Fetch artworks with pagination, filtering, and sorting
-    const artworks = await Artwork.find(query)
+    const artworks = await Artwork.find({ artist: userId })
       .populate("artist", "name") // Populate artist's name
       .limit(Number(limit))
       .skip(Number(skip))
       .sort({ createdAt: -1 });
 
-    // Count the total number of artworks matching the query
-    const totalArtworks = await Artwork.countDocuments(query);
+    // Count the total number of artworks matching the hehe
+    const totalArtworks = await Artwork.countDocuments({ artist: userId });
 
     // Return the artworks along with pagination info
     res.status(200).json({
       artworks,
+      totalArtworks,
       totalPages: Math.ceil(totalArtworks / limit),
       currentPage: Number(page),
     });

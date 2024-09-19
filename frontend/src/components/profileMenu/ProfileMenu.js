@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 const ProfileMenu = ({ visible, onClose, handleLogout }) => {
 
     const name = useSelector((state) => state.user.name);
+    const { profilePicture } = useSelector((state) => state.user);
    
 
   if (!visible) return null;
@@ -14,13 +15,13 @@ const ProfileMenu = ({ visible, onClose, handleLogout }) => {
     <div className="profile-menu-overlay" onClick={onClose}>
     <div className="profile-menu" onClick={(e) => e.stopPropagation()}>
       <div className="profile-header">
-        <img src="https://cdna.artstation.com/p/users/avatars/003/335/420/medium/f33bfbdbaae4201808d02ed394bc4c6c.jpg?1629021119" alt="Profile" className="profile-pic" />
+        <img src={profilePicture} alt="Profile" className="profile-pic" />
         <div className="profile-info">
           <div className="profile-name">{name}</div>
-          <div className="profile-links">
-            <Link to="/profile">View Profile</Link>
+          <div className="profile-links min-w-max">
+            <Link to="/portfolio">View Profile</Link>
             <span> · </span>
-            <Link to="/profile">Edit Profile</Link>
+            <Link to="/edit-profile">Edit Profile</Link>
           </div>
         </div>
       </div>

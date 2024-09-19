@@ -6,27 +6,27 @@ import { deleteArtwork } from "../../store/slices/artWorkSlice";
 const ArtCard = ({artwork}) => {
 
     
-        const dispatch = useDispatch();
+        // const dispatch = useDispatch();
       
-        const handleDelete = async () => {
-          const artistId = artwork.artist._id; // Assuming artist ID is within the artwork object
-          const artworkId = artwork._id; // Get artwork ID directly from the artwork object
+        // const handleDelete = async () => {
+        //   const artistId = artwork.artist._id; // Assuming artist ID is within the artwork object
+        //   const artworkId = artwork._id; // Get artwork ID directly from the artwork object
       
-          try {
-            const response = await axios.delete(
-              `http://localhost:4000/api/artworks/${artistId}/${artworkId}`,
-              {
-                withCredentials: true,
-              }
-            );
+        //   try {
+        //     const response = await axios.delete(
+        //       `http://localhost:4000/api/artworks/${artistId}/${artworkId}`,
+        //       {
+        //         withCredentials: true,
+        //       }
+        //     );
       
-            if (response.status === 200) {
-              dispatch(deleteArtwork(artworkId)); // Dispatch with the artwork ID
-            }
-          } catch (error) {
-            console.log("Error deleting artwork:", error);
-          }
-        };
+        //     if (response.status === 200) {
+        //       dispatch(deleteArtwork(artworkId)); // Dispatch with the artwork ID
+        //     }
+        //   } catch (error) {
+        //     console.log("Error deleting artwork:", error);
+        //   }
+        // };
       
         return (
           <div className="bg-[#1c1c1c] rounded-sm overflow-hidden shadow-lg transition-transform transform hover:translate-y-[-5px] hover:shadow-xl">

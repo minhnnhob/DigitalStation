@@ -11,7 +11,7 @@ const storage = new CloudinaryStorage({
     let folder = "profilePicture"; // Default folder for user uploads
 
     // Determine which folder to store the file in based on file field
-    if (file.mimetype.fieldname=== "profilePicture") {
+    if (file.mimetype.fieldname === "profilePicture") {
       folder = "profilePicture";
     } else if (file.fieldname === "coverPicture") {
       folder = "coverPicture";
@@ -94,11 +94,8 @@ const getUserById = async (req, res) => {
 
   try {
     const user = await User.findById(id).select(
-      "name , email , email name profilePicture followers following feedPreferences headline city country"
+      " email name profilePicture coverPicture interestedTopics headline city country socialLinks"
     );
-
-    followersCount = user.followers.length;
-    followingCount = user.following.length;
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -108,20 +105,20 @@ const getUserById = async (req, res) => {
       email: user.email,
       name: user.name,
       profilePicture: user.profilePicture,
-      followers: user.followers,
-      following: user.following,
-      feedPreferences: user.feedPreferences,
+      coverPicture: user.coverPicture,
+      interestedTopics: user.interestedTopics,
       headline: user.headline,
       city: user.city,
       country: user.country,
-      followersCount,
-      followingCount,
+      socialLinks: user.socialLinks,
+      
     };
 
     console.log(userData);
 
     res.status(200).json(userData);
   } catch (error) {
+    console.error("Error fetching user by ID:", error.message);
     res.status(500).json({ error: "Server Error" });
   }
 };
@@ -169,7 +166,7 @@ const logoutUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    const  id  = req.params.id; // Get userId from the URL parameters
+    const id = req.params.id; // Get userId from the URL parameters
     const { name, headline, city, country } = req.body; // Extract other fields from the request body
     let profilePicture, coverPicture; // Variables to store URLs for uploaded images
 
@@ -183,7 +180,9 @@ const updateUser = async (req, res) => {
 
     // Check if the user is authorized to update this profile (you may want to add more checks here)
     if (user._id.toString() !== req.user.id) {
-      return res.status(403).json({ error: "Unauthorized to update this profile" });
+      return res
+        .status(403)
+        .json({ error: "Unauthorized to update this profile" });
     }
 
     // If files are present in the request, upload them to Cloudinary
@@ -191,18 +190,24 @@ const updateUser = async (req, res) => {
       // Upload profile picture if present
       if (req.files.profilePicture) {
         const profilePic = req.files.profilePicture[0];
-        const profileUploadResult = await cloudinary.uploader.upload(profilePic.path, {
-          folder: "profilePictures",
-        });
+        const profileUploadResult = await cloudinary.uploader.upload(
+          profilePic.path,
+          {
+            folder: "profilePictures",
+          }
+        );
         profilePicture = profileUploadResult.secure_url;
       }
 
       // Upload cover picture if present
       if (req.files.coverPicture) {
         const coverPic = req.files.coverPicture[0];
-        const coverUploadResult = await cloudinary.uploader.upload(coverPic.path, {
-          folder: "coverPictures",
-        });
+        const coverUploadResult = await cloudinary.uploader.upload(
+          coverPic.path,
+          {
+            folder: "coverPictures",
+          }
+        );
         coverPicture = coverUploadResult.secure_url;
       }
     }
@@ -239,5 +244,5 @@ module.exports = {
   getAuthUser,
   updateUser,
   getVerifyToken,
-  upload
+  upload,
 };

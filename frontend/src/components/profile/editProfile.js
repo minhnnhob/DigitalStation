@@ -8,12 +8,12 @@ import {
   updateUser,
 } from "../../store/slices/userSlice";
 import axios from "axios";
-import toast from "react-hot-toast";
+
 import Loading from "../loading/Loading";
-import { showNotification, hideNotification } from "../../store/slices/notificationSlice";
-
-
-
+import {
+  showNotification,
+  hideNotification,
+} from "../../store/slices/notificationSlice";
 
 const EditProfile = () => {
   const dispatch = useDispatch();
@@ -46,7 +46,6 @@ const EditProfile = () => {
       dispatch(fetchUserInfo(id));
     }
   }, [dispatch, id]);
-
 
   useEffect(() => {
     if (userInfor) {
@@ -96,13 +95,20 @@ const EditProfile = () => {
       if (response.status === 200) {
         console.log("User updated successfully");
         dispatch(updateUser(response.data));
-        dispatch(showNotification({ type: "success", message: "Profile updated successfully" }));
+        dispatch(
+          showNotification({
+            type: "success",
+            message: "Profile updated successfully",
+          })
+        );
         setTimeout(() => {
           dispatch(hideNotification());
         }, 3000);
       }
     } catch (error) {
-      dispatch(showNotification({ type: "error", message: "Profile update failed" }));
+      dispatch(
+        showNotification({ type: "error", message: "Profile update failed" })
+      );
       setTimeout(() => {
         dispatch(hideNotification());
       }, 3000);

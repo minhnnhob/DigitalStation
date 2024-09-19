@@ -17,6 +17,8 @@ router.get("/", getPublicArtworkForExplore);
 
 router.get("/explore",getUserRecommentExplore ); 
 
+router.get("/:userId", getArtworks);
+
 // Route to get artwork by ID
 router.get("/:artworkId", getArtworkById);
 

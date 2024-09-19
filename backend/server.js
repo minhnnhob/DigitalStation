@@ -3,7 +3,7 @@ const express = require("express");
 // const mongoose = require("mongoose");
 const workoutsRouter = require("./routes/workouts");
 const userRouter = require("./routes/user");
-const artworkRouter = require("./routes/artwork");  
+const artworkRouter = require("./routes/artwork");
 const topicRouter = require("./routes/topic");
 const tagRouter = require("./routes/tags");
 const followerRouter = require("./routes/followers");
@@ -46,7 +46,6 @@ app.use("/api/follow", followerRouter);
 app.use("/api/like", likeRouter);
 app.use("/api/comments", commentRouter);
 app.use("/api/notification", artnotiRouter);
-
 
 //connect to mongodb
 app.listen(process.env.PORT, () => {

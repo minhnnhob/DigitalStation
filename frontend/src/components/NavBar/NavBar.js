@@ -35,7 +35,7 @@ const NavBar = () => {
       <div className=" justify-between ">
       <nav className=" flex   pl-5 pr-6  ">
           <Link
-            to="/explore"
+            to="/"
             className="no-underline  text-gray-color hover:text-gray-light"
           >
             Explore
