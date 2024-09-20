@@ -31,7 +31,11 @@ const ArtworkForm = () => {
     formData.append("artistId", id);
     // formData.append("topicId", topicId);
     formData.append("tags", tags);
-    Array.from(files).forEach((file) => formData.append("files", file));
+    // Array.from(files).forEach((file) => formData.append("files", file));
+    files.forEach((file, index) => {
+      formData.append(`files `, file);
+      formData.append(`fileDescriptions[${index}]`, "Description for this file");  
+    })  
 
     try {
       const response = await axios.post(

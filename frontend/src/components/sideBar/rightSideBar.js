@@ -15,7 +15,7 @@ const RightSidebar = ({ userInfor, isCollapsed, toggleCollapse }) => {
   return (
     <div
       className={` fixed  right-4 h-full l transition-all duration-150 ease-in-out bg-bg-pf text-white p-4  rounded-lg ${
-        isCollapsed ? "w-[7%]" : "w-[26%]"
+        isCollapsed ? "w-[6%]" : "w-[26%]"
       }`}
     >
       {/* Back Button */}

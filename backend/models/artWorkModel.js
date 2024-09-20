@@ -20,6 +20,9 @@ const ArtworkSchema = new Schema({
         type: String,
         required: true,
       },
+      description: {
+        type: String,
+      },
     },
   ],
   artist: {

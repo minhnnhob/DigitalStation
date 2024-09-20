@@ -278,7 +278,7 @@ const getArtworks = async (req, res) => {
 const addArtwork = async (req, res) => {
   try {
     // const { title, description, artistId, topicId, tags } = req.body;
-    const { title, description, artistId, tags } = req.body;
+    const { title, description, artistId, tags ,fileDescriptions  } = req.body;
 
     // Ensure the required fields are provided
     if (!title || !req.files || !artistId) {
@@ -289,9 +289,10 @@ const addArtwork = async (req, res) => {
     }
 
     // Prepare file upload information in a non-blocking manner
-    const fileUploads = req.files.map((file) => ({
+    const fileUploads = req.files.map((file,index) => ({
       fileUrl: file.path,
       fileType: file.mimetype,
+      description: fileDescriptions && fileDescriptions[index] ? fileDescriptions[index] : "No description provided",
     }));
 
     // Convert tags to an array if it is not already one
