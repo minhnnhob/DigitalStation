@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const Topic = require("../models/topicModel");
 const Follower = require("../models/followersModel");
 const jwt = require("jsonwebtoken");
 const VfToken = require("../models/vfTokenModel");
@@ -96,7 +97,7 @@ const getUserById = async (req, res) => {
   try {
     const user = await User.findById(id).select(
       " email name profilePicture coverPicture interestedTopics headline city country socialLinks"
-    );
+    ).populate("interestedTopics", "name");
 
     const followers = await Follower.countDocuments({ followingId: id });
     const following = await Follower.countDocuments({ followerId: id });
@@ -110,15 +111,14 @@ const getUserById = async (req, res) => {
       name: user.name,
       profilePicture: user.profilePicture,
       coverPicture: user.coverPicture,
-      interestedTopics: user.interestedTopics,
+      
       headline: user.headline,
       city: user.city,
       country: user.country,
       socialLinks: user.socialLinks,
-
+      interestedTopics: user.interestedTopics,
       followersCount: followers,
       followingCount: following,
-      
     };
 
     console.log(userData);
@@ -174,16 +174,24 @@ const logoutUser = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const id = req.params.id; // Get userId from the URL parameters
-    const { name, headline, city, country } = req.body; // Extract other fields from the request body
+    const { name, headline, city, country, interestedTopics } = req.body; // Extract other fields from the request body
     let profilePicture, coverPicture; // Variables to store URLs for uploaded images
 
-    // Find the user by ID
     const user = await User.findById(id);
-
-    // Check if the user exists
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
+
+    // Handle interestedTopics if provided
+    let interested = [];
+    if (Array.isArray(interestedTopics) && interestedTopics.length > 0) {
+      interested = await Topic.find({ name: { $in: interestedTopics } });
+      if (interested.length === 0) {
+        return res.status(400).json({ error: "No valid topics found" });
+      }
+    }
+
+    console.log(interested);
 
     // Check if the user is authorized to update this profile (you may want to add more checks here)
     if (user._id.toString() !== req.user.id) {
@@ -227,6 +235,8 @@ const updateUser = async (req, res) => {
       country: country || user.country,
       profilePicture: profilePicture || user.profilePicture,
       coverPicture: coverPicture || user.coverPicture,
+      interestedTopics:
+        interested.length > 0 ? interested : user.interestedTopics, // Update only if valid topics provided
     };
 
     // Update the user document with new information

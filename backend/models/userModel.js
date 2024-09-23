@@ -4,15 +4,12 @@ const validator = require("validator");
 const VfToken = require("../models/vfTokenModel");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
-require("dotenv").config()
+require("dotenv").config();
 
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-  name: {
-    type: String,
-    // required: true,
-  },
+  // Account Information
   email: {
     type: String,
     required: true,
@@ -24,6 +21,26 @@ const userSchema = new Schema({
     required: true,
   },
 
+  userType: {
+    type: String,
+    enum: ["basic", "artist", "studio", "admin"],
+    default: "basic",
+  },
+
+  status: {
+    type: String,
+    enum: ["active", "inactive", "suspended"],
+    default: "active",
+  },
+
+  isBanned: { type: Boolean, default: false },
+
+  // personal information
+  name: {
+    type: String,
+    // required: true,
+  },
+
   profilePicture: {
     type: String,
     default: "",
@@ -32,10 +49,6 @@ const userSchema = new Schema({
   coverPicture: {
     type: String,
     default: "",
-  },
-
-  headline: {
-    type: String,
   },
 
   city: {
@@ -51,10 +64,29 @@ const userSchema = new Schema({
     instagram: String,
   },
 
-  interestedTopics: [{
-    type: Schema.Types.ObjectId,
-    ref: "Topic",
-  }],
+  // Artist Information
+  headline: {
+    type: String,
+  },
+
+  resume: String, // Cloudinary URL for the resume // URL to uploaded CV
+
+  // Studio Information
+  companyName: String,
+  companyWebsite: String,
+  studioApplicationStatus: {
+    type: String,
+    enum: ["none", "pending", "approved", "rejected"],
+    default: "none",
+  },
+
+  interestedTopics: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Topic",
+    },
+  ],
+
   createdAt: {
     type: Date,
     default: Date.now,
@@ -63,15 +95,10 @@ const userSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+
   isVerified: {
     type: Boolean,
     default: false,
-  },
-
-  role: {
-    type: String,
-    enum: ["user", "admin"],
-    default: "user",
   },
 });
 

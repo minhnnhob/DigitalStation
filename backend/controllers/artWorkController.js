@@ -1,4 +1,6 @@
 const Artwork = require("../models/artWorkModel");
+const Topic = require("../models/topicModel");
+const User = require("../models/userModel");
 const Tag = require("../models/tagsModel");
 const UserActivity = require("../models/userActivityModel");
 const cloudinary = require("cloudinary").v2;
@@ -34,16 +36,15 @@ const getPublicArtworkForExplore = async (req, res) => {
       page = 1,
       limit = 20,
       sort = "recent",
-      topicId,
+      topic,
       tags,
       search,
-      userId,
     } = req.query;
 
     const query = {};
 
     // Apply topic filter if provided
-    if (topicId) query.topicId = topic;
+    if (topic) query.topic = { $in: topic.split(",") };
 
     // Apply tag filter if provided
     if (tags) query.tags = { $in: tags.split(",") };
@@ -85,7 +86,7 @@ const getPublicArtworkForExplore = async (req, res) => {
         .skip((page - 1) * limit)
         .limit(parseInt(limit))
         .populate("artist", "name profilePicture")
-        .populate("topicId", "name")
+        .populate("topic", "name")
         .lean();
     }
 
@@ -107,16 +108,34 @@ const getUserRecommentExplore = async (req, res) => {
       page = 1,
       limit = 20,
       sort = "recent",
-      topic,
       tags,
       search,
+      topic,
       userId,
     } = req.query;
+
+    const userid = req.body.userid;
+    
+    console.log("User ID:", userid); // Debugging step
+
+    // Fetch user's interested topics
+    const user = await User.findById(userid);
+
+    
+
+    let userInterestedTopics = [];
+    userInterestedTopics = user.interestedTopics.map(
+      (topic) => topic._id
+    );
 
     const query = {};
 
     if (userId) {
       query.userId = userId;
+    }
+
+    if (userInterestedTopics) {
+      query.topic = userInterestedTopics;
     }
 
     if (tags) {
@@ -127,6 +146,8 @@ const getUserRecommentExplore = async (req, res) => {
       query.$text = { $search: search };
     }
 
+
+    // Set sorting options
     let sortOption = {};
     switch (sort) {
       case "popular":
@@ -140,13 +161,14 @@ const getUserRecommentExplore = async (req, res) => {
         sortOption = { createdAt: -1 };
         break;
       case "random":
-        // Handle random sort differently
+        // Handle random sorting
         break;
       case "recent":
       default:
         sortOption = { createdAt: -1 };
     }
 
+    // Retrieve artworks based on query and sort option
     let artworks;
     const totalArtworks = await Artwork.countDocuments(query);
 
@@ -161,18 +183,18 @@ const getUserRecommentExplore = async (req, res) => {
         .skip((page - 1) * limit)
         .limit(parseInt(limit))
         .populate("artist", "name profilePicture")
-        .populate("topicId", "name")
+        .populate("topic", "name")
         .lean();
     }
 
-    // Enhance artwork data
+    // Enhance artwork data with additional information
     artworks = await Promise.all(
       artworks.map(async (artwork) => {
         const enhancedArtwork = {
           ...artwork,
           filePreview: artwork.files[0]?.fileUrl,
           fileCount: artwork.files.length,
-          topicName: artwork.topicId?.name,
+          topicName: artwork.topic?.name,
         };
 
         // Check if the logged-in user has liked this artwork
@@ -195,41 +217,55 @@ const getUserRecommentExplore = async (req, res) => {
       })
     );
 
-    // Get personalized recommendations for logged-in users
+    // Personalized recommendation logic
     let recommendations = [];
+    if (userId) {
+      // Get user interests from their activity
+      const userInterests = await UserActivity.aggregate([
+        { $match: { userId: userId } },
+        { $group: { _id: "$artworkId", count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 10 },
+      ]);
 
-    const userInterests = await UserActivity.aggregate([
-      { $match: { userId: userId } },
-      { $group: { _id: "$artworkId", count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-      { $limit: 10 },
-    ]);
+      const interestIds = userInterests.map((interest) => interest._id);
 
-    const interestIds = userInterests.map((interest) => interest._id);
+      recommendations = await Artwork.find({
+        topic: { $in: userInterestedTopics }, // Find artworks matching user's interested topics
+        _id: { $nin: interestIds }, // Exclude already interacted artworks
+      })
+        .limit(10)
+        .populate("artist", "name profilePicture")
+        .lean();
 
-    recommendations = await Artwork.find({
-      _id: { $nin: interestIds },
-      $or: [
-        {
-          topicId: {
-            $in: await Artwork.distinct("topicId", {
-              _id: { $in: interestIds },
-            }),
-          },
-        },
-        {
-          tags: {
-            $in: await Artwork.distinct("tags", {
-              _id: { $in: interestIds },
-            }),
-          },
-        },
-      ],
-    })
-      .limit(10)
-      .populate("artist", "name profilePicture")
-      .lean();
+      console.log("Topic-based recommendations:", recommendations);
 
+      if(!recommendations.length){
+        recommendations = await Artwork.find({
+          _id: { $nin: interestIds },
+          $or: [
+            {
+              topic: {
+                $in: await Artwork.distinct("topic", {
+                  _id: { $in: interestIds },
+                }),
+              },
+            },
+            {
+              tags: {
+                $in: await Artwork.distinct("tags", {
+                  _id: { $in: interestIds },
+                }),
+              },
+            },
+          ],
+        })
+          .limit(10)
+          .populate("artist", "name profilePicture")
+          .lean();
+      }
+    }
+    // Return paginated artworks and recommendations
     res.status(200).json({
       artworks,
       recommendations,
@@ -238,10 +274,11 @@ const getUserRecommentExplore = async (req, res) => {
       totalArtworks,
     });
   } catch (error) {
-    console.error("Error in getArtworksForExplore:", error);
+    console.error("Error in getUserRecommentExplore:", error);
     res.status(500).json({ error: "Server Error" });
   }
 };
+
 //getArtworks of own user
 const getArtworks = async (req, res) => {
   try {
@@ -278,7 +315,7 @@ const getArtworks = async (req, res) => {
 const addArtwork = async (req, res) => {
   try {
     // const { title, description, artistId, topicId, tags } = req.body;
-    const { title, description, artistId, tags ,fileDescriptions  } = req.body;
+    const { title, description, artistId, tags, fileDescriptions,topic } = req.body;
 
     // Ensure the required fields are provided
     if (!title || !req.files || !artistId) {
@@ -289,10 +326,13 @@ const addArtwork = async (req, res) => {
     }
 
     // Prepare file upload information in a non-blocking manner
-    const fileUploads = req.files.map((file,index) => ({
+    const fileUploads = req.files.map((file, index) => ({
       fileUrl: file.path,
       fileType: file.mimetype,
-      description: fileDescriptions && fileDescriptions[index] ? fileDescriptions[index] : "No description provided",
+      description:
+        fileDescriptions && fileDescriptions[index]
+          ? fileDescriptions[index]
+          : "No description provided",
     }));
 
     // Convert tags to an array if it is not already one
@@ -302,13 +342,19 @@ const addArtwork = async (req, res) => {
       ? tags.split(",").map((tag) => tag.trim())
       : [];
 
+    const topicsArray = Array.isArray(topic)
+      ? topic
+      : topic
+      ? topic.split(",").map((topic) => topic.trim())
+      : [];
+
     // Execute artwork creation and tag updates concurrently
     const artworkCreationPromise = Artwork.create({
       title,
       description,
       files: fileUploads,
       artist: artistId,
-      // topicId:topicId,
+      topic: topicsArray, 
       tags: tagsArray,
     });
 
@@ -321,10 +367,22 @@ const addArtwork = async (req, res) => {
       },
     }));
 
+    const topicUpdatePromises = topicsArray.map((topic) => ({
+      updateOne: {
+        filter: { name: topic },
+        update: { $inc: { artworkCount: 1 } },
+        upsert: true,
+      },
+    }));
+
     const [artwork] = await Promise.all([
       artworkCreationPromise,
       tagUpdatePromises.length > 0
         ? Tag.bulkWrite(tagUpdatePromises)
+        : Promise.resolve(),
+
+      topicUpdatePromises.length > 0
+        ? Topic.bulkWrite(topicUpdatePromises)
         : Promise.resolve(),
     ]);
 
@@ -409,15 +467,17 @@ const deleteArtwork = async (req, res) => {
 };
 
 // Get Artwork by id function
-const getArtworkById = async (artworkId) => {
+const getArtworkById = async (req, res) => {
   try {
-    const artwork = await Artwork.findById(artworkId)
-      .populate("artist", "name")
-      .populate("comments.userId", "name");
+    const artworkId = req.params.artworkId;
+    const artwork = await Artwork.findById(artworkId).populate(
+      "artist",
+      "name"
+    );
     if (!artwork) {
       return res.status(404).json({ error: "Artwork not found" });
     }
-    return artwork;
+    return res.status(200).json(artwork);
   } catch (error) {
     console.error(error.message);
 

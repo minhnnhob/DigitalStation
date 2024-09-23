@@ -24,6 +24,7 @@ import ProfileForm from "./components/profile/editProfile";
 import Notification from "./components/notification/Notification";
 import Explore from "./pages/Explore";
 import PortfolioPage from "./pages/Portfolio";
+import ArtworkDetail from "./pages/DetailArtwork";
 
 function App() {
   useEffect(() => {
@@ -36,6 +37,7 @@ function App() {
     createRoutesFromElements(
       <Route path="/" element={<RootLayout />}>
         <Route index element={<Explore />} />
+        <Route path="/artwork/:artworkId" element={<ArtworkDetail />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route path= "portfolio" element={<PortfolioPage/>}/>

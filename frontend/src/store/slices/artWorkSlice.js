@@ -25,15 +25,16 @@ const fetchArtworks = createAsyncThunk(
 
 const fetchArtworkUser = createAsyncThunk(
   "artwork/fetchArtworkUser",
-  async (_, { rejectWithValue }) => {
+  async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        "http://localhost:4000/api/artworks/explore",
+      const response = await axios.post(
+        `http://localhost:4000/api/artworks/explore/`,
+        { userid: id },
         {
           withCredentials: true,
         }
       );
-
+      console.log(id);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -51,7 +52,22 @@ const fetchArtwprkOfUser = createAsyncThunk(
           withCredentials: true,
         }
       );
-        return response.data;
+      return response.data;
+    } catch (error) {
+      return console.error(error);
+    }
+  }
+);
+
+const fetchArtwork = createAsyncThunk(
+  "artwork/fetchArtwork",
+  async (artworkId) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:4000/api/artworks/artwork/${artworkId}`
+      );
+
+      return response.data;
     } catch (error) {
       return console.error(error);
     }
@@ -73,6 +89,20 @@ const artworkState = createSlice({
     },
   },
   extraReducers: (builder) => {
+    builder
+      .addCase(fetchArtwork.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchArtwork.fulfilled, (state, action) => {
+        state.loading = false;
+        state.artworks = action.payload;
+      })
+      .addCase(fetchArtwork.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
     builder
       .addCase(fetchArtwprkOfUser.pending, (state) => {
         state.loading = true;
@@ -120,4 +150,4 @@ const artworkState = createSlice({
 export default artworkState.reducer;
 export const { updateArtwork, deleteArtwork, createArtwork } =
   artworkState.actions;
-export { fetchArtworks, fetchArtworkUser, fetchArtwprkOfUser };
+export { fetchArtworks, fetchArtworkUser, fetchArtwprkOfUser, fetchArtwork };

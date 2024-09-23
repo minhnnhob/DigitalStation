@@ -15,12 +15,13 @@ const { upload } = require("../controllers/artWorkController");
 // Route to get all artwork
 router.get("/", getPublicArtworkForExplore);
 
-router.get("/explore",getUserRecommentExplore ); 
+router.post("/explore",getUserRecommentExplore ); 
 
 router.get("/:userId", getArtworks);
 
 // Route to get artwork by ID
-router.get("/:artworkId", getArtworkById);
+
+router.get("/artwork/:artworkId", getArtworkById);
 
 router.post("/", upload.array("files", 10), addArtwork); // Allows up to 10 files to be uploaded
 

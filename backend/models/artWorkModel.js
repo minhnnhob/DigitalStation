@@ -40,7 +40,7 @@ const ArtworkSchema = new Schema({
     },
   ],
 
-  topicId: {
+  topic: {
     type: Schema.Types.ObjectId,
     ref: "Topic", // Reference to Topics collection
     // required: true,
