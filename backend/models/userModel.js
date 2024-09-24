@@ -24,7 +24,7 @@ const userSchema = new Schema({
   userType: {
     type: String,
     enum: ["basic", "artist", "studio", "admin"],
-    default: "basic",
+    default: "artist",
   },
 
   status: {
@@ -103,7 +103,6 @@ const userSchema = new Schema({
 });
 
 //Register Function
-
 userSchema.statics.register = async function (email, password) {
   //validation
   if (!email || !password) {

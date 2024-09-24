@@ -33,8 +33,8 @@ const upload = multer({ storage: storage }).fields([
   { name: "coverPicture", maxCount: 1 },
 ]);
 
-const generateToken = (_id) => {
-  return jwt.sign({ _id: _id }, process.env.JWT_SECRET, {
+const generateToken = (_id, userType) => {
+  return jwt.sign({ _id: _id, userType: userType }, process.env.JWT_SECRET, {
     expiresIn: "1h",
   });
 };
@@ -95,9 +95,11 @@ const getUserById = async (req, res) => {
   const id = req.params.id;
 
   try {
-    const user = await User.findById(id).select(
-      " email name profilePicture coverPicture interestedTopics headline city country socialLinks"
-    ).populate("interestedTopics", "name");
+    const user = await User.findById(id)
+      .select(
+        " email name profilePicture coverPicture interestedTopics headline city country socialLinks"
+      )
+      .populate("interestedTopics", "name");
 
     const followers = await Follower.countDocuments({ followingId: id });
     const following = await Follower.countDocuments({ followerId: id });
@@ -111,7 +113,7 @@ const getUserById = async (req, res) => {
       name: user.name,
       profilePicture: user.profilePicture,
       coverPicture: user.coverPicture,
-      
+
       headline: user.headline,
       city: user.city,
       country: user.country,
@@ -132,17 +134,16 @@ const getUserById = async (req, res) => {
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
-
+  console.log(email);
   try {
     const user = await User.login(email, password);
-
     // create jwt token
-
-    const token = generateToken(user._id);
-
+    const token = generateToken(user._id, user.userType);
     res.cookie("token", token);
 
-    res.status(200).json({ email, userId: user._id, token });
+    res
+      .status(200)
+      .json({ email, userId: user._id, token, userType: user.userType });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

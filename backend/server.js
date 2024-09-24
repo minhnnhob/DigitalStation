@@ -10,17 +10,19 @@ const followerRouter = require("./routes/followers");
 const likeRouter = require("./routes/like");
 const commentRouter = require("./routes/comment");
 const artnotiRouter = require("./routes/artnoti");
+const recruitmentRouter = require("./routes/recruiment");
+
+// job system
+const jobRouter = require("./routes/jobs");
 
 const cros = require("cors");
 const db = require("./config/db");
-
 const app = express();
 
 //connect to mongodb
 db.connect();
 
 //cross origin resource sharing
-
 const corsOptions = {
   origin: "http://localhost:3000", // Your frontend origin
   credentials: true, // Allow credentials
@@ -38,6 +40,7 @@ app.use((req, res, next) => {
 //routes
 
 app.use("/api/workouts", workoutsRouter);
+// social
 app.use("/api/users", userRouter);
 app.use("/api/artworks", artworkRouter);
 app.use("/api/topics", topicRouter);
@@ -46,6 +49,13 @@ app.use("/api/follow", followerRouter);
 app.use("/api/like", likeRouter);
 app.use("/api/comments", commentRouter);
 app.use("/api/notification", artnotiRouter);
+//job system
+app.use("/api/jobs", jobRouter);
+// recruitment
+app.use("/api/recruitment", recruitmentRouter);
+
+
+
 
 //connect to mongodb
 app.listen(process.env.PORT, () => {
