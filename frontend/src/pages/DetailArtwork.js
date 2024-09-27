@@ -12,12 +12,19 @@ import {
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 
+import {
+  likeArtwork,
+  unlikeArtwork,
+  fetchLikesByArtwork,
+} from "../store/slices/activity/likeSlice";
+
 const ArtworkDetail = () => {
   const { artworkId } = useParams(); // Get the artworkId from the URL params
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { artworks } = useSelector((state) => state.artwork); // Get the artworks from the global state
   const { loggedIn } = useSelector((state) => state.user.loggedIn);
+  const { id } = useSelector((state) => state.user);
 
   const [artwork, setArtwork] = useState(null); // Start with null instead of empty array
 
@@ -25,9 +32,10 @@ const ArtworkDetail = () => {
     if (loggedIn) {
       // Check if user is logged in to fetch
       dispatch(fetchArtwork(artworkId)).unwarp();
-      console.log(dispatch(fetchArtwork(artworkId).unwarp())); // Fetch the artwork by ID
+      // Fetch the artwork by ID
     }
-  }, [artworkId, loggedIn, dispatch]); // Dependency array updated to listen to artworkId
+  }, [artworkId, loggedIn, dispatch]);
+  // Dependency array updated to listen to artworkId
 
   useEffect(() => {
     if (artworks.length > 0) {
@@ -41,9 +49,7 @@ const ArtworkDetail = () => {
   const [currentArtworkIndex, setCurrentArtworkIndex] = useState(
     artworks.findIndex((artwork) => artwork._id === artworkId)
   ); // Find the index of the current artwork
-  console.log(currentArtworkIndex);
 
-  // // Function to handle next/previous artwork
   // Function to handle next artwork
   const handleNextArtwork = () => {
     setCurrentArtworkIndex((prevIndex) => {
@@ -66,6 +72,44 @@ const ArtworkDetail = () => {
   };
 
   const currentArtwork = artworks[currentArtworkIndex];
+
+
+  // like improvements: status for like to wait fetch
+  const { likes } = useSelector((state) => state.like);
+
+  const [like, setLike] = useState([]); // Set the initial like count
+  const [isLiked, setIsLiked] = useState(false); // Set the initial like status
+
+  useEffect(() => {
+    dispatch(fetchLikesByArtwork(artworkId));
+
+    setLike(likes.likes.length);
+  }, [artworkId, dispatch]);
+
+  useEffect(() => {
+    if (likes) {
+      setLike(likes.likes.length);
+      setIsLiked(likes.likes.includes(id));
+    }
+  }, [likes]);
+
+  if (id === undefined) {
+    return <div className="text-white">Please login to view this page</div>;
+  }
+
+  const handleLike = () => {
+    console.log(isLiked);
+    console.log(artworkId, id);
+    if (isLiked === false) {
+      dispatch(likeArtwork(artworkId, id));
+      setIsLiked(true);
+      setLike(like + 1);
+    } else{
+      dispatch(unlikeArtwork(artworkId));
+      setIsLiked(false);
+      setLike(like - 1);
+    }
+  };
 
   // Check if artwork exists and handle cases where artwork is undefined
   if (!artwork) {
@@ -108,9 +152,7 @@ const ArtworkDetail = () => {
 
         {/* Custom Navigation Buttons */}
         <div className=" relative w-full  flex justify-around mt-4">
-          <div className="">
-            
-          </div>
+          <div className=""></div>
           <button
             onClick={handlePreviousArtwork}
             className=" ml-4 fixed left-0 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white px-4 py-2 rounded-full focus:outline-none hover:bg-gray-700 "
@@ -131,8 +173,8 @@ const ArtworkDetail = () => {
       <div className="mt-4 lg:mt-0 lg:ml-6 w-full lg:w-1/3 bg-[#1c1c1c] p-6 text-white">
         <div className="flex items-center gap-4">
           <img
-            src={artwork.artist?.profileImage || "default-avatar-url"}
-            alt={artwork.artist?.name || "Unknown Artist"}
+            src={currentArtwork.artist?.profilePicture || "default-avatar-url"}
+            alt={currentArtwork.artist?.name || "Unknown Artist"}
             className="w-16 h-16 rounded-full object-cover"
           />
           <div>
@@ -147,8 +189,13 @@ const ArtworkDetail = () => {
 
         {/* Artwork Actions */}
         <div className="mt-4 flex items-center gap-4">
-          <button className="bg-gray-700 px-4 py-2 rounded-md">Like</button>
-          <button className="bg-gray-700 px-4 py-2 rounded-md">Share</button>
+          <button
+            className=" flex space-x-2 bg-gray-700 px-4 py-2 rounded-md"
+            onClick={handleLike}
+          >
+            <p> Like </p> <p>{like}</p>
+          </button>
+          {/* <button className="bg-gray-700 px-4 py-2 rounded-md">Share</button> */}
         </div>
 
         {/* Comments Section */}

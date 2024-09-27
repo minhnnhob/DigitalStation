@@ -3,6 +3,7 @@ import workoutReducer from "./slices/workoutSlice";
 import userReducer from "./slices/userSlice";
 import artworkReducer from "./slices/artWorkSlice";
 import notificationReducer from "./slices/notificationSlice";
+import likeReducer from "./slices/activity/likeSlice";
 
 // });
 
@@ -12,6 +13,7 @@ const store = configureStore({
     user: userReducer,
     artwork: artworkReducer,
     notification: notificationReducer,
+    like: likeReducer,
   },
 });
 

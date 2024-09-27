@@ -8,6 +8,8 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { useState } from "react";
 import ProfileMenu from "../profileMenu/ProfileMenu";
 
+import logo from "../../assets/Artboard 1@22x.png";
+
 const NavBar = () => {
   const [menuVisible, setMenuVisible] = useState(false);
   const loggedIn = useSelector((state) => state.user.loggedIn);
@@ -27,8 +29,9 @@ const NavBar = () => {
       <div className="flex justify-between  items-center  mx-auto px-5  w-full ">
 
         <div className="flex text-gray-color ml-5 text-3xl font-black items-start min-w-max">
-          <Link to="/">
-            <h1> DigiStation</h1>
+        <Link to="/" >
+        {/* <h1> DigiStation</h1> */}
+          <img src={logo} alt="DigiStation" className="w-10 h-10 " />
           </Link>
         </div>
       {/* link */}
