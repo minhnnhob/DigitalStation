@@ -2,6 +2,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
+const initialState = {
+  likes: [],
+  loading: false,
+  error: null,
+};
+
 const fetchLikesByArtwork = createAsyncThunk(
   "like/fetchLikesByArtwork",
   async (artworkId, { rejectWithValue }) => {
@@ -18,56 +24,72 @@ const fetchLikesByArtwork = createAsyncThunk(
 
 const likeArtwork = createAsyncThunk(
   "like/likeArtwork",
-  async (artworkId, userId, { rejectWithValue }) => {
+  async (data) => {
+    // console.log(data.artworkId, data.id);
     try {
-      const response = await axios.post("http://localhost:4000/api/like/like", {
-        userId: userId,
-        artworkId: artworkId,
-      });
-      console.log(artworkId,userId);
+      const response = await axios.post(
+        "http://localhost:4000/api/like/like",
+        {
+          userId: data.id,
+          artworkId: data.artworkId,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+
       return response.data;
     } catch (error) {
       console.log(error.response.data);
-      return rejectWithValue(error.response.data);
+      return error.response.data;
     }
   }
+  //
 );
 
-const unlikeArtwork = createAsyncThunk(
-  "like/unlikeArtwork",
-  async (artworkId, { getState }) => {
-    const { user } = getState().auth;
-    const response = await axios.post("/api/like/unlike", {
-      userId: user._id,
-      artworkId,
-    });
+const unlikeArtwork = createAsyncThunk("like/unlikeArtwork", async (data) => {
+  console.log(data.id, data.artworkId);
+  try {
+    const response = await axios.post(
+      "http://localhost:4000/api/like/unlike",
+      {
+        userId: data.id,
+        artworkId: data.artworkId,
+      },
+      {
+        withCredentials: true,
+      }
+    );
     return response.data;
+  } catch (error) {
+    console.log(error.response.data);
+    return error.response.data;
   }
-);
+});
 
 const likeSlice = createSlice({
   name: "like",
-  initialState: { likes: [], status: null },
+  initialState: initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder
-      .addCase(likeArtwork.fulfilled, (state, action) => {
-        state.likes = [...state.likes, action.payload.like];
-      })
-      .addCase(unlikeArtwork.fulfilled, (state, action) => {
-        state = state.filter((like) => like._id !== action.payload.like._id);
-      });
+    builder.addCase(likeArtwork.fulfilled, (state, action) => {
+      state.likes = action.payload;
+    });
+
+    builder.addCase(unlikeArtwork.fulfilled, (state, action) => {
+      state.likes = action.payload;
+    });
 
     builder
-    .addCase(fetchLikesByArtwork.fulfilled, (state, action) => {
-      state.likes = action.payload;
-    })
-    .addCase(fetchLikesByArtwork.rejected, (state, action) => {
-      state.status = "failed";
-    })
-    .addCase(fetchLikesByArtwork.pending, (state, action) => {
+      .addCase(fetchLikesByArtwork.fulfilled, (state, action) => {
+        state.likes = action.payload;
+      })
+      .addCase(fetchLikesByArtwork.rejected, (state, action) => {
+        state.status = "failed";
+      })
+      .addCase(fetchLikesByArtwork.pending, (state, action) => {
         state.status = "loading";
-    });
+      });
   },
 });
 

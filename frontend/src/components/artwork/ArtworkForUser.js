@@ -9,7 +9,7 @@ const ArtworkForUser = () => {
   const dispatch = useDispatch();
   const { id } = useSelector((state) => state.user);
   const { artworks, loading, error } = useSelector((state) => state.artwork);
-
+  console.log(artworks);
   useEffect(() => {
     const fetchData = async () => {
       try {

@@ -17,7 +17,7 @@ const PortfolioPage = () => {
   );
 
   // console.log(artworks.map((artwork) => console.log(artwork)));
-
+  console.log(artworks);
   useEffect(() => {
     if (userInfor && artworks) {
       setCoverPicture(userInfor.coverPicture || "");

@@ -27,42 +27,41 @@ const NavBar = () => {
   return (
     <header className=" bg-bg-df py-2.5 px-2 min-w-sm sticky top-0 z-30 ">
       <div className="flex justify-between  items-center  mx-auto px-5  w-full ">
-
         <div className="flex text-gray-color ml-5 text-3xl font-black items-start min-w-max">
-        <Link to="/" >
-        {/* <h1> DigiStation</h1> */}
-          <img src={logo} alt="DigiStation" className="w-10 h-10 " />
+          <Link to="/">
+            {/* <h1> DigiStation</h1> */}
+            <img src={logo} alt="DigiStation" className="w-10 h-10 " />
           </Link>
         </div>
-      {/* link */}
-      <div className=" justify-between ">
-      <nav className=" flex   pl-5 pr-6  ">
-          <Link
-            to="/"
-            className="no-underline  text-gray-color hover:text-gray-light"
-          >
-            Explore
-          </Link>
-          <Link
-            to="/learn"
-            className="no-underline  text-gray-color hover:text-gray-light"
-          >
-            Learn
-          </Link>
-          <Link
-            to="/shop"
-            className="no-underline  text-gray-color hover:text-gray-light"
-          >
-            Shop
-          </Link>
-          <Link
-            to="/jobs"
-            className="no-underline  text-gray-color hover:text-gray-light"
-          >
-            Jobs
-          </Link>
-        </nav>
-      </div>
+        {/* link */}
+        <div className=" justify-between ">
+          <nav className=" flex   pl-5 pr-6  ">
+            <Link
+              to="/"
+              className="no-underline  text-gray-color hover:text-gray-light"
+            >
+              Explore
+            </Link>
+            <Link
+              to="/learn"
+              className="no-underline  text-gray-color hover:text-gray-light"
+            >
+              Learn
+            </Link>
+            <Link
+              to="/shop"
+              className="no-underline  text-gray-color hover:text-gray-light"
+            >
+              Shop
+            </Link>
+            <Link
+              to="/jobs"
+              className="no-underline  text-gray-color hover:text-gray-light"
+            >
+              Jobs
+            </Link>
+          </nav>
+        </div>
         <div className=" lg:flex sm:hidden border-2 border-gray-border items-center rounded-full pl-6 mx-4 w-4/5  h-10">
           <FaSearch className="text-gray-color pr-1 text-2xl" />
           <input
@@ -72,7 +71,12 @@ const NavBar = () => {
           />
         </div>
         <div className="flex items-center gap-5 ">
-          <MdFileUpload className="text-gray-color text-3xl cursor-pointer" />
+          <Link
+            to="/project/new"
+            className="no-underline  text-gray-color "
+          >
+            <MdFileUpload className="text-gray-color text-3xl cursor-pointer hover:text-gray-light" />
+          </Link>
 
           <div className="notification-icon">
             <IoIosNotifications className="text-gray-color text-3xl cursor-pointer" />

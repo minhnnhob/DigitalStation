@@ -32,6 +32,7 @@ const ArtworkList = () => {
 
     fetchData();
   }, [dispatch]);
+  
 
   if (artworks === null) {
     return <p>No artworks found</p>;

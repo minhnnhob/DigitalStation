@@ -4,7 +4,6 @@ import {
   createRoutesFromElements,
   RouterProvider,
 } from "react-router-dom";
-// pages & components
 
 
 import { Provider } from "react-redux";
@@ -23,8 +22,10 @@ import ProfileLayout from "./layouts/ProfileLayout";
 import ProfileForm from "./components/profile/editProfile";
 import Notification from "./components/notification/Notification";
 import Explore from "./pages/Explore";
+// pages & components
 import PortfolioPage from "./pages/Portfolio";
 import ArtworkDetail from "./pages/DetailArtwork";
+import UploadArtwork from "./pages/UploadArtwork";
 
 function App() {
   useEffect(() => {
@@ -44,6 +45,7 @@ function App() {
         <Route path="edit-profile" element={<ProfileLayout />}>
           <Route index element={<ProfileForm />} />
         </Route>
+        <Route path="project/new" element={<UploadArtwork/>} />
       </Route>
     )
   );

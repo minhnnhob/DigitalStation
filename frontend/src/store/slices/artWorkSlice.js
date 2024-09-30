@@ -34,7 +34,7 @@ const fetchArtworkUser = createAsyncThunk(
           withCredentials: true,
         }
       );
-      console.log(id);
+
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -110,7 +110,7 @@ const artworkState = createSlice({
       })
       .addCase(fetchArtwprkOfUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.artworks = action.payload;
+        state.artworks = action.payload.artworks;
       })
       .addCase(fetchArtwprkOfUser.rejected, (state, action) => {
         state.loading = false;

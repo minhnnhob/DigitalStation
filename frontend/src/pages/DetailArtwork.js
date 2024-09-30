@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchArtwork } from "../store/slices/artWorkSlice";
+import { fetchArtwork, fetchArtwprkOfUser } from "../store/slices/artWorkSlice";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import ReactPlayer from "react-player";
@@ -23,19 +23,41 @@ const ArtworkDetail = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { artworks } = useSelector((state) => state.artwork); // Get the artworks from the global state
-  const { loggedIn } = useSelector((state) => state.user.loggedIn);
-  const { id } = useSelector((state) => state.user);
+  const { loggedIn, id } = useSelector((state) => state.user);
+  const { likes } = useSelector((state) => state.like.likes);
 
   const [artwork, setArtwork] = useState(null); // Start with null instead of empty array
+  const [likeCount, setLikeCount] = useState();
+  const [isLike, setIsLike] = useState();
+  
+  // console.log(artworks);
+ 
+
+  // Fetch artwork and likes when artworkId changes
+  useEffect(() => {
+    if (artworkId) {
+      // dispatch(fetchArtwork(artworkId));
+      dispatch(fetchLikesByArtwork(artworkId));
+    }
+  }, [artworkId, dispatch]);
 
   useEffect(() => {
-    if (loggedIn) {
-      // Check if user is logged in to fetch
-      dispatch(fetchArtwork(artworkId)).unwarp();
-      // Fetch the artwork by ID
+    console.log(likes);
+    if (Array.isArray(likes)) {
+      setLikeCount(likes.length);
+      setIsLike(likes.some((like) => like.userId._id === id));
     }
-  }, [artworkId, loggedIn, dispatch]);
-  // Dependency array updated to listen to artworkId
+  }, [likes, id]);
+
+  // Find the current artwork based on artworkId
+  useEffect(() => {
+    if (artworks.length > 0) {
+      const selectedArtwork = artworks.find(
+        (artwork) => artwork._id === artworkId
+      );
+      setArtwork(selectedArtwork);
+    }
+  }, [artworks, artworkId]); // Ensure artwork is set when artworks are loaded
 
   useEffect(() => {
     if (artworks.length > 0) {
@@ -47,7 +69,7 @@ const ArtworkDetail = () => {
   }, [artworks, artworkId]); // Ensure artwork is set when artworks are loaded
 
   const [currentArtworkIndex, setCurrentArtworkIndex] = useState(
-    artworks.findIndex((artwork) => artwork._id === artworkId)
+    artworks.findIndex((a) => a._id === artworkId)
   ); // Find the index of the current artwork
 
   // Function to handle next artwork
@@ -73,42 +95,19 @@ const ArtworkDetail = () => {
 
   const currentArtwork = artworks[currentArtworkIndex];
 
-
   // like improvements: status for like to wait fetch
-  const { likes } = useSelector((state) => state.like);
-
-  const [like, setLike] = useState([]); // Set the initial like count
-  const [isLiked, setIsLiked] = useState(false); // Set the initial like status
-
-  useEffect(() => {
-    dispatch(fetchLikesByArtwork(artworkId));
-
-    setLike(likes.likes.length);
-  }, [artworkId, dispatch]);
-
-  useEffect(() => {
-    if (likes) {
-      setLike(likes.likes.length);
-      setIsLiked(likes.likes.includes(id));
-    }
-  }, [likes]);
-
-  if (id === undefined) {
-    return <div className="text-white">Please login to view this page</div>;
-  }
 
   const handleLike = () => {
-    console.log(isLiked);
-    console.log(artworkId, id);
-    if (isLiked === false) {
-      dispatch(likeArtwork(artworkId, id));
-      setIsLiked(true);
-      setLike(like + 1);
-    } else{
-      dispatch(unlikeArtwork(artworkId));
-      setIsLiked(false);
-      setLike(like - 1);
+    if (isLike) {
+      dispatch(unlikeArtwork({ id, artworkId }));
+      setLikeCount(likeCount - 1);
+      setIsLike(false);
+    } else {
+      dispatch(likeArtwork({ id, artworkId }));
+      setLikeCount(likeCount + 1);
+      setIsLike(true);
     }
+    console.log(isLike);
   };
 
   // Check if artwork exists and handle cases where artwork is undefined
@@ -193,7 +192,7 @@ const ArtworkDetail = () => {
             className=" flex space-x-2 bg-gray-700 px-4 py-2 rounded-md"
             onClick={handleLike}
           >
-            <p> Like </p> <p>{like}</p>
+            <p> {isLike ? "Unlike" : "Like"} </p> <p>{likeCount}</p>
           </button>
           {/* <button className="bg-gray-700 px-4 py-2 rounded-md">Share</button> */}
         </div>

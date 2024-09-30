@@ -8,16 +8,17 @@ import Loading from "../loading/Loading";
 const ArtworkOfUser = ({ artworksUser }) => {
   //   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.artwork);
+ 
+  const [artworks, setArtworks] = useState(artworksUser );
 
-  const [artworks, setArtworks] = useState([]);
   useEffect(() => {
-    if (artworksUser && artworksUser.artworks) {
+    if (artworksUser) {
       // artworksUser is an object with a property artworks
-      setArtworks(artworksUser.artworks);
+      setArtworks(artworksUser);
     }
   }, [artworksUser]);
-
-  if (artworks.length === 0) {
+  console.log(artworksUser);
+  if (!artworks) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-[#121212] text-white">
         <div className="flex flex-col items-center">
@@ -52,7 +53,7 @@ const ArtworkOfUser = ({ artworksUser }) => {
       </div>
     );
   }
-
+  
   if (loading) return <Loading />;
 
   if (error) return <p>Error: {error}</p>;
