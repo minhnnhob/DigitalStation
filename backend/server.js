@@ -38,14 +38,9 @@ app.use((req, res, next) => {
 });
 
 //routes
-app.use("/",
-//   ()=>{
-//   return <><p>hehehe</p></>
-// }
-(req, res) => {
-  res.send("Hello World");
-}
-);
+app.use("/", (req, res) => {
+  res.send("welcome to the server!This works");
+});
 app.use("/api/workouts", workoutsRouter);
 // social
 app.use("/api/users", userRouter);
@@ -60,9 +55,6 @@ app.use("/api/notification", artnotiRouter);
 app.use("/api/jobs", jobRouter);
 // recruitment
 app.use("/api/recruitment", recruitmentRouter);
-
-
-
 
 //connect to mongodb
 app.listen(process.env.PORT, () => {
