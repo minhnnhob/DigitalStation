@@ -16,11 +16,7 @@ const tagSchema = new Schema({
     type: Number,
     default: 0,
   },
-  topicId: {
-    type: Schema.Types.ObjectId,
-    ref: "Topic",
-    required: true,
-  },
+
   createdAt: {
     type: Date,
     default: Date.now,

@@ -74,6 +74,30 @@ const fetchArtwork = createAsyncThunk(
   }
 );
 
+const createArtwork = createAsyncThunk(
+  "artwork/createArtwork",
+  async (formData, { rejectWithValue }) => {
+    console.log(formData);
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/artworks",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
+      console.log(response.data);
+     
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 // Slice definition
 const artworkState = createSlice({
   name: "artwork",
@@ -84,11 +108,24 @@ const artworkState = createSlice({
         (artwork) => artwork._id !== action.payload
       );
     },
-    createArtwork: (state, action) => {
-      state.artworks = [action.payload, ...state.artworks];
-    },
   },
   extraReducers: (builder) => {
+    builder
+      .addCase(createArtwork.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createArtwork.fulfilled, (state, action) => {
+        state.loading = false;
+        state.artworks = [...state.artworks, action.payload];
+      })
+      .addCase(createArtwork.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+
+
     builder
       .addCase(fetchArtwork.pending, (state) => {
         state.loading = true;
@@ -148,6 +185,11 @@ const artworkState = createSlice({
 });
 
 export default artworkState.reducer;
-export const { updateArtwork, deleteArtwork, createArtwork } =
-  artworkState.actions;
-export { fetchArtworks, fetchArtworkUser, fetchArtwprkOfUser, fetchArtwork };
+export const { updateArtwork, deleteArtwork } = artworkState.actions;
+export {
+  fetchArtworks,
+  fetchArtworkUser,
+  fetchArtwprkOfUser,
+  fetchArtwork,
+  createArtwork,
+};

@@ -80,6 +80,14 @@ const EditProfile = () => {
     fromData.append("profilePicture", profilePicture);
     fromData.append("coverPicture", coverPicture);
     setLoadingl(true);
+
+    console.log(profilePicture);
+
+    for (var pair of fromData.entries()) {
+      console.log(pair[0]+ ', ' + pair[1]); 
+  }  
+
+    
     try {
       const response = await axios.patch(
         `http://localhost:4000/api/users/${id}`,

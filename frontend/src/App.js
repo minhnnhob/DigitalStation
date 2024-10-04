@@ -15,6 +15,7 @@ import { useEffect } from "react";
 // redux
 import store from "./store/index";
 import { fetchCurrentUser } from "./store/slices/userSlice";
+import { fetchAllTopics } from "./store/slices/category/topicSlice";
 
 //layouts
 import RootLayout from "./layouts/RootLayout";
@@ -26,10 +27,12 @@ import Explore from "./pages/Explore";
 import PortfolioPage from "./pages/Portfolio";
 import ArtworkDetail from "./pages/DetailArtwork";
 import UploadArtwork from "./pages/UploadArtwork";
+import JobBoard from "./pages/Jobs";
 
 function App() {
   useEffect(() => {
     store.dispatch(fetchCurrentUser());
+    store.dispatch(fetchAllTopics());
 
     // eslint-disable-next-line
   }, []);
@@ -38,10 +41,12 @@ function App() {
     createRoutesFromElements(
       <Route path="/" element={<RootLayout />}>
         <Route index element={<Explore />} />
+        <Route path="jobs" element={<JobBoard/>} />
         <Route path="/artwork/:artworkId" element={<ArtworkDetail />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route path= "portfolio" element={<PortfolioPage/>}/>
+       
         <Route path="edit-profile" element={<ProfileLayout />}>
           <Route index element={<ProfileForm />} />
         </Route>

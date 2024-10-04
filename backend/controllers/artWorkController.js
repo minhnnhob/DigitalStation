@@ -7,6 +7,8 @@ const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
+const mongoose = require("mongoose");
+
 // Configure Cloudinary storage
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
@@ -32,27 +34,71 @@ const upload = multer({ storage: storage });
 
 const getPublicArtworkForExplore = async (req, res) => {
   try {
-    const {
-      page = 1,
-      limit = 20,
+    // Destructure and parse query parameters with defaults
+    let {
+      page = "1",
+      limit = "20",
       sort = "recent",
       topic,
       tags,
       search,
     } = req.query;
 
+    // Convert page and limit to integers and ensure they are positive
+    page = parseInt(page, 10);
+    limit = parseInt(limit, 10);
+
+    if (isNaN(page) || page < 1) page = 1;
+    if (isNaN(limit) || limit < 1) limit = 20;
+
     const query = {};
 
-    // Apply topic filter if provided
-    if (topic) query.topic = { $in: topic.split(",") };
+    // Handle topic filter: treat 'topic' as array of ObjectId strings
+    if (topic) {
+      // Ensure topic is an array. If it's a string, split by comma
+      let topicArray = [];
+      if (Array.isArray(topic)) {
+        topicArray = topic;
+      } else if (typeof topic === "string") {
+        topicArray = topic.split(",").map((t) => t.trim());
+      }
 
-    // Apply tag filter if provided
-    if (tags) query.tags = { $in: tags.split(",") };
+      console.log("topicArray:", topicArray);
 
-    // Apply search filter if provided
-    if (search) query.$text = { $search: search };
+      query.topic = { $in: topicArray };
+    }
 
-    let sortOption = {};
+    // Handle tags filter
+    if (tags) {
+      // Ensure tags is an array. If it's a string, split by comma
+      let tagsArray = [];
+      if (Array.isArray(tags)) {
+        tagsArray = tags;
+      } else if (typeof tags === "string") {
+        tagsArray = tags.split(",").map((tag) => tag.trim());
+      }
+
+      // Filter out any empty strings
+      tagsArray = tagsArray.filter((tag) => tag);
+
+      if (tagsArray.length > 0) {
+        query.tags = { $in: tagsArray };
+      }
+    }
+
+    // Handle search filter
+    if (search) {
+      // Use $regex for partial matching and case-insensitive search
+      query.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+        { tags: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Determine sort options
+    let sortOption = { createdAt: -1 }; // Default: recent
+
     switch (sort) {
       case "popular":
         sortOption = { likesCount: -1 };
@@ -65,39 +111,79 @@ const getPublicArtworkForExplore = async (req, res) => {
         sortOption = { createdAt: -1 };
         break;
       case "random":
-        // Random sort handling
+        // Random sort will be handled separately
         break;
       case "recent":
       default:
         sortOption = { createdAt: -1 };
     }
 
-    let artworks;
+    // Count total artworks matching the query
     const totalArtworks = await Artwork.countDocuments(query);
 
+    let artworks;
+
     if (sort === "random") {
+      // Use aggregation with $sample for random sorting
       artworks = await Artwork.aggregate([
         { $match: query },
-        { $sample: { size: parseInt(limit) } },
+        { $sample: { size: limit } },
+        // Lookup artist details
+        {
+          $lookup: {
+            from: "artists", // Ensure this matches the actual collection name
+            localField: "artist",
+            foreignField: "_id",
+            as: "artist",
+          },
+        },
+        { $unwind: "$artist" },
+        // Lookup topic details
+        {
+          $lookup: {
+            from: "topics", // Ensure this matches the actual collection name
+            localField: "topic",
+            foreignField: "_id",
+            as: "topic",
+          },
+        },
+        // Optionally, limit fields returned
+        {
+          $project: {
+            title: 1,
+            description: 1,
+            files: 1,
+            artist: { name: 1, profilePicture: 1 },
+            topic: { name: 1 },
+            likesCount: 1,
+            viewsCount: 1,
+            createdAt: 1,
+            isStaffPick: 1,
+          },
+        },
       ]);
     } else {
+      // For other sorting options, use find with sort, skip, limit, and populate
       artworks = await Artwork.find(query)
         .sort(sortOption)
         .skip((page - 1) * limit)
-        .limit(parseInt(limit))
-        .populate("artist", "name profilePicture")
-        .populate("topic", "name")
+        .limit(limit)
+        .populate("artist", "name profilePicture") // Populate artist's name and profile picture
         .lean();
     }
 
+    // Calculate total pages
+    const totalPages = Math.ceil(totalArtworks / limit);
+
+    // Respond with artworks and pagination info
     res.status(200).json({
       artworks,
-      currentPage: parseInt(page),
-      totalPages: Math.ceil(totalArtworks / limit),
+      currentPage: page,
+      totalPages,
       totalArtworks,
     });
   } catch (error) {
-    console.error(error.message);
+    console.error("Error in getPublicArtworkForExplore:", error.message);
     res.status(500).json({ error: "Server Error" });
   }
 };
@@ -115,18 +201,12 @@ const getUserRecommentExplore = async (req, res) => {
     } = req.query;
 
     const userid = req.body.userid;
-    
-    console.log("User ID:", userid); // Debugging step
 
     // Fetch user's interested topics
     const user = await User.findById(userid);
 
-    
-
     let userInterestedTopics = [];
-    userInterestedTopics = user.interestedTopics.map(
-      (topic) => topic._id
-    );
+    userInterestedTopics = user.interestedTopics.map((topic) => topic._id);
 
     const query = {};
 
@@ -145,7 +225,6 @@ const getUserRecommentExplore = async (req, res) => {
     if (search) {
       query.$text = { $search: search };
     }
-
 
     // Set sorting options
     let sortOption = {};
@@ -183,7 +262,7 @@ const getUserRecommentExplore = async (req, res) => {
         .skip((page - 1) * limit)
         .limit(parseInt(limit))
         .populate("artist", "name profilePicture")
-        .populate("topic", "name")
+        // .populate("topic", "name")
         .lean();
     }
 
@@ -240,7 +319,7 @@ const getUserRecommentExplore = async (req, res) => {
 
       console.log("Topic-based recommendations:", recommendations);
 
-      if(!recommendations.length){
+      if (!recommendations.length) {
         recommendations = await Artwork.find({
           _id: { $nin: interestIds },
           $or: [
@@ -311,55 +390,83 @@ const getArtworks = async (req, res) => {
 };
 
 // Add Artwork function
-// Optimized addArtwork function
 const addArtwork = async (req, res) => {
-  try {
-    // const { title, description, artistId, topicId, tags } = req.body;
-    const { title, description, artistId, tags, fileDescriptions,topic } = req.body;
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-    // Ensure the required fields are provided
+  try {
+    const { title, description, artistId, tags, fileDescriptions, topic } =
+      req.body;
+
+    // Validate required fields
     if (!title || !req.files || !artistId) {
-      //(!title || !req.files || !artistId || !topicId)
+      await session.abortTransaction();
+      session.endSession();
       return res
         .status(400)
-        .json({ error: "Title, files, artist, and domain are required." });
+        .json({ error: "Title, files, and artist are required." });
     }
 
-    // Prepare file upload information in a non-blocking manner
-    const fileUploads = req.files.map((file, index) => ({
-      fileUrl: file.path,
-      fileType: file.mimetype,
-      description:
-        fileDescriptions && fileDescriptions[index]
-          ? fileDescriptions[index]
-          : "No description provided",
-    }));
+    // Validate artistId
+    if (!mongoose.Types.ObjectId.isValid(artistId)) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({ error: "Invalid artist ID." });
+    }
 
-    // Convert tags to an array if it is not already one
-    const tagsArray = Array.isArray(tags)
-      ? tags
-      : tags
-      ? tags.split(",").map((tag) => tag.trim())
+    // Handle Topics: Convert topic names to ObjectIds
+    let topicIds = [];
+    if (topic) {
+      const topicNames = Array.isArray(topic)
+        ? topic
+        : topic.split(",").map((t) => t.trim());
+
+      // Find existing topics
+      const existingTopics = await Topic.find({
+        name: { $in: topicNames },
+      }).session(session);
+      const existingTopicNames = existingTopics.map((t) => t.name);
+      const existingTopicIds = existingTopics.map((t) => t._id);
+
+      // Determine which topics need to be created
+      const newTopicNames = topicNames.filter(
+        (t) => !existingTopicNames.includes(t)
+      );
+
+      // Create new topics
+      let newTopics = [];
+      if (newTopicNames.length > 0) {
+        newTopics = await Topic.insertMany(
+          newTopicNames.map((name) => ({ name, artworkCount: 1 })),
+          { session }
+        );
+      }
+
+      // Combine existing and new topic IDs
+      topicIds = [...existingTopicIds, ...newTopics.map((t) => t._id)];
+
+      // Update artworkCount for existing topics
+      if (existingTopicIds.length > 0) {
+        await Topic.updateMany(
+          { _id: { $in: existingTopicIds } },
+          { $inc: { artworkCount: 1 } },
+          { session }
+        );
+      }
+    }
+
+    // Handle Tags: Convert to array and sanitize
+    const tagsArray = tags
+      ? Array.isArray(tags)
+        ? tags
+        : tags
+            .split(",")
+            .map((tag) => tag.trim())
+            .filter((tag) => tag)
       : [];
 
-    const topicsArray = Array.isArray(topic)
-      ? topic
-      : topic
-      ? topic.split(",").map((topic) => topic.trim())
-      : [];
-
-    // Execute artwork creation and tag updates concurrently
-    const artworkCreationPromise = Artwork.create({
-      title,
-      description,
-      files: fileUploads,
-      artist: artistId,
-      topic: topicsArray, 
-      tags: tagsArray,
-    });
-
-    // Use a bulk operation to update tags in the database
-    const tagUpdatePromises = tagsArray.map((tag) => ({
+    // Prepare Tag bulk operations
+    const tagUpdateOperations = tagsArray.map((tag) => ({
       updateOne: {
         filter: { name: tag },
         update: { $inc: { artworkCount: 1 } },
@@ -367,32 +474,84 @@ const addArtwork = async (req, res) => {
       },
     }));
 
-    const topicUpdatePromises = topicsArray.map((topic) => ({
-      updateOne: {
-        filter: { name: topic },
-        update: { $inc: { artworkCount: 1 } },
-        upsert: true,
-      },
-    }));
+    if (tagUpdateOperations.length > 0) {
+      await Tag.bulkWrite(tagUpdateOperations, { session });
+    }
 
-    const [artwork] = await Promise.all([
-      artworkCreationPromise,
-      tagUpdatePromises.length > 0
-        ? Tag.bulkWrite(tagUpdatePromises)
-        : Promise.resolve(),
+    // Handle File Uploads and Thumbnail Generation
+    let thumbnailUrl = null;
+    const fileUploads = await Promise.all(
+      req.files.map(async (file, index) => {
+        // Upload file to Cloudinary
+        let uploadOptions = {
+          folder: "artworks", // Adjust folder as needed
+          resource_type: file.mimetype.startsWith("video/") ? "video" : "image",
+        };
 
-      topicUpdatePromises.length > 0
-        ? Topic.bulkWrite(topicUpdatePromises)
-        : Promise.resolve(),
-    ]);
+        const uploadedFile = await cloudinary.uploader.upload(
+          file.path,
+          uploadOptions
+        );
 
-    res.status(201).json(artwork);
+        // Generate thumbnail for the first file
+        if (index === 0) {
+          if (uploadedFile.resource_type === "image") {
+            thumbnailUrl = cloudinary.url(uploadedFile.public_id, {
+              transformation: [
+                // { width: 400, crop: "scale" }, // Uncomment if resizing is needed
+                { effect: "sharpen" },
+              ],
+              resource_type: "image",
+            });
+          } else if (uploadedFile.resource_type === "video") {
+            thumbnailUrl = cloudinary.url(uploadedFile.public_id, {
+              resource_type: "video",
+              format: "jpg",
+              start_offset: "10", // Capture frame at the 10th second
+              transformation: [
+                // { width: 400, crop: "scale" }, // Uncomment if resizing is needed
+                { effect: "sharpen" },
+              ],
+            });
+          }
+        }
+
+        return {
+          fileUrl: uploadedFile.secure_url, // Use secure_url from Cloudinary
+          fileType: uploadedFile.resource_type === "video" ? "video" : "image",
+          description:
+            fileDescriptions && fileDescriptions[index]
+              ? fileDescriptions[index]
+              : "",
+        };
+      })
+    );
+
+    // Create Artwork Document
+    const newArtwork = new Artwork({
+      title,
+      description,
+      files: fileUploads,
+      artist: artistId,
+      topic: topicIds, // Assign ObjectIds
+      tags: tagsArray,
+      thumbnail: thumbnailUrl,
+    });
+
+    await newArtwork.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(201).json(newArtwork);
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
     console.error("Error in addArtwork:", error.message);
     res.status(500).json({ error: "Server Error" });
   }
-};
-//Update Artwork function
+}; //Update Artwork function
+
 const updateArtwork = async (req, res) => {
   try {
     const { artistId, artworkId } = req.params; // Destructure artistId and artworkId from URL parameters

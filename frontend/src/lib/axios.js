@@ -1,7 +1,18 @@
 import axios from 'axios';
 
-const instance = axios.create({
-    baseURL: 'https://tên-miền-nào-đó.com/api/',
-    timeout: 1000,
-    headers: {'X-Custom-Header': 'foobar'}
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_ENDPOINT,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+export const uploadFiles = (url, formData) => {
+  return api.post(url, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data', // Ensure this header is set for file uploads
+    },
   });
+};
+
+export default api;

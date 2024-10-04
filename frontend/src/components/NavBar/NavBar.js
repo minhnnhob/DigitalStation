@@ -42,7 +42,7 @@ const NavBar = () => {
             >
               Explore
             </Link>
-            <Link
+            {/* <Link
               to="/learn"
               className="no-underline  text-gray-color hover:text-gray-light"
             >
@@ -53,9 +53,9 @@ const NavBar = () => {
               className="no-underline  text-gray-color hover:text-gray-light"
             >
               Shop
-            </Link>
+            </Link> */}
             <Link
-              to="/jobs"
+              to="jobs"
               className="no-underline  text-gray-color hover:text-gray-light"
             >
               Jobs
@@ -71,32 +71,39 @@ const NavBar = () => {
           />
         </div>
         <div className="flex items-center gap-5 ">
-          <Link
-            to="/project/new"
-            className="no-underline  text-gray-color "
-          >
-            <MdFileUpload className="text-gray-color text-3xl cursor-pointer hover:text-gray-light" />
-          </Link>
-
-          <div className="notification-icon">
-            <IoIosNotifications className="text-gray-color text-3xl cursor-pointer" />
-            <span className="notification-count">179</span>
-          </div>
-          <IoMdCart className="text-gray-color text-3xl cursor-pointer " />
+          {/* <IoMdCart className="text-gray-color text-3xl cursor-pointer " /> */}
           <div className=" min-w-max">
             {loggedIn ? (
-              <>
+              <div className="flex items-center gap-5 ">
+                
+                <Link
+                  to="/project/new"
+                  className="no-underline  text-gray-color "
+                >
+                  <MdFileUpload className="text-gray-color text-3xl cursor-pointer hover:text-gray-light" />
+                </Link>
+                <div className="notification-icon">
+                  <IoIosNotifications className="text-gray-color text-3xl cursor-pointer" />
+                  <span className="notification-count">179</span>
+                </div>
                 <img
                   src={profilePicture}
                   alt="Profile"
                   className="w-8 h-8 rounded-full mr-2.5"
                   onClick={toggleMenu}
                 />
-              </>
+              </div>
             ) : (
-              <Link to="/login" className="login-link pr-2">
-                Log in
-              </Link>
+              <div className="flex w-full gap-4">
+                
+                <Link to="/register" className="bg-bg-pf font-semibold rounded-md px-6 py-2">
+                  Register
+                </Link>
+
+                <Link to="/login" className="login-link bg-primary font-semibold rounded-md px-6 py-2 ">
+                  Log in
+                </Link>
+              </div>
             )}
           </div>
           <BsThreeDotsVertical className="text-gray-color text-2xl cursor-pointer" />

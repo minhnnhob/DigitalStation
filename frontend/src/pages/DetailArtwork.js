@@ -18,6 +18,11 @@ import {
   fetchLikesByArtwork,
 } from "../store/slices/activity/likeSlice";
 
+import {
+  showNotification,
+  hideNotification,
+} from "../store/slices/notificationSlice";
+
 const ArtworkDetail = () => {
   const { artworkId } = useParams(); // Get the artworkId from the URL params
   const navigate = useNavigate();
@@ -29,9 +34,8 @@ const ArtworkDetail = () => {
   const [artwork, setArtwork] = useState(null); // Start with null instead of empty array
   const [likeCount, setLikeCount] = useState();
   const [isLike, setIsLike] = useState();
-  
+
   // console.log(artworks);
- 
 
   // Fetch artwork and likes when artworkId changes
   useEffect(() => {
@@ -98,6 +102,21 @@ const ArtworkDetail = () => {
   // like improvements: status for like to wait fetch
 
   const handleLike = () => {
+    if (!loggedIn) {
+      // navigate("/login");
+      // navigate("/login");
+      dispatch(
+        showNotification({
+          type: "warning",
+          message: "Please login to like this artwork",
+        })
+      );
+      setTimeout(() => {
+        dispatch(hideNotification());
+      }, 3000);
+      return;
+    }
+
     if (isLike) {
       dispatch(unlikeArtwork({ id, artworkId }));
       setLikeCount(likeCount - 1);
