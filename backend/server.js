@@ -38,9 +38,14 @@ app.use((req, res, next) => {
 });
 
 //routes
-app.use("/",()=>{
-  return <><p>hehehe</p></>
-});
+app.use("/",
+//   ()=>{
+//   return <><p>hehehe</p></>
+// }
+(req, res) => {
+  res.send("Hello World");
+}
+);
 app.use("/api/workouts", workoutsRouter);
 // social
 app.use("/api/users", userRouter);
