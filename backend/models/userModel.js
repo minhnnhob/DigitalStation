@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const validator = require("validator");
 const VfToken = require("../models/vfTokenModel");
 const sendEmail = require("../utils/sendEmail");
