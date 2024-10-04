@@ -1,16 +1,15 @@
 {
     "version": 2,
-    "routes": [
-      {
-        "handle": "error"
-      },
-      {
-        "status": 404,
-        "src": "^(?!/api).*$",
-        "dest": "/404.html"
-      }
+    "builds": [
+        {
+            "src": "server.js",
+            "use": "@vercel/node"
+        }
     ],
-    "crons": []
-  }
-  
-  
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "server.js"
+        }
+    ]
+} 
