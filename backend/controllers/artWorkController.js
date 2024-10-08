@@ -44,6 +44,8 @@ const getPublicArtworkForExplore = async (req, res) => {
       search,
     } = req.query;
 
+    console.log("Query params:", req.query);
+
     // Convert page and limit to integers and ensure they are positive
     page = parseInt(page, 10);
     limit = parseInt(limit, 10);

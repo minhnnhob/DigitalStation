@@ -14,7 +14,6 @@ import {
 
 import { useSelector } from "react-redux";
 const ProfileSidebar = () => {
-
   const { profilePicture } = useSelector((state) => state.user);
 
   return (

@@ -12,9 +12,13 @@ const initialState = {
 // Define async actions for fetching, adding, updating, and deleting artworks
 const fetchArtworks = createAsyncThunk(
   "artwork/fetchArtworks",
-  async (_, { rejectWithValue }) => {
+  async (params, { rejectWithValue }) => {
     try {
-      const response = await axios.get("http://localhost:4000/api/artworks");
+      const response = await axios.get(
+        "http://localhost:4000/api/artworks",
+        { params },
+        { withCredentials: true }
+      );
 
       return response.data;
     } catch (error) {
@@ -90,7 +94,7 @@ const createArtwork = createAsyncThunk(
         }
       );
       console.log(response.data);
-     
+
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -123,8 +127,6 @@ const artworkState = createSlice({
         state.loading = false;
         state.error = action.payload;
       });
-
-
 
     builder
       .addCase(fetchArtwork.pending, (state) => {

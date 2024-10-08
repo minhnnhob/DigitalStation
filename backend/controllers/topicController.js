@@ -5,7 +5,7 @@ const createTopic = async (req, res) => {
   try {
     const { name, slug, tags } = req.body;
 
-    const existingTopic = await Topic.findOne({slug: slug});
+    const existingTopic = await Topic.findOne({ slug: slug });
 
     if (existingTopic) {
       return res.status(400).json({ error: "Topic already exists" });
@@ -65,4 +65,25 @@ const getAllTopics = async (req, res) => {
     res.status(500).json({ error: "Server Error" });
   }
 };
-module.exports = { createTopic, getArtworkByTopic, getAllTopics };
+
+const deleteTopicById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const topic = await Topic.findById(id);
+    if (!topic) {
+      return res.status(404).json({ error: "Topic not found" });
+    }
+    await Topic.findByIdAndDelete(id);
+    res.status(200).json({ message: "Topic deleted successfully" });
+  } catch (error) {
+    console.error("Error in deleting topic:", error);
+    res.status(500).json({ error: "Server Error" });
+  }
+};
+module.exports = {
+  createTopic,
+  getArtworkByTopic,
+  getAllTopics,
+  deleteTopicById,
+};

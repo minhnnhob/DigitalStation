@@ -29,6 +29,7 @@ import ArtworkDetail from "./pages/DetailArtwork";
 import UploadArtwork from "./pages/UploadArtwork";
 import JobBoard from "./pages/Jobs";
 
+
 function App() {
   useEffect(() => {
     store.dispatch(fetchCurrentUser());

@@ -38,10 +38,10 @@ app.use((req, res, next) => {
 });
 
 //routes
-app.use("/", (req, res) => {
-  res.send("welcome to the server!This works");
-});
-app.use("/api/workouts", workoutsRouter);
+// app.use("/", (req, res) => {
+//   res.send("welcome to the server!This works");
+// });
+app.use("/workouts", workoutsRouter);
 // social
 app.use("/api/users", userRouter);
 app.use("/api/artworks", artworkRouter);

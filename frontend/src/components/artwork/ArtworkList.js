@@ -10,12 +10,13 @@ import {
   showNotification,
   hideNotification,
 } from "../../store/slices/notificationSlice";
+import TopicList from "../topic/topicList";
 
 const ArtworkList = () => {
   const dispatch = useDispatch();
 
   const { artworks, loading, error } = useSelector((state) => state.artwork);
-
+  const { topics } = useSelector((state) => state.topic);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -32,7 +33,6 @@ const ArtworkList = () => {
 
     fetchData();
   }, [dispatch]);
-  
 
   if (artworks === null) {
     return <p>No artworks found</p>;
@@ -42,10 +42,16 @@ const ArtworkList = () => {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-0.5 p-2 bg-[#121212]">
-      {artworks.map((artwork) => (
-        <ArtworkCart key={artwork._id} artwork={artwork} />
-      ))}
+    <div>
+      <div >
+        <TopicList topics={topics} className="flex" />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-0.5 p-2 bg-[#121212]">
+        {artworks.map((artwork) => (
+          <ArtworkCart key={artwork._id} artwork={artwork} />
+        ))}
+      </div>
     </div>
   );
 };
