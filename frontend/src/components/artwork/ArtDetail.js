@@ -4,7 +4,7 @@ const ArtCard = ({ artwork }) => {
   const navigate = useNavigate();
 
   const goToDetail = () => {
-    navigate(`/artwork/${artwork._id}`);
+    navigate(`/jobs/${artwork._id}`);
   };
 
   return (

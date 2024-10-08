@@ -28,6 +28,11 @@ import PortfolioPage from "./pages/Portfolio";
 import ArtworkDetail from "./pages/DetailArtwork";
 import UploadArtwork from "./pages/UploadArtwork";
 import JobBoard from "./pages/Jobs";
+import JobBoardLayout from "./layouts/JobBoardLayout";
+import StudiosListing from "./pages/Studios";
+import SavedJobsListing from "./pages/SaveJob";
+import JobPreferences from "./pages/JobPreferences";
+import DetailJob from "./pages/JobDetail";
 
 
 function App() {
@@ -42,7 +47,16 @@ function App() {
     createRoutesFromElements(
       <Route path="/" element={<RootLayout />}>
         <Route index element={<Explore />} />
-        <Route path="jobs" element={<JobBoard/>} />
+        <Route path="job" element={<JobBoardLayout/>}>
+          <Route index element={<JobBoard />} />
+          <Route path="job-listings" element={<JobBoard />} />
+          <Route path="studios" element={< StudiosListing/>} />
+          <Route path="saved-jobs" element={<SavedJobsListing />} />
+          <Route path="job-preferences" element={<JobPreferences />} />
+          
+        </Route>
+        <Route path="/job/:jobId" element={<DetailJob />} />
+
         <Route path="/artwork/:artworkId" element={<ArtworkDetail />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />

@@ -55,7 +55,7 @@ const NavBar = () => {
               Shop
             </Link> */}
             <Link
-              to="jobs"
+              to="/job/job-listings"
               className="no-underline  text-gray-color hover:text-gray-light"
             >
               Jobs
