@@ -16,7 +16,12 @@ const Login = () => {
 
     const currUser = { email, password };
     await dispatch(login(currUser));
-    window.location.href = "/";
+    const result = await dispatch(login(currUser));
+    if (result.payload.userType === "admin") {
+      window.location.href = "/admin";
+    } else if (result.payload.userType === "artist") {
+      window.location.href = "/";
+    }
   };
 
   return (
@@ -80,11 +85,10 @@ const Login = () => {
             Forgot password?
           </a>
         </div>
-       <div className=" flex justify-center items-center">
-       <p> Don't have an account?</p><a href="/register">{"register"}</a>
-
-       </div>
-       
+        <div className=" flex justify-center items-center">
+          <p> Don't have an account?</p>
+          <a href="/register">{"register"}</a>
+        </div>
       </form>
     </div>
   );

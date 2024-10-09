@@ -19,7 +19,7 @@ const fetchUserInfo = createAsyncThunk("user/fetchUserInfo", async (id) => {
     const response = await axios.get(`http://localhost:4000/api/users/${id}`, {
       withCredentials: true,
     });
-   
+
     return response.data;
   } catch (error) {
     throw new Error(error.response.data);
@@ -43,7 +43,6 @@ const login = createAsyncThunk("user/login", async (user) => {
 });
 
 // Update user profile
-
 
 const register = createAsyncThunk("user/register", async (user) => {
   try {
@@ -92,11 +91,9 @@ const userSlice = createSlice({
       state.userInfor = action.payload;
       state.profilePicture = action.payload.profilePicture;
       state.loading = false;
-    }
+    },
   },
   extraReducers: (builder) => {
-
-
     builder.addCase(fetchUserInfo.pending, (state, action) => {
       state.loading = true;
     });
@@ -113,18 +110,24 @@ const userSlice = createSlice({
 
     builder.addCase(fetchCurrentUser.pending, (state, action) => {
       state.fetchCurrentUserLoading = true;
+      state.loading = true;
     });
     builder.addCase(fetchCurrentUser.fulfilled, (state, action) => {
       state.fetchCurrentUserLoading = false;
+      state.loading = false;
       state.loggedIn = true;
       state.id = action.payload.id;
       state.email = action.payload.email;
       state.name = action.payload.name;
       state.profilePicture = action.payload.profilePicture;
+      state.role = action.payload.role;
+
+      
     });
 
     builder.addCase(fetchCurrentUser.rejected, (state, action) => {
       state.fetchCurrentUserLoading = false;
+      state.loading = false;
       state.loggedIn = false;
       state.id = null;
       state.email = null;

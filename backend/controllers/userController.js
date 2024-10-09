@@ -81,9 +81,10 @@ const getAuthUser = async (req, res) => {
     res.status(200).json({
       id: userData._id,
       email: userData.email,
-      role: userData.role,
+      role: userData.userType,
       name: userData.name,
       profilePicture: userData.profilePicture,
+      
     });
   } catch (error) {
     console.error("Error fetching authenticated user:", error.message);
@@ -113,6 +114,7 @@ const getUserById = async (req, res) => {
       name: user.name,
       profilePicture: user.profilePicture,
       coverPicture: user.coverPicture,
+      userType: user.userType,
 
       headline: user.headline,
       city: user.city,

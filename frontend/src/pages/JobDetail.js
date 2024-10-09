@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import { fetchJobById } from "../store/slices/jobSlice";
@@ -6,46 +6,23 @@ import { fetchJobById } from "../store/slices/jobSlice";
 const DetailJob = () => {
   const dispatch = useDispatch();
   const selectedJob = useSelector((state) => state.job.selectedJob);
+  const loading = useSelector((state) => state.job.loading);
   const { jobId } = useParams();
-  console.log(jobId);
-  useEffect(() => {
-    if (!selectedJob) {
-      dispatch(fetchJobById(jobId));
-    }
-  }, [selectedJob]);
+useEffect(() => {
+  if (jobId) {
+    dispatch(fetchJobById(jobId));
+  }
+}, [dispatch, jobId]);
 
-  // job = {
-  //     id: 1,
-  //     title: "UI/UX Freelancer",
-  //     company: {
-  //       name: "Transcend Studios",
-  //       website: "www.operandvision.com",
-  //     },
-  //     salary: {
-  //       min: 699,
-  //       max: 2000,
-  //       currency: "USD",
-  //       period: "month",
-  //     },
-  //     jobDescription: "Stylized UI/UX Freelancing (Remote Work) \nFor mobile-gaming!",
-  //     skillsRequirements: "Stylized UI/UX Freelancing (Remote Work) \nFor mobile-gaming!",
-  //     howToApply: `Please DM me here on ArtStation \n
-  //                   or at bogdan@operandvision.com \n
-  //                   or bogdanotel@yahoo.com`,
-  //     aboutCompany: `Intuition-based culture, rather than first principle thinking when creating our games. And vice versa when making it efficient. \n
-  //                   Too much budget and too much time kill creativity. We are not fast-paced, but we also can't waste time on tasks that can be achieved more efficiently.`,
-  //     instructions: ["Job Description", "Skills & Requirements", "How to Apply", "About the Company"],
-  //     jobInfo: {
-  //       level: "Middle",
-  //       type: "Freelance",
-  //       location: "Remote",
-  //     },
-  //     industry: "Games",
-  //     medium: ["Digital 2D", "Digital 3D"],
-  //     tags: ["UI/UX"],
-  // }
-  console.log(selectedJob);
+if (loading) {
+  return <div>Loading...</div>;
+}
+
+if (!selectedJob) {
+  return <div>Job not found</div>;
+}
   return (
+    
     <div className="max-w-screen-lg mx-auto p-4 text-white">
       Header Section
       <div className="bg-dark-900 p-6 rounded-lg shadow-md flex flex-col space-y-4">
@@ -140,8 +117,6 @@ const DetailJob = () => {
             <h2 className="text-lg font-semibold">Tags</h2>
             <p>{selectedJob.tags.join(", ")}</p>
           </div> */}
-
-          
         </div>
       </div>{" "}
     </div>

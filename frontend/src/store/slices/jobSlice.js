@@ -26,6 +26,8 @@ const fetchJobById = createAsyncThunk(
         withCredentials: true,
       });
 
+      console.log(response.data);
+
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -36,8 +38,6 @@ const fetchJobById = createAsyncThunk(
 const createJob = createAsyncThunk(
   "jobs/create",
   async (jobData, { rejectWithValue }) => {
-    //
-
     try {
       const response = await axios.post(
         "http://localhost:4000/api/jobs",
@@ -86,7 +86,6 @@ const jobState = createSlice({
       .addCase(fetchJobById.fulfilled, (state, action) => {
         state.loading = false;
         state.selectedJob = action.payload;
-        console.log(action.payload)
       })
       .addCase(fetchJobById.rejected, (state, action) => {
         state.loading = false;

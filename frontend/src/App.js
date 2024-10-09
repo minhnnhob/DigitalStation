@@ -33,6 +33,8 @@ import StudiosListing from "./pages/Studios";
 import SavedJobsListing from "./pages/SaveJob";
 import JobPreferences from "./pages/JobPreferences";
 import DetailJob from "./pages/JobDetail";
+import AdminLayout from "./layouts/AdminLayout";
+
 
 
 function App() {
@@ -66,7 +68,21 @@ function App() {
           <Route index element={<ProfileForm />} />
         </Route>
         <Route path="project/new" element={<UploadArtwork/>} />
+
+      {/* Admin Route */}
+
+      <Route path="admin" element={<AdminLayout/>} >
+        <Route index element={<div>Users</div>} />
+        <Route path="dashboard" element={<div>Jobs</div>} />
+        <Route path="manage-users" element={<div>Jobs</div>} />
+        <Route path="manage-topics" element={<div>Toic</div>} />
       </Route>
+
+
+
+      </Route>
+
+
     )
   );
 
