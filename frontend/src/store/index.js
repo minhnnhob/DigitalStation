@@ -6,6 +6,7 @@ import notificationReducer from "./slices/notificationSlice";
 import likeReducer from "./slices/activity/likeSlice";
 import topicReducer from "./slices/category/topicSlice";
 import tagReducer from "./slices/category/tagSlice";
+import jobReducer from "./slices/jobSlice";
 
 // });
 
@@ -18,6 +19,7 @@ const store = configureStore({
     like: likeReducer,
     topic: topicReducer,
     tag: tagReducer,
+    job: jobReducer,
   },
 });
 

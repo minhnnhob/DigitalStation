@@ -52,7 +52,7 @@ const JobNavBar = () => {
           <li>
             <NavLink
               to="job-listings"
-              exact
+              
               className={({ isActive }) =>
                 isActive ? "border-b-2 border-blue-500" : ""
               }

@@ -11,6 +11,7 @@ const initialState = {
   userInfor: [],
   error: null,
   profilePicture: null,
+  role: null,
 };
 
 const fetchUserInfo = createAsyncThunk("user/fetchUserInfo", async (id) => {
