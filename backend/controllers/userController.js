@@ -84,7 +84,6 @@ const getAuthUser = async (req, res) => {
       role: userData.userType,
       name: userData.name,
       profilePicture: userData.profilePicture,
-      
     });
   } catch (error) {
     console.error("Error fetching authenticated user:", error.message);
@@ -136,7 +135,7 @@ const getUserById = async (req, res) => {
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
-  console.log(email);
+ 
   try {
     const user = await User.login(email, password);
     // create jwt token
@@ -152,14 +151,10 @@ const loginUser = async (req, res) => {
 };
 
 const registerUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password,role, studioData} = req.body;
 
   try {
-    const user = await User.register(email, password);
-
-    // create jwt token
-
-    // const token = generateToken(user._id);
+    const user = await User.register(email, password, role, studioData);
 
     res.status(201).json({
       message:
@@ -176,7 +171,12 @@ const logoutUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    const id = req.params.id; // Get userId from the URL parameters
+    const id = req.user.id; // Get the user ID from the request object
+
+    console.log(id);
+    if (!id) {
+      return res.status(400).json({ error: "User not found (!id)" });
+    }
     const { name, headline, city, country, interestedTopics } = req.body; // Extract other fields from the request body
     let profilePicture, coverPicture; // Variables to store URLs for uploaded images
 

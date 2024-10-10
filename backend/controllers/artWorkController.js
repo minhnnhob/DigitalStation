@@ -191,6 +191,8 @@ const getPublicArtworkForExplore = async (req, res) => {
 };
 
 const getUserRecommentExplore = async (req, res) => {
+  const userId = req.user.id;
+ 
   try {
     const {
       page = 1,
@@ -199,13 +201,10 @@ const getUserRecommentExplore = async (req, res) => {
       tags,
       search,
       topic,
-      userId,
     } = req.query;
 
-    const userid = req.body.userid;
-
     // Fetch user's interested topics
-    const user = await User.findById(userid);
+    const user = await User.findById(userId);
 
     let userInterestedTopics = [];
     userInterestedTopics = user.interestedTopics.map((topic) => topic._id);
@@ -346,6 +345,7 @@ const getUserRecommentExplore = async (req, res) => {
           .lean();
       }
     }
+
     // Return paginated artworks and recommendations
     res.status(200).json({
       artworks,

@@ -126,6 +126,11 @@ userSchema.statics.register = async function (
     );
   }
 
+  if (!role) {
+    console.log(role);
+    throw Error("Role is invalid");
+  }
+
   const exists = await this.findOne({ email });
 
   if (exists) {
@@ -135,35 +140,56 @@ userSchema.statics.register = async function (
   const salt = bcrypt.genSaltSync(10);
   const hash = bcrypt.hashSync(password, salt);
 
-  const user = await this.create({
-    email,
-    password: hash,
-    role,
-  });
+  let user =null
 
-  const tokenVf = await new VfToken({
-    userId: user._id,
-    tokenVf: crypto.randomBytes(32).toString("hex"),
-  }).save();
+  if (role === "artist") {
+     user = await this.create({
+      email,
+      password: hash,
+      userType: role,
+    });
 
-  // await tokenVf.save();
+    const tokenVf = await new VfToken({
+      userId: user._id,
+      tokenVf: crypto.randomBytes(32).toString("hex"),
+    }).save();
 
-  const url = `${process.env.API_ENDPOINT}/api/users/${user._id}/verify/${tokenVf.tokenVf}`;
-  await sendEmail(user.email, "Verify your email", url);
-
+    const url = `${process.env.API_ENDPOINT}/api/users/${user._id}/verify/${tokenVf.tokenVf}`;
+    await sendEmail(user.email, "Verify your email", url);
+  }
 
   // If the user is HR, create a studio profile
-  if(role === "studio") {
+  if (role === "studio") {
+    if (!studioData || !studioData.name || !studioData.contactInfor) {
+      throw Error("Studio information is incomplete");
+    }
+
+     user = await this.create({
+      email,
+      password: hash,
+      userType: role,
+    });
+
+    const tokenVf = await new VfToken({
+      userId: user._id,
+      tokenVf: crypto.randomBytes(32).toString("hex"),
+    }).save();
+
     const studio = await Studio.create({
       name: studioData.name,
-      userId: user._id,
+      studioAdminId: user._id,
       description: studioData.description,
       contactInfor: studioData.contactInfor,
     });
 
     user.studioId = studio._id;
     await user.save();
+
+    const url = `${process.env.API_ENDPOINT}/api/users/${user._id}/verify/${tokenVf.tokenVf}`;
+    await sendEmail(user.email, "Verify your email", url);
   }
+
+  console.log(user);
 
   return user;
 };

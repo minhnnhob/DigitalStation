@@ -30,7 +30,7 @@ const NavBar = () => {
         <div className="flex text-gray-color ml-5 text-3xl font-black items-start min-w-max">
           <Link to="/">
             {/* <h1> DigiStation</h1> */}
-            <img src={logo} alt="DigiStation" className="w-10 h-10 " />
+            <img src={logo} alt="DigiStation" className="w-10 h-10 object-fit " />
           </Link>
         </div>
         {/* link */}
@@ -89,7 +89,7 @@ const NavBar = () => {
                 <img
                   src={profilePicture}
                   alt="Profile"
-                  className="w-8 h-8 rounded-full mr-2.5"
+                  className="w-8 h-8 rounded-full mr-2.5 object-cover "
                   onClick={toggleMenu}
                 />
               </div>

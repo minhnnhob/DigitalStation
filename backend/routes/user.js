@@ -25,7 +25,7 @@ router.use(requireAuth);
 
 router.get('/',getAuthUser);
 
-router.patch("/:id",upload, updateUser);
+router.patch("/",upload, updateUser);
 
 router.get("/:id", getUserById);
 

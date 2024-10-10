@@ -18,9 +18,11 @@ const ArtworkOfUser = ({ artworksUser }) => {
     }
   }, [artworksUser]);
   console.log(artworksUser);
-  if (!artworks) {
+
+
+  if (!artworks|| artworks.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-[#121212] text-white">
+      <div className="flex flex-col mt-[5%]  h-screen bg-[#121212] text-white">
         <div className="flex flex-col items-center">
           {/* Image placeholder (you can replace this with an actual image) */}
           <div className="w-40 h-40 bg-gray-700 rounded-lg flex items-center justify-center">

@@ -7,13 +7,17 @@ import ArtworkCart from "./ArtDetail";
 
 const ArtworkForUser = () => {
   const dispatch = useDispatch();
-  const { id } = useSelector((state) => state.user);
+  
+
   const { artworks, loading, error } = useSelector((state) => state.artwork);
-  console.log(artworks);
+ 
   useEffect(() => {
     const fetchData = async () => {
+      console.log(artworks);
       try {
-        await dispatch(fetchArtworkUser(id)).unwrap();
+        const result= await dispatch(fetchArtworkUser()).unwrap();
+
+        console.log(result);
       } catch (error) {
         dispatch(
           showNotification({
@@ -26,6 +30,8 @@ const ArtworkForUser = () => {
 
     fetchData();
   }, [dispatch]);
+
+
   if (loading) return <Loading />;
   if (error) return <p>Error: {error}</p>;
 
@@ -40,6 +46,8 @@ const ArtworkForUser = () => {
       </div>
     );
   }
+
+ 
 };
 
 export default ArtworkForUser;

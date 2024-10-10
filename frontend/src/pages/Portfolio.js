@@ -58,9 +58,13 @@ const PortfolioPage = () => {
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
   };
+
+  
+
+
   return (
     <div className="flex gap-1  justify-end w-full  ">
-      <div className=" h-full">
+      <div className=" h-full w-full">
         <div
           className="  h-60 w-full  bg-center bg-cover rounded-[16px]  mb-[16px] "
           style={{

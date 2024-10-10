@@ -39,7 +39,7 @@ const RightSidebar = ({ userInfor, isCollapsed, toggleCollapse }) => {
         <img
           src={userInfor.profilePicture}
           alt={userInfor.name}
-          className={`rounded-full    ${isCollapsed ? "w-8 h-8" : "w-40 h-40"}`}
+          className={`rounded-full object-cover    ${isCollapsed ? "w-8 h-8" : "w-40 h-40"}`}
         />
         {!isCollapsed && (
           <h2 className="text-3xl font-black"> {userInfor.name} </h2>

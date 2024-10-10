@@ -121,8 +121,6 @@ const userSlice = createSlice({
       state.name = action.payload.name;
       state.profilePicture = action.payload.profilePicture;
       state.role = action.payload.role;
-
-      
     });
 
     builder.addCase(fetchCurrentUser.rejected, (state, action) => {

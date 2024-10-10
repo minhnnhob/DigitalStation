@@ -29,15 +29,16 @@ const fetchArtworks = createAsyncThunk(
 
 const fetchArtworkUser = createAsyncThunk(
   "artwork/fetchArtworkUser",
-  async (id, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
       const response = await axios.post(
         `http://localhost:4000/api/artworks/explore/`,
-        { userid: id },
+        {},
         {
           withCredentials: true,
         }
       );
+      console.log(response.data);
 
       return response.data;
     } catch (error) {

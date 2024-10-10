@@ -10,12 +10,12 @@ const {
   getUserRecommentExplore
 } = require("../controllers/artWorkController");
 const { upload } = require("../controllers/artWorkController");
+const { requireAuth } = require("../middleware/requireAuth");
 
 // Route to add new artwork with multiple file uploads
 // Route to get all artwork
 router.get("/", getPublicArtworkForExplore);
 
-router.post("/explore",getUserRecommentExplore ); 
 
 router.get("/:userId", getArtworks);
 
@@ -29,5 +29,9 @@ router.post("/", upload.array("files", 10), addArtwork); // Allows up to 10 file
 router.patch("/:artistId/:artworkId", updateArtwork);
 // Route to delete artwork
 router.delete("/:artistId/:artworkId", deleteArtwork);
+
+router.use(requireAuth);
+router.post("/explore",getUserRecommentExplore ); 
+
 
 module.exports = router;

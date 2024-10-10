@@ -90,7 +90,7 @@ const EditProfile = () => {
     
     try {
       const response = await axios.patch(
-        `http://localhost:4000/api/users/${id}`,
+        `http://localhost:4000/api/users`,
         fromData,
         {
           headers: {
