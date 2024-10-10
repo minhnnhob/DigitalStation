@@ -10,10 +10,12 @@ const followerRouter = require("./routes/followers");
 const likeRouter = require("./routes/like");
 const commentRouter = require("./routes/comment");
 const artnotiRouter = require("./routes/artnoti");
-const recruitmentRouter = require("./routes/recruiment");
+
+
 
 // job system
-const jobRouter = require("./routes/jobs");
+// const jobRouter = require("./routes/jobs");
+// const recruitmentRouter = require("./routes/recruiment");
 
 const cros = require("cors");
 const db = require("./config/db");
@@ -52,9 +54,9 @@ app.use("/api/like", likeRouter);
 app.use("/api/comments", commentRouter);
 app.use("/api/notification", artnotiRouter);
 //job system
-app.use("/api/jobs", jobRouter);
-// recruitment
-app.use("/api/recruitment", recruitmentRouter);
+// app.use("/api/jobs", jobRouter);
+
+// app.use("/api/recruitment", recruitmentRouter);
 
 //connect to mongodb
 app.listen(process.env.PORT, () => {

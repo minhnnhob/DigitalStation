@@ -20,10 +20,7 @@ const notificationSchema = new Schema({
         type: Boolean,
         default: false, // Default is unread notification
     },
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    }
+    
 }, { timestamps: true });
 
 module.exports = mongoose.model('Notification', notificationSchema);

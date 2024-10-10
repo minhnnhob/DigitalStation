@@ -2,15 +2,15 @@ const mongoose = require("mongoose");
 
 const recruitmentSchema = new mongoose.Schema(
   {
-    job: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: "Job", 
-      required: true 
+    job: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Job",
+      required: true,
     },
-    applicant: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: "User", 
-      required: true 
+    applicant: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
     status: {
       type: String,
@@ -23,35 +23,37 @@ const recruitmentSchema = new mongoose.Schema(
     interviews: [
       {
         date: Date, // Date of the interview
-        type: { 
-          type: String, 
-          enum: ["phone", "video", "inPerson"] 
+        type: {
+          type: String,
+          enum: ["phone", "video", "inPerson"],
         }, // Interview type: phone, video, or in-person
         notes: String, // Notes from the interview
       },
     ],
-    recruiter: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: "User", 
-      required: true 
+    recruiter: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     }, // The recruiter handling the application
     feedback: [
       {
-        providedBy: { 
-          type: mongoose.Schema.Types.ObjectId, 
-          ref: "User" 
+        providedBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
         }, // Feedback provider (e.g., interviewer)
         text: String, // Feedback text
         rating: { type: Number, min: 1, max: 5 }, // Optional rating system for candidates
         date: { type: Date, default: Date.now }, // Feedback date
       },
     ],
-    applicationDate: { 
-      type: Date, 
-      default: Date.now 
+    appliedAt: {
+      type: Date,
+      default: Date.now,
     }, // When the application was submitted
   },
   { timestamps: true }
 );
+
+recruitmentSchema.index({ job: 1, applicant: 1, status: 1 });
 
 module.exports = mongoose.model("Recruitment", recruitmentSchema);

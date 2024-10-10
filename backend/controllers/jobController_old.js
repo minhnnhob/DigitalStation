@@ -1,5 +1,5 @@
 const { requireAuth } = require("../middleware/requireAuth");
-const Job = require("../models/jobModel");
+const Job = require("../models/jobModel_old");
 const User = require("../models/userModel");
 const mongoose = require("mongoose");
 

@@ -6,105 +6,111 @@ const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 require("dotenv").config();
 
+const Studio = require("./studioModel");
+
 const Schema = mongoose.Schema;
 
-const userSchema = new Schema({
-  // Account Information
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-
-  password: {
-    type: String,
-    required: true,
-  },
-
-  userType: {
-    type: String,
-    enum: ["basic", "artist", "studio", "admin"],
-    default: "artist",
-  },
-
-  status: {
-    type: String,
-    enum: ["active", "inactive", "suspended"],
-    default: "active",
-  },
-
-  isBanned: { type: Boolean, default: false },
-
-  // personal information
-  name: {
-    type: String,
-    // required: true,
-  },
-
-  profilePicture: {
-    type: String,
-    default: "",
-  },
-
-  coverPicture: {
-    type: String,
-    default: "",
-  },
-
-  city: {
-    type: String,
-  },
-  country: {
-    type: String,
-  },
-
-  socialLinks: {
-    website: String,
-    twitter: String,
-    instagram: String,
-  },
-
-  // Artist Information
-  headline: {
-    type: String,
-  },
-
-  resume: String, // Cloudinary URL for the resume // URL to uploaded CV
-
-  // Studio Information
-  companyName: String,
-  companyWebsite: String,
-  studioApplicationStatus: {
-    type: String,
-    enum: ["none", "pending", "approved", "rejected"],
-    default: "none",
-  },
-
-  interestedTopics: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Topic",
+const userSchema = new Schema(
+  {
+    // Account Information
+    email: {
+      type: String,
+      required: true,
+      unique: true,
     },
-  ],
 
-  
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
+    password: {
+      type: String,
+      required: true,
+    },
 
-  isVerified: {
-    type: Boolean,
-    default: false,
+    userType: {
+      type: String,
+      enum: ["artist", "studio", "admin"],
+      default: "artist",
+    },
+
+    status: {
+      type: String,
+      enum: ["active", "inactive", "suspended"],
+      default: "active",
+    },
+
+    isBanned: { type: Boolean, default: false },
+
+    // personal information
+    name: {
+      type: String,
+      // required: true,
+    },
+
+    profilePicture: {
+      type: String,
+      default: "",
+    },
+
+    coverPicture: {
+      type: String,
+      default: "",
+    },
+
+    city: {
+      type: String,
+    },
+    country: {
+      type: String,
+    },
+
+    // Artist Information
+    headline: {
+      type: String,
+    },
+
+    socialLinks: [
+      {
+        platform: String,
+        url: String,
+      },
+    ],
+
+    skills: [
+      {
+        type: String,
+      },
+    ],
+
+    experience: [
+      { jobTitle: String, company: String, startDate: Date, endDate: Date },
+    ],
+
+    education: [
+      { institution: String, degree: String, startDate: Date, endDate: Date },
+    ],
+
+    resume: String, // Cloudinary URL for the resume // URL to uploaded CV
+
+    interestedTopics: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Topic",
+      },
+    ],
+
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
-});
+  { timestamps: true }
+);
 
 //Register Function
-userSchema.statics.register = async function (email, password) {
+userSchema.statics.register = async function (
+  email,
+  password,
+  role,
+  studioData = null
+) {
   //validation
   if (!email || !password) {
     throw Error("Email and password are required");
@@ -132,6 +138,7 @@ userSchema.statics.register = async function (email, password) {
   const user = await this.create({
     email,
     password: hash,
+    role,
   });
 
   const tokenVf = await new VfToken({
@@ -143,6 +150,20 @@ userSchema.statics.register = async function (email, password) {
 
   const url = `${process.env.API_ENDPOINT}/api/users/${user._id}/verify/${tokenVf.tokenVf}`;
   await sendEmail(user.email, "Verify your email", url);
+
+
+  // If the user is HR, create a studio profile
+  if(role === "studio") {
+    const studio = await Studio.create({
+      name: studioData.name,
+      userId: user._id,
+      description: studioData.description,
+      contactInfor: studioData.contactInfor,
+    });
+
+    user.studioId = studio._id;
+    await user.save();
+  }
 
   return user;
 };

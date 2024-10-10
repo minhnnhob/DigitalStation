@@ -76,10 +76,6 @@ const ArtworkSchema = new Schema(
       index: true, // Index for efficient retrieval of recent artworks
     },
 
-    updatedAt: {
-      type: Date,
-      default: Date.now,
-    },
   },
   { timestamps: true }
 );

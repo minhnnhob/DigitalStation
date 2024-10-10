@@ -1,41 +1,41 @@
-const express = require("express");
-const router = express.Router();
-const {
-  createJob,
-  updateJob,
-  deleteJob,
-  getAllJobs,
-  getJobById,
-  getJobsByStudio,
-  closeJob,
-  reopenJob,
-  applyForJob,
-} = require("../controllers/jobController");
-const { requireAuth } = require("../middleware/requireAuth");
+// const express = require("express");
+// const router = express.Router();
+// const {
+//   createJob,
+//   updateJob,
+//   deleteJob,
+//   getAllJobs,
+//   getJobById,
+//   getJobsByStudio,
+//   closeJob,
+//   reopenJob,
+//   applyForJob,
+// } = require("../controllers/jobController_old");
+// const { requireAuth } = require("../middleware/requireAuth");
 
-// get jobs by studio
-router.get("/studio", requireAuth, getJobsByStudio);
+// // get jobs by studio
+// router.get("/studio", requireAuth, getJobsByStudio);
 
-// router.post("/:jobId/apply", requireAuth, applyForJob);
+// // router.post("/:jobId/apply", requireAuth, applyForJob);
 
-// router.patch("/reopen/:jobId", requireAuth, reopenJob);
+// // router.patch("/reopen/:jobId", requireAuth, reopenJob);
 
-// router.patch("/close/:jobId", requireAuth, closeJob);
+// // router.patch("/close/:jobId", requireAuth, closeJob);
 
-//get all getAllJobs
-router.get("/", getAllJobs);
-//get job by id
-router.get("/:id", getJobById);
+// //get all getAllJobs
+// router.get("/", getAllJobs);
+// //get job by id
+// router.get("/:id", getJobById);
 
-// router.use(requireAuth);
+// // router.use(requireAuth);
 
-//create job
-router.post("/", createJob);
+// //create job
+// router.post("/", createJob);
 
-//update job
-router.patch("/:id", updateJob);
+// //update job
+// router.patch("/:id", updateJob);
 
-//delete job
-router.delete("/:id", deleteJob);
+// //delete job
+// router.delete("/:id", deleteJob);
 
-module.exports = router;
+// module.exports = router;
