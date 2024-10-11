@@ -104,25 +104,28 @@ const updateJob = async (req, res) => {
 
     const user = req.user.id;
     const { userType, studioId } = await User.findById(user);
+    // console.log(user);
 
     let updatedJob;
     if (userType === "artist") {
       updatedJob = await IndividualJob.findById(jobId);
 
-      if (updatedJob.posterBy != user.id) {
+      if (!updatedJob) {
+        return res.status(404).json({ error: "Job not found" });
+      }
+
+      if (updatedJob.posterBy != user) {
         return res
           .status(401)
           .json({ error: "You are not authorized to update this job" });
       }
 
-      if (!updatedJob) {
-        return res.status(404).json({ error: "Job not found" });
-      }
       Object.assign(updatedJob, jobData);
+
+      await updatedJob.save();
     } else if (userType === "studio") {
       updatedJob = await StudioJob.findById(jobId);
-
-      if (updatedJob.studioId != studioId) {
+      if (updatedJob.studioId.toString() !== studioId.toString()) {
         return res
           .status(401)
           .json({ error: "You are not authorized to update this job" });
@@ -132,9 +135,9 @@ const updateJob = async (req, res) => {
         return res.status(404).json({ error: "Job not found" });
       }
       Object.assign(updatedJob, jobData);
-    }
 
-    await updatedJob.save();
+      await updatedJob.save();
+    }
 
     res.json({
       message: "Job updated successfully",
@@ -146,9 +149,58 @@ const updateJob = async (req, res) => {
   }
 };
 
+const deleteJob = async (req, res) => {
+  try {
+    const jobId = req.params.id;
+
+    const user = req.user.id;
+
+    const { userType, studioId } = await User.findById(user);
+
+    let deletedJob;
+
+    if (userType === "artist") {
+      deletedJob = await IndividualJob.findById(jobId);
+
+      if (deletedJob.posterBy != user) {
+        return res
+          .status(401)
+          .json({ error: "You are not authorized to delete this job" });
+      }
+      if (!deletedJob) {
+        return res.status(404).json({ error: "Job not found" });
+      }
+
+      await deletedJob.deleteOne();
+    } else if (userType === "studio") {
+      deletedJob = await StudioJob.findById(jobId);
+
+      if (deletedJob.studioId.toString() != studioId.toString()) {
+        return res
+          .status(401)
+          .json({ error: "You are not authorized to delete this job" });
+      }
+      if (!deletedJob) {
+        return res.status(404).json({ error: "Job not found" });
+      }
+
+      await deletedJob.deleteOne();
+    }
+
+    res.json({
+      message: "Job deleted successfully",
+      jobId: jobId,
+    });
+  } catch (error) {
+    console.error("Error deleting job:", error);
+    res.status(500).json({ error: "Failed to delete job" });
+  }
+};
+
 module.exports = {
   getAllJobs,
   getJobById,
   createJob,
   updateJob,
+  deleteJob,
 };

@@ -44,7 +44,7 @@ const express = require("express");
 
 const { requireAuth } = require("../middleware/requireAuth");
 
-const { getAllJobs, getJobById, createJob, updateJob } = require("../controllers/jobController");
+const { getAllJobs, getJobById, createJob, updateJob, deleteJob } = require("../controllers/jobController");
 
 
 const router = express.Router();
@@ -62,5 +62,6 @@ router.use(requireAuth);
 // create job
 router.post("/",createJob);
 router.patch("/:id",updateJob);
+router.delete("/:id",deleteJob);
 
 module.exports = router;
