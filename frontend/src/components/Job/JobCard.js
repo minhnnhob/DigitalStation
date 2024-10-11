@@ -25,7 +25,7 @@ const JobCard = ({ job }) => {
           <div className="flex items-center ">
             <div className="flex items-center  ">
               <img
-                src={job.postedBy.profilePicture}
+                // src={job.postedBy.profilePicture}
                 alt={job.company}
                 className="w-12 h-12 rounded-full"
               />

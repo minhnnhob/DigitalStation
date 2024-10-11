@@ -36,6 +36,11 @@ const userSchema = new Schema(
       default: "active",
     },
 
+    studioId: {
+      type: Schema.Types.ObjectId,
+      ref: "Studio",
+    },
+
     isBanned: { type: Boolean, default: false },
 
     // personal information

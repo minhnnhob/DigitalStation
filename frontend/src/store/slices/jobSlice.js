@@ -5,11 +5,21 @@ import axios from "axios";
 // Async Thunks
 const fetchAllJobs = createAsyncThunk(
   "jobs/fetchAll",
-  async (_, rejectWithValue) => {
+  async (_, { getState, rejectWithValue }) => {
+    const { filters } = getState().job;
+
+    const params = {
+      ...filters,
+    };
+
     try {
-      const response = await axios.get("http://localhost:4000/api/jobs", {
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        "http://localhost:4000/api/jobs",
+        { params },
+        {
+          withCredentials: true,
+        }
+      );
 
       return response.data;
     } catch (error) {
@@ -59,10 +69,15 @@ const jobState = createSlice({
   initialState: {
     jobs: [],
     selectedJob: null,
+    filters: {},
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    setFilters(state, action) {
+      state.filters = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllJobs.pending, (state) => {
@@ -71,7 +86,7 @@ const jobState = createSlice({
       })
       .addCase(fetchAllJobs.fulfilled, (state, action) => {
         state.loading = false;
-        state.jobs = action.payload;
+        state.jobs = action.payload.jobs;
       })
       .addCase(fetchAllJobs.rejected, (state, action) => {
         state.loading = false;
@@ -110,3 +125,4 @@ const jobState = createSlice({
 
 export default jobState.reducer;
 export { fetchAllJobs, fetchJobById, createJob };
+export const { setFilters } = jobState.actions;

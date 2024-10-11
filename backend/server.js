@@ -14,7 +14,7 @@ const artnotiRouter = require("./routes/artnoti");
 
 
 // job system
-// const jobRouter = require("./routes/jobs");
+const jobRouter = require("./routes/jobs");
 // const recruitmentRouter = require("./routes/recruiment");
 
 const cros = require("cors");
@@ -53,8 +53,9 @@ app.use("/api/follow", followerRouter);
 app.use("/api/like", likeRouter);
 app.use("/api/comments", commentRouter);
 app.use("/api/notification", artnotiRouter);
+
 //job system
-// app.use("/api/jobs", jobRouter);
+app.use("/api/jobs", jobRouter);
 
 // app.use("/api/recruitment", recruitmentRouter);
 

@@ -16,14 +16,20 @@ const indiJobSchema = new Schema(
       required: true,
       min: 0,
     },
+
+    currency: {
+      type: String,
+      default: "USD",
+      enum: ["USD", "EUR", "GBP", "JPY", "AUD", "VND", "Other"],
+    },
   },
   {
     timestamps: true,
   }
 );
 
-individualJobSchema.pre("save", function (next) {
-    if (this.posterType !== "individual") {
+indiJobSchema.pre("save", function (next) {
+    if (this.posterType !== "artist") {
       return next(new Error("posterType must be 'individual' for IndividualJob."));
     }
     // Additional validations can be added here if necessary

@@ -13,6 +13,7 @@ const JobBoard = () => {
   const dispatch = useDispatch();
 
   const jobs = useSelector((state) => state.job.jobs);
+  console.log(jobs);  
   useEffect(() => {
     const fetchData = async () => {
       try {
