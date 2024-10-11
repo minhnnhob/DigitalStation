@@ -41,6 +41,76 @@ const getAllJobs = async (req, res) => {
   }
 };
 
+const getAllStudioJobs = async (req, res) => {
+  try {
+    const { page = 1, limit = 10, sort = "-createdAt", ...filters } = req.query;
+
+    // Convert array filters to use $in operator
+    const queryFilters = { posterType: "studio" }; // Filter for studio jobs
+    for (const key in filters) {
+      if (Array.isArray(filters[key])) {
+        queryFilters[key] = { $in: filters[key] };
+      } else {
+        queryFilters[key] = filters[key];
+      }
+    }
+
+    const studioJobs = await StudioJob.find(queryFilters)
+      //   .populate("postedBy", "name email")
+      .sort(sort)
+      .limit(parseInt(limit))
+      .skip((parseInt(page) - 1) * parseInt(limit))
+      .exec();
+
+    const total = await Job.countDocuments(queryFilters);
+
+    res.status(200).json({
+      total,
+      page: parseInt(page),
+      pages: Math.ceil(total / limit),
+      jobs: studioJobs,
+    });
+  } catch (error) {
+    console.error("Error fetching studio jobs:", error);
+    res.status(500).json({ error: "Unable to fetch studio jobs" });
+  }
+};
+
+const getAllIndividualJobs = async (req, res) => {
+  try {
+    const { page = 1, limit = 10, sort = "-createdAt", ...filters } = req.query;
+
+    // Convert array filters to use $in operator
+    const queryFilters = { posterType: "artist" }; // Filter for individual jobs
+    for (const key in filters) {
+      if (Array.isArray(filters[key])) {
+        queryFilters[key] = { $in: filters[key] };
+      } else {
+        queryFilters[key] = filters[key];
+      }
+    }
+
+    const individualJobs = await Job.find(queryFilters)
+      .populate("postedBy", "name email")
+      .sort(sort)
+      .limit(parseInt(limit))
+      .skip((parseInt(page) - 1) * parseInt(limit))
+      .exec();
+
+    const total = await Job.countDocuments(queryFilters);
+
+    res.status(200).json({
+      total,
+      page: parseInt(page),
+      pages: Math.ceil(total / limit),
+      jobs: individualJobs,
+    });
+  } catch (error) {
+    console.error("Error fetching individual jobs:", error);
+    res.status(500).json({ error: "Unable to fetch individual jobs" });
+  }
+};
+
 const getJobById = async (req, res) => {
   try {
     const jobId = req.params.id;
@@ -197,10 +267,49 @@ const deleteJob = async (req, res) => {
   }
 };
 
+const getJobsByUser = async (req, res) => {
+  try {
+    const user = req.user.id;
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const { userType, studioId } = await User.findById(user);
+
+    let jobs;
+    let total;
+    if (userType === "artist") {
+      jobs = await IndividualJob.find({ posterBy: user });
+      total = await IndividualJob.countDocuments({ posterBy: user });
+    } else if (userType === "studio") {
+      jobs = await StudioJob.find({ studioId: studioId });
+      total = await StudioJob.countDocuments({ studioId: studioId });
+    }
+
+    if (!jobs) {
+      return res.status(404).json({ error: "Jobs not found" });
+    }
+
+    res.json({
+      message: "Jobs retrieved successfully",
+      total,
+      jobs,
+    });
+  } catch (error) {
+    console.error("Error fetching jobs:", error);
+    res.status(500).json({ error: "Unable to fetch jobs" });
+  }
+};
+
 module.exports = {
   getAllJobs,
   getJobById,
   createJob,
   updateJob,
   deleteJob,
+  getJobsByUser,
+
+  getAllStudioJobs,
+  getAllIndividualJobs,
 };
