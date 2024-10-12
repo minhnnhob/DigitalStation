@@ -114,15 +114,24 @@ const getAllIndividualJobs = async (req, res) => {
 const getJobById = async (req, res) => {
   try {
     const jobId = req.params.id;
+  
+    let jobView = await Job.findById(jobId);
 
-    const job = await Job.findById(jobId)
-      .populate("postedBy", "name email")
-      // .populate('applicants', 'name email')
-      .exec();
+    let job ;
+
+    if(jobView.posterType === "studio"){
+      job = await StudioJob.findById(jobId).populate("studioId");
+    }
+    else if(jobView.posterType === "artist"){
+      job = await IndividualJob.findById(jobId).populate("posterBy", "name");
+    }
 
     if (!job) {
       return res.status(404).json({ error: "Job not found" });
     }
+
+    jobView.viewCount += 1;
+    await jobView.save();
 
     res.json(job);
   } catch (error) {

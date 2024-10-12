@@ -9,6 +9,7 @@ const createNotification = async (req, res) => {
             userId,
             type,
             message,
+            isRead: false,
         });
 
         await newNotification.save();

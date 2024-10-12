@@ -44,6 +44,11 @@ const jobSchema = new Schema(
       required: true,
     },
 
+    viewCount: {
+      type: Number,
+      default: 0,
+    },
+
    
     maxApplicants: {
       type: Number,

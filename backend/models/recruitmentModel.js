@@ -22,12 +22,16 @@ const recruitmentSchema = new mongoose.Schema(
     recruiterNotes: String, // Internal notes added by the recruiter regarding the candidate
     interviews: [
       {
-        date: Date, // Date of the interview
+        date: Date,
         type: {
           type: String,
           enum: ["phone", "video", "inPerson"],
-        }, // Interview type: phone, video, or in-person
-        notes: String, // Notes from the interview
+        },
+        confirmed: {
+          type: Boolean,
+          default: false,
+        },
+        notes: String,
       },
     ],
     recruiter: {
