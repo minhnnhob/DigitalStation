@@ -5,6 +5,8 @@ const Studio = require("../models/studioModel");
 const IndividualJob = require("../models/Job/indiJob");
 const StudioJob = require("../models/Job/studioJob");
 
+const Recruitment = require("../models/recruitmentModel");
+
 const getAllJobs = async (req, res) => {
   try {
     const { page = 1, limit = 10, sort = "-createdAt", ...filters } = req.query;
@@ -114,15 +116,14 @@ const getAllIndividualJobs = async (req, res) => {
 const getJobById = async (req, res) => {
   try {
     const jobId = req.params.id;
-  
+
     let jobView = await Job.findById(jobId);
 
-    let job ;
+    let job;
 
-    if(jobView.posterType === "studio"){
+    if (jobView.posterType === "studio") {
       job = await StudioJob.findById(jobId).populate("studioId");
-    }
-    else if(jobView.posterType === "artist"){
+    } else if (jobView.posterType === "artist") {
       job = await IndividualJob.findById(jobId).populate("posterBy", "name");
     }
 
@@ -304,10 +305,80 @@ const getJobsByUser = async (req, res) => {
       message: "Jobs retrieved successfully",
       total,
       jobs,
+      own: user,
     });
   } catch (error) {
     console.error("Error fetching jobs:", error);
     res.status(500).json({ error: "Unable to fetch jobs" });
+  }
+};
+
+const getJobAnalytics = async (req, res) => {
+  try {
+    const user = req.user.id;
+    const jobId = req.params.id;
+
+    const { userType, studioId } = await User.findById(user);
+
+    let job;
+
+    if (userType === "artist") {
+      job = await IndividualJob.findOne({ posterBy: user, _id: jobId });
+    } else if (userType === "studio") {
+      job = await StudioJob.findOne({ studioId: studioId, _id: jobId });
+    }
+
+    if (!job) {
+      return res.status(404).json({ error: "Job not found" });
+    }
+
+    const applications = await Recruitment.countDocuments({ job: jobId });
+    const views = job.viewCount;
+
+    const averageRating = await Recruitment.aggregate([
+      { $match: { job: jobId } },
+      { $unwind: "$feedback" },
+      { $group: { _id: null, rating: { $avg: "$feedback.rating" } } },
+    ]);
+
+    const ratingCount = averageRating.length;
+
+    let avgRating = null;
+
+    if (ratingCount > 0) {
+      avgRating = averageRating[0].rating;
+    }
+
+    res.json({
+      views,
+      applications,
+
+      averageRating: avgRating,
+    });
+  } catch (error) {
+    console.error("Error fetching job analytics:", error);
+    res.status(500).json({ error: "Unable to fetch job analytics" });
+  }
+};
+
+const getRecommentJobs = async (req, res) => {
+  try {
+    const user = req.user.id;
+    const { skills } = await User.findById(user);
+
+    const recommended = await Job.find({ skillsRequired: { $in: skills } })
+      .limit(5)
+      .exec();
+
+    const jobs = await Job.find().limit(5).exec();
+
+    res.json({
+      recommended,
+      // jobs,
+    });
+  } catch (error) {
+    console.error("Error fetching recommended jobs:", error);
+    res.status(500).json({ error: "Unable to fetch recommended jobs" });
   }
 };
 
@@ -321,4 +392,7 @@ module.exports = {
 
   getAllStudioJobs,
   getAllIndividualJobs,
+
+  getJobAnalytics,
+  getRecommentJobs,
 };

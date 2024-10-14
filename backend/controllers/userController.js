@@ -135,7 +135,7 @@ const getUserById = async (req, res) => {
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
- 
+
   try {
     const user = await User.login(email, password);
     // create jwt token
@@ -151,7 +151,7 @@ const loginUser = async (req, res) => {
 };
 
 const registerUser = async (req, res) => {
-  const { email, password,role, studioData} = req.body;
+  const { email, password, role, studioData } = req.body;
 
   try {
     const user = await User.register(email, password, role, studioData);
@@ -173,11 +173,11 @@ const updateUser = async (req, res) => {
   try {
     const id = req.user.id; // Get the user ID from the request object
 
-    console.log(id);
     if (!id) {
       return res.status(400).json({ error: "User not found (!id)" });
     }
-    const { name, headline, city, country, interestedTopics } = req.body; // Extract other fields from the request body
+
+    const userData = req.body; // Extract all fields from the request body dynamically
     let profilePicture, coverPicture; // Variables to store URLs for uploaded images
 
     const user = await User.findById(id);
@@ -185,22 +185,25 @@ const updateUser = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Handle interestedTopics if provided
-    let interested = [];
-    if (Array.isArray(interestedTopics) && interestedTopics.length > 0) {
-      interested = await Topic.find({ name: { $in: interestedTopics } });
-      if (interested.length === 0) {
-        return res.status(400).json({ error: "No valid topics found" });
-      }
-    }
-
-    console.log(interested);
-
-    // Check if the user is authorized to update this profile (you may want to add more checks here)
+    // Check if the user is authorized to update this profile
     if (user._id.toString() !== req.user.id) {
       return res
         .status(403)
         .json({ error: "Unauthorized to update this profile" });
+    }
+
+    // Handle interestedTopics if provided
+    if (
+      Array.isArray(userData.interestedTopics) &&
+      userData.interestedTopics.length > 0
+    ) {
+      const interested = await Topic.find({
+        name: { $in: userData.interestedTopics },
+      });
+      if (interested.length === 0) {
+        return res.status(400).json({ error: "No valid topics found" });
+      }
+      userData.interestedTopics = interested;
     }
 
     // If files are present in the request, upload them to Cloudinary
@@ -215,6 +218,7 @@ const updateUser = async (req, res) => {
           }
         );
         profilePicture = profileUploadResult.secure_url;
+        userData.profilePicture = profilePicture; // Add profile picture to userData
       }
 
       // Upload cover picture if present
@@ -227,23 +231,12 @@ const updateUser = async (req, res) => {
           }
         );
         coverPicture = coverUploadResult.secure_url;
+        userData.coverPicture = coverPicture; // Add cover picture to userData
       }
     }
 
-    // Prepare updates with the new data
-    const updates = {
-      name: name || user.name,
-      headline: headline || user.headline,
-      city: city || user.city,
-      country: country || user.country,
-      profilePicture: profilePicture || user.profilePicture,
-      coverPicture: coverPicture || user.coverPicture,
-      interestedTopics:
-        interested.length > 0 ? interested : user.interestedTopics, // Update only if valid topics provided
-    };
-
-    // Update the user document with new information
-    const updatedUser = await User.findByIdAndUpdate(id, updates, {
+    // Update the user document with new information dynamically
+    const updatedUser = await User.findByIdAndUpdate(id, userData, {
       new: true, // Return the updated document
       runValidators: true, // Ensure validators are run for updated fields
     });

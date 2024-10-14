@@ -153,13 +153,13 @@ const ArtworkDetail = () => {
                   controls
                   width="100%"
                   playing={true}
-                  loop={true}
+                  loop={ false}
                 />
               ) : (
                 <img
                   src={file.fileUrl}
                   alt="Artwork"
-                  className="w-full h-auto"
+                  className=" w-full h-auto object-cover"
                 />
               )}
 
