@@ -37,7 +37,6 @@ const recruitmentSchema = new mongoose.Schema(
     recruiter: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
     }, // The recruiter handling the application
     feedback: [
       {

@@ -16,7 +16,7 @@ const storage = new CloudinaryStorage({
     let folder = "artworks"; // Default folder
 
     if (file.mimetype.startsWith("image/")) {
-      folder = "images";
+      folder = "image";
     } else if (file.mimetype.startsWith("video/")) {
       folder = "video";
     }

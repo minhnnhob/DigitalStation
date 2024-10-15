@@ -15,7 +15,7 @@ const artnotiRouter = require("./routes/artnoti");
 
 // job system
 const jobRouter = require("./routes/jobs");
-// const recruitmentRouter = require("./routes/recruiment");
+const recruitmentRouter = require("./routes/recruiment");
 
 const cros = require("cors");
 const db = require("./config/db");
@@ -57,7 +57,7 @@ app.use("/api/notification", artnotiRouter);
 //job system
 app.use("/api/jobs", jobRouter);
 
-// app.use("/api/recruitment", recruitmentRouter);
+app.use("/api/recruitment", recruitmentRouter);
 
 //connect to mongodb
 app.listen(process.env.PORT, () => {
