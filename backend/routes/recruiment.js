@@ -1,14 +1,14 @@
 const express = require("express");
-
 const {
   applyJob,
-  updatewStatus,
-  addNotes,
-  addInterviewFeedback,
+  updateRecruitment,
+  addFeedback,
   scheduleInterview,
   confirmInterview,
   autoCloseJob,
+
 } = require("../controllers/recruimentController");
+const { upload } = require("../config/cloudinary");
 
 const router = express.Router();
 
@@ -19,12 +19,10 @@ const { requireAuth } = require('../middleware/requireAuth');
 
 router.use(requireAuth);
 
-router.post('/apply', applyJob);
-router.patch('applications/:applicationId/updateStatus', updatewStatus);
-router.patch('applications/:applicationId/addNotes', addNotes);
-router.patch('applications/:applicationId/addInterviewFeedback', addInterviewFeedback);
-router.post('applications/:applicationId/scheduleInterview', scheduleInterview);
-router.patch('applications/:applicationId/confirmInterview', confirmInterview);
-router.post('applications/:applicationId/autoCloseJob', autoCloseJob);
+router.post('/apply',upload.single("resumeVersion"), applyJob);
+router.patch('/:applicationId/updateStatus', updateRecruitment);
+router.patch('/:applicationId/addInterviewFeedback', addFeedback);
+router.post('/:applicationId/scheduleInterview', scheduleInterview);
+router.patch('/:applicationId/confirmInterview', confirmInterview);
 
 module.exports = router;

@@ -4,33 +4,8 @@ const User = require("../models/userModel");
 const Tag = require("../models/tagsModel");
 const UserActivity = require("../models/userActivityModel");
 const cloudinary = require("cloudinary").v2;
-const multer = require("multer");
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 const mongoose = require("mongoose");
-
-// Configure Cloudinary storage
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: async (req, file) => {
-    let folder = "artworks"; // Default folder
-
-    if (file.mimetype.startsWith("image/")) {
-      folder = "image";
-    } else if (file.mimetype.startsWith("video/")) {
-      folder = "video";
-    }
-
-    return {
-      folder: folder,
-      public_id: file.originalname.split(".")[0], // Store with original name
-      resource_type: "auto", // Automatically detect resource type
-    };
-  },
-});
-
-// Set up multer with Cloudinary storage for multiple files
-const upload = multer({ storage: storage });
 
 const getPublicArtworkForExplore = async (req, res) => {
   try {
@@ -192,7 +167,7 @@ const getPublicArtworkForExplore = async (req, res) => {
 
 const getUserRecommentExplore = async (req, res) => {
   const userId = req.user.id;
- 
+
   try {
     const {
       page = 1,
@@ -397,16 +372,13 @@ const addArtwork = async (req, res) => {
   session.startTransaction();
 
   try {
-    const { title, description, artistId, tags, fileDescriptions, topic } =
-      req.body;
-
+    const { title, description, artistId, tags, fileDescriptions, topic } = req.body;
+    
     // Validate required fields
     if (!title || !req.files || !artistId) {
       await session.abortTransaction();
       session.endSession();
-      return res
-        .status(400)
-        .json({ error: "Title, files, and artist are required." });
+      return res.status(400).json({ error: "Title, files, and artist are required." });
     }
 
     // Validate artistId
@@ -416,58 +388,31 @@ const addArtwork = async (req, res) => {
       return res.status(400).json({ error: "Invalid artist ID." });
     }
 
-    // Handle Topics: Convert topic names to ObjectIds
+    // Handle Topics: Convert topic names to ObjectIds (same as before)
     let topicIds = [];
     if (topic) {
-      const topicNames = Array.isArray(topic)
-        ? topic
-        : topic.split(",").map((t) => t.trim());
+      const topicNames = Array.isArray(topic) ? topic : topic.split(",").map((t) => t.trim());
 
-      // Find existing topics
-      const existingTopics = await Topic.find({
-        name: { $in: topicNames },
-      }).session(session);
+      const existingTopics = await Topic.find({ name: { $in: topicNames } }).session(session);
       const existingTopicNames = existingTopics.map((t) => t.name);
       const existingTopicIds = existingTopics.map((t) => t._id);
 
-      // Determine which topics need to be created
-      const newTopicNames = topicNames.filter(
-        (t) => !existingTopicNames.includes(t)
-      );
+      const newTopicNames = topicNames.filter((t) => !existingTopicNames.includes(t));
 
-      // Create new topics
       let newTopics = [];
       if (newTopicNames.length > 0) {
-        newTopics = await Topic.insertMany(
-          newTopicNames.map((name) => ({ name, artworkCount: 1 })),
-          { session }
-        );
+        newTopics = await Topic.insertMany(newTopicNames.map((name) => ({ name, artworkCount: 1 })), { session });
       }
 
-      // Combine existing and new topic IDs
       topicIds = [...existingTopicIds, ...newTopics.map((t) => t._id)];
 
-      // Update artworkCount for existing topics
       if (existingTopicIds.length > 0) {
-        await Topic.updateMany(
-          { _id: { $in: existingTopicIds } },
-          { $inc: { artworkCount: 1 } },
-          { session }
-        );
+        await Topic.updateMany({ _id: { $in: existingTopicIds } }, { $inc: { artworkCount: 1 } }, { session });
       }
     }
 
-    // Handle Tags: Convert to array and sanitize
-    const tagsArray = tags
-      ? Array.isArray(tags)
-        ? tags
-        : tags
-            .split(",")
-            .map((tag) => tag.trim())
-            .filter((tag) => tag)
-      : [];
-
-    // Prepare Tag bulk operations
+    // Handle Tags: (same as before)
+    const tagsArray = tags ? Array.isArray(tags) ? tags : tags.split(",").map((tag) => tag.trim()).filter((tag) => tag) : [];
     const tagUpdateOperations = tagsArray.map((tag) => ({
       updateOne: {
         filter: { name: tag },
@@ -475,59 +420,34 @@ const addArtwork = async (req, res) => {
         upsert: true,
       },
     }));
-
     if (tagUpdateOperations.length > 0) {
       await Tag.bulkWrite(tagUpdateOperations, { session });
     }
 
-    // Handle File Uploads and Thumbnail Generation
+    // Handle File Uploads (rely on multer to upload to Cloudinary)
     let thumbnailUrl = null;
-    const fileUploads = await Promise.all(
-      req.files.map(async (file, index) => {
-        // Upload file to Cloudinary
-        let uploadOptions = {
-          folder: "artworks", // Adjust folder as needed
-          resource_type: file.mimetype.startsWith("video/") ? "video" : "image",
-        };
+    const fileUploads = req.files.map((file, index) => {
+      // Generate thumbnail for the first file
+      if (index === 0 && file.mimetype.startsWith("image/")) {
+        thumbnailUrl = cloudinary.url(file.filename, {
+          transformation: [{ effect: "sharpen" }],
+          resource_type: "image",
+        });
+      } else if (index === 0 && file.mimetype.startsWith("video/")) {
+        thumbnailUrl = cloudinary.url(file.filename, {
+          resource_type: "video",
+          format: "jpg",
+          start_offset: "10",
+          transformation: [{ effect: "sharpen" }],
+        });
+      }
 
-        const uploadedFile = await cloudinary.uploader.upload(
-          file.path,
-          uploadOptions
-        );
-
-        // Generate thumbnail for the first file
-        if (index === 0) {
-          if (uploadedFile.resource_type === "image") {
-            thumbnailUrl = cloudinary.url(uploadedFile.public_id, {
-              transformation: [
-                // { width: 400, crop: "scale" }, // Uncomment if resizing is needed
-                { effect: "sharpen" },
-              ],
-              resource_type: "image",
-            });
-          } else if (uploadedFile.resource_type === "video") {
-            thumbnailUrl = cloudinary.url(uploadedFile.public_id, {
-              resource_type: "video",
-              format: "jpg",
-              start_offset: "10", // Capture frame at the 10th second
-              transformation: [
-                // { width: 400, crop: "scale" }, // Uncomment if resizing is needed
-                { effect: "sharpen" },
-              ],
-            });
-          }
-        }
-
-        return {
-          fileUrl: uploadedFile.secure_url, // Use secure_url from Cloudinary
-          fileType: uploadedFile.resource_type === "video" ? "video" : "image",
-          description:
-            fileDescriptions && fileDescriptions[index]
-              ? fileDescriptions[index]
-              : "",
-        };
-      })
-    );
+      return {
+        fileUrl: file.path,  // Use the path/secure_url from req.files
+        fileType: file.mimetype.startsWith("video/") ? "video" : "image",
+        description: fileDescriptions && fileDescriptions[index] ? fileDescriptions[index] : "",
+      };
+    });
 
     // Create Artwork Document
     const newArtwork = new Artwork({
@@ -535,13 +455,12 @@ const addArtwork = async (req, res) => {
       description,
       files: fileUploads,
       artist: artistId,
-      topic: topicIds, // Assign ObjectIds
+      topic: topicIds,
       tags: tagsArray,
       thumbnail: thumbnailUrl,
     });
 
     await newArtwork.save({ session });
-
     await session.commitTransaction();
     session.endSession();
 
@@ -552,8 +471,10 @@ const addArtwork = async (req, res) => {
     console.error("Error in addArtwork:", error.message);
     res.status(500).json({ error: "Server Error" });
   }
-}; //Update Artwork function
+};
 
+
+//Update Artwork function
 const updateArtwork = async (req, res) => {
   try {
     const { artistId, artworkId } = req.params; // Destructure artistId and artworkId from URL parameters
@@ -652,7 +573,6 @@ module.exports = {
   deleteArtwork,
   getArtworkById,
   getArtworks,
-  upload,
   getPublicArtworkForExplore,
   getUserRecommentExplore,
 };

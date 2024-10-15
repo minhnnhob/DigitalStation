@@ -9,7 +9,7 @@ const {
   getPublicArtworkForExplore,
   getUserRecommentExplore
 } = require("../controllers/artWorkController");
-const { upload } = require("../controllers/artWorkController");
+const { upload } = require("../config/cloudinary");
 const { requireAuth } = require("../middleware/requireAuth");
 
 // Route to add new artwork with multiple file uploads

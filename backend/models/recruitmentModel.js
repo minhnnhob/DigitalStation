@@ -18,9 +18,12 @@ const recruitmentSchema = new mongoose.Schema(
       default: "pending",
     },
     coverLetter: String, // The cover letter provided by the applicant
-    resumeVersion: String, // URL or identifier for the version of the resume used for this application
+    resumeVersion: {
+      url: String,
+      originalName: String,
+    }, // URL or identifier for the version of the resume used for this application
     recruiterNotes: String, // Internal notes added by the recruiter regarding the candidate
-    interviews: [
+    interviews: 
       {
         date: Date,
         type: {
@@ -32,12 +35,14 @@ const recruitmentSchema = new mongoose.Schema(
           default: false,
         },
         notes: String,
+
+        recruiter: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        }, // The recruiter handling the application
       },
-    ],
-    recruiter: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    }, // The recruiter handling the application
+    
+
     feedback: [
       {
         providedBy: {
@@ -49,10 +54,6 @@ const recruitmentSchema = new mongoose.Schema(
         date: { type: Date, default: Date.now }, // Feedback date
       },
     ],
-    appliedAt: {
-      type: Date,
-      default: Date.now,
-    }, // When the application was submitted
   },
   { timestamps: true }
 );
