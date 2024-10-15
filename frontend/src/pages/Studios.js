@@ -1,74 +1,118 @@
-import React from 'react';
-import { Star, ExternalLink, MapPin, Briefcase } from 'lucide-react';
+import React, { useEffect } from "react";
+import { ExternalLink, MapPin, Briefcase } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchStudios } from "../store/slices/studioSlice";
+import Loading from "../components/loading/Loading";
+import { useNavigate } from "react-router-dom";
 
-const StudioCard = ({ name, logo, banner, website, location, jobsOpen, featured }) => (
-  <div className="bg-gray-800 rounded-lg overflow-hidden">
-    <div className="relative h-40">
-      <img src={banner} alt={name} className="w-full h-full object-cover" />
-      {featured && (
-        <div className="absolute top-2 left-2 bg-yellow-500 text-black px-2 py-1 rounded-full text-xs font-bold flex items-center">
-          <Star size={12} className="mr-1" /> FEATURED
+const StudioCard = ({
+  _id,
+  name,
+  studioProfileImage,
+  backgroundImage,
+  website,
+  location,
+}) => {
+  const navigate = useNavigate();
+  const viewStudio = () => {
+    navigate(`/studio/${_id}`);
+  };
+
+  return (
+    <div className="bg-gray-800 rounded-lg overflow-hidden">
+      <div className="relative h-20">
+        <img
+          src={backgroundImage}
+          alt={name}
+          className="w-full h-full object-cover"
+        />
+      </div>
+      <div className="p-4 ">
+        <div className=" h-10  rounded-full flex items-center  ">
+          <img
+            src={studioProfileImage}
+            alt={`${name} logo`}
+            className=" mr-4  w-10 h-full object-contain drop-shadow-md "
+          />
+          <h3 className="  text-xl font-bold text-white">{name}</h3>
         </div>
-      )}
+
+        {website ? (
+          <div className="text-gray-400 mb-2 flex items-center mt-4">
+            <ExternalLink size={16} className="mr-1" />
+            <a
+              href={website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-blue-400"
+            >
+              {website}
+            </a>
+          </div>
+        ) : (
+          ""
+        )}
+
+        {location ? (
+          <div className="text-gray-400 mb-4 mt-2 flex w-full h-10 items-center overflow-hidden">
+            <MapPin size={20} className="mr-1" />
+            <span className="truncate">{location}</span>
+          </div>
+        ) : (
+          ""
+        )}
+
+        <button onClick={viewStudio} className="w-full  bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded flex items-center justify-center mt-2">
+          <Briefcase size={16} className="mr-2" />
+          View Studio
+        </button>
+      </div>
     </div>
-    <div className="p-4">
-      <div className="flex items-center mb-2">
-        <img src={logo} alt={`${name} logo`} className="w-12 h-12 rounded-full mr-3" />
-        <h3 className="text-xl font-bold text-white">{name}</h3>
-      </div>
-      <div className="text-gray-400 mb-2 flex items-center">
-        <ExternalLink size={16} className="mr-1" />
-        <a href={website} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">{website}</a>
-      </div>
-      <div className="text-gray-400 mb-4 flex items-center">
-        <MapPin size={16} className="mr-1" />
-        {location}
-      </div>
-      <button className="w-full bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded flex items-center justify-center">
-        <Briefcase size={16} className="mr-2" />
-        {jobsOpen} Jobs Open
-      </button>
-    </div>
-  </div>
-);
+  );
+};
 
 const StudiosListing = () => {
-  const studios = [
-    {
-      name: "TransPerfect Gaming",
-      logo: "https://via.placeholder.com/50",
-      banner: "https://via.placeholder.com/400",
-      website: "www.transperfect.com",
-      location: "New York, NY, USA",
-      jobsOpen: 4,
-      featured: true
-    },
-    {
-      name: "Grinding Gear Games",
-      logo: "https://via.placeholder.com/50",
-      banner: "https://via.placeholder.com/400",
-      website: "www.grindinggear.com",
-      location: "Auckland, AUK, New Zealand",
-      jobsOpen: 7,
-      featured: true
-    },
-    {
-      name: "Seedworld Studios",
-      logo: "https://via.placeholder.com/50",
-      banner: "https://via.placeholder.com/400",
-      website: "seedworld.io",
-      location: "Singapore",
-      jobsOpen: 12,
-      featured: true
+  const studios = useSelector((state) => state.studio.studios);
+  const loading = useSelector((state) => state.studio.loading);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (studios.length === 0) {
+      dispatch(fetchStudios());
     }
-  ];
+  }, [dispatch]);
+
+  console.log(studios);
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (!studios.length) {
+    return (
+      <div className="bg-gray-900 text-white p-6">
+        <h1 className="text-3xl font-bold">No Studios Found</h1>
+        <p className="text-gray-400 mt-1">
+          Please check back later or try refreshing the page.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-900 text-white p-6">
       <div className="flex justify-between items-center mb-4">
         <div>
-          <h1 className="text-3xl font-bold">Studios <span className="text-gray-400 text-xl">{studios.length} results</span></h1>
-          <p className="text-gray-400 mt-1">Featured Studios paid for an ArtStation Jobs subscription and are shown to all users.</p>
+          <h1 className="text-3xl font-bold">
+            Studios{" "}
+            <span className="text-gray-400 text-xl">
+              {studios.length} results
+            </span>
+          </h1>
+          <p className="text-gray-400 mt-1">
+            Featured Studios paid for an ArtStation Jobs subscription and are
+            shown to all users.
+          </p>
         </div>
         <input
           type="text"

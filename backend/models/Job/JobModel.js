@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { trim } = require("validator");
 
 const Schema = mongoose.Schema;
 
@@ -38,6 +39,11 @@ const jobSchema = new Schema(
       },
     ],
 
+    requiments: {
+      type: String,
+      trim: true,
+    },
+
     experienceLevel: {
       type: String,
       enum: ["Entry Level", "Mid Level", "Senior", "Lead", "Any"],
@@ -49,7 +55,6 @@ const jobSchema = new Schema(
       default: 0,
     },
 
-   
     maxApplicants: {
       type: Number,
       default: 1, // Default max applicants allowed before auto-closing
@@ -76,7 +81,6 @@ const jobSchema = new Schema(
         message: "Expiration date must be after the posting date.",
       },
     },
-    
   },
   { timestamps: true }
 );

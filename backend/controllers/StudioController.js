@@ -12,6 +12,7 @@ const getAllStudios = async (req, res) => {
     if (location) query.location = location;
 
     const studios = await Studio.find(query);
+    console.log(studios);
     res.status(200).json(studios);
   } catch (error) {
     res.status(500).json({ error: "Unable to fetch studios" });
@@ -61,7 +62,7 @@ const updateStudios = async (req, res) => {
     }
 
     Object.assign(studio, studioData); // Update the studio with the request body fields
-    // await studio.save();
+    await studio.save();
 
     res.status(200).json(studio);
   } catch (error) {

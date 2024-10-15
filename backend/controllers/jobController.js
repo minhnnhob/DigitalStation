@@ -20,14 +20,13 @@ const getAllJobs = async (req, res) => {
         queryFilters[key] = filters[key];
       }
     }
-    console.log(queryFilters);
-    const jobs = await Job.find(queryFilters)
-      .populate("postedBy", "name email")
-      // .populate('applicants', 'name email')
-      .sort(sort)
-      .limit(parseInt(limit))
-      .skip((parseInt(page) - 1) * parseInt(limit))
-      .exec();
+    let jobs;
+    const { posterType } = Job.findById(req.user.id);
+    if (posterType === "studio") {
+      queryFilters.posterType = "studio";
+    } else if (posterType === "artist") {
+      queryFilters.posterType = "artist";
+    }
 
     const total = await Job.countDocuments(filters);
 
@@ -58,7 +57,7 @@ const getAllStudioJobs = async (req, res) => {
     }
 
     const studioJobs = await StudioJob.find(queryFilters)
-      //   .populate("postedBy", "name email")
+      .populate("studioId", "studioProfileImage location ")
       .sort(sort)
       .limit(parseInt(limit))
       .skip((parseInt(page) - 1) * parseInt(limit))
@@ -184,7 +183,7 @@ const updateJob = async (req, res) => {
 
     const user = req.user.id;
     const { userType, studioId } = await User.findById(user);
-    // console.log(user);
+    console.log(userType, studioId);
 
     let updatedJob;
     if (userType === "artist") {
@@ -205,6 +204,7 @@ const updateJob = async (req, res) => {
       await updatedJob.save();
     } else if (userType === "studio") {
       updatedJob = await StudioJob.findById(jobId);
+
       if (updatedJob.studioId.toString() !== studioId.toString()) {
         return res
           .status(401)

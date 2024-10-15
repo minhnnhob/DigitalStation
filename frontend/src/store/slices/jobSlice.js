@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 // Async Thunks
-const fetchAllJobs = createAsyncThunk(
+const fetchAllJobs = createAsyncThunk(//studioJob
   "jobs/fetchAll",
   async (_, { getState, rejectWithValue }) => {
     const { filters } = getState().job;
@@ -14,7 +14,7 @@ const fetchAllJobs = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        "http://localhost:4000/api/jobs",
+        "http://localhost:4000/api/jobs/jobByStudio",
         { params },
         {
           withCredentials: true,
@@ -56,6 +56,21 @@ const createJob = createAsyncThunk(
           withCredentials: true,
         }
       );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+const getOwnJobs = createAsyncThunk(
+  "jobs/getOwnJobs",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get("http://localhost:4000/api/jobs/owned/Jobs", {
+        withCredentials: true,
+      });
+
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -120,9 +135,23 @@ const jobState = createSlice({
         state.loading = false;
         state.error = action.payload;
       });
+
+    builder
+      .addCase(getOwnJobs.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getOwnJobs.fulfilled, (state, action) => {
+        state.loading = false;
+        state.jobs = action.payload;
+      })
+      .addCase(getOwnJobs.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
 export default jobState.reducer;
-export { fetchAllJobs, fetchJobById, createJob };
+export { fetchAllJobs, fetchJobById, createJob , getOwnJobs};
 export const { setFilters } = jobState.actions;

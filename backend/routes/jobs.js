@@ -20,8 +20,8 @@ const router = express.Router();
 // list all jobs
 
 router.get("/", getAllJobs);
-// router.get("/jobByStudio/",getAllStudioJobs);
-// router.get("/jobByIndividual/",getAllIndividualJobs);
+router.get("/jobByStudio/",getAllStudioJobs);
+router.get("/jobByIndividual/",getAllIndividualJobs);
 
 router.get("/:id", getJobById);
 

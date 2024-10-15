@@ -34,6 +34,7 @@ import SavedJobsListing from "./pages/SaveJob";
 import JobPreferences from "./pages/JobPreferences";
 import DetailJob from "./pages/JobDetail";
 import AdminLayout from "./layouts/AdminLayout";
+import DetailStudio from "./components/studio/DetailStudio";
 
 
 
@@ -68,6 +69,8 @@ function App() {
           <Route index element={<ProfileForm />} />
         </Route>
         <Route path="project/new" element={<UploadArtwork/>} />
+
+        <Route path="studio/:id" element={<DetailStudio />} />
 
       {/* Admin Route */}
 

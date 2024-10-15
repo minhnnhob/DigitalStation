@@ -17,6 +17,7 @@ const JobCard = ({ job }) => {
     );
     if (newWindow) newWindow.opener = null;
   };
+  console.log(job);
 
   return (
     <div className="bg-gray-800 rounded-lg p-4 mb-4" onClick={goToDetail}>
@@ -25,9 +26,13 @@ const JobCard = ({ job }) => {
           <div className="flex items-center ">
             <div className="flex items-center  ">
               <img
-                // src={job.postedBy.profilePicture}
+                src={
+                  job.studioId && job.studioId.studioProfileImage
+                    ? job.studioId.studioProfileImage
+                    : "https://via.placeholder.com/150"
+                }
                 alt={job.company}
-                className="w-12 h-12 rounded-full"
+                className="w-16 h-16 rounded-full aspect-* object-cover "
               />
               <div className="mx-4 mb-4">
                 <h2 className="font-bold">{job.title}</h2>
@@ -48,11 +53,11 @@ const JobCard = ({ job }) => {
 
               <div className="bg-bg-pf rounded-full p-2">
                 <div
-                  key={job.jobType}
+                  key={job.employmentType}
                   className="flex items-center text-gray-400 text-sm"
                 >
-                  <MapPinIcon size={16} className="mr-1" />
-                  {job.jobType}
+                 
+                  {job.employmentType}
                 </div>
               </div>
 

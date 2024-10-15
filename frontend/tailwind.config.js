@@ -1,9 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
-    
-  ],
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
       screens: {
@@ -15,14 +12,12 @@ module.exports = {
       colors: {
         "gray-color": "#96969A",
         "gray-light": "#FFFFFF",
-        "primary": "#24BAFF",
-        "gray-border":"#707074",
-        
-        
+        primary: "#24BAFF",
+        "gray-border": "#707074",
       },
-      backgroundColor:{
+      backgroundColor: {
         "bg-df": "#101014",
-        "bg-pf":"#1E1E24",
+        "bg-pf": "#1E1E24",
       },
       fontFamily: {
         sans: ["Inter", "sans-serif"],
@@ -45,7 +40,15 @@ module.exports = {
       borderRadius: {
         "4xl": "2rem",
       },
+
+      dropShadow: {
+        "3xl": "0 35px 35px rgba(0, 0, 0, 0.25)",
+        "4xl": [
+          "0 35px 35px rgba(0, 0, 0, 0.25)",
+          "0 45px 65px rgba(0, 0, 0, 0.15)",
+        ],
+      },
     },
   },
-  plugins: [require('@tailwindcss/forms'),],
+  plugins: [require("@tailwindcss/forms")],
 };

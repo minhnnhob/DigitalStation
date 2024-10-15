@@ -7,6 +7,7 @@ import likeReducer from "./slices/activity/likeSlice";
 import topicReducer from "./slices/category/topicSlice";
 import tagReducer from "./slices/category/tagSlice";
 import jobReducer from "./slices/jobSlice";
+import studioReducer from "./slices/studioSlice";
 
 // });
 
@@ -20,6 +21,7 @@ const store = configureStore({
     topic: topicReducer,
     tag: tagReducer,
     job: jobReducer,
+    studio: studioReducer,
   },
 });
 
