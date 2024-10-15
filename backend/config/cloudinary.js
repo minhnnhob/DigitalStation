@@ -10,9 +10,9 @@ const storage = new CloudinaryStorage({
     let folder = "artworks"; // Default folder
 
     if (file.mimetype.startsWith("image/")) {
-      folder = "images";
+      folder = "artworks/images";
     } else if (file.mimetype.startsWith("video/")) {
-      folder = "video";
+      folder = "artworks/video";
     } else if (
       file.mimetype === "text/plain" ||
       file.mimetype === "application/pdf"
@@ -28,7 +28,56 @@ const storage = new CloudinaryStorage({
   },
 });
 
+const storageUser = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => {
+    let folder = "user"; // Default folder for user uploads
+
+    // Determine which folder to store the file in based on file field
+    if (file.fieldname === "profilePicture") {
+      folder = "user/profilePictures";
+    } else if (file.fieldname === "coverPicture") {
+      folder = "user/coverPictures";
+    }
+
+    return {
+      folder: folder,
+      public_id: file.originalname.split(".")[0], // Store with the original file name (excluding extension)
+      resource_type: "auto", // Automatically detect resource type (image, video, etc.)
+    };
+  },
+});
+
+const storageStudio = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => {
+    let folder = "studio"; // Default folder for studio uploads
+
+    // Determine which folder to store the file in based on file field
+    if (file.fieldname === "studioProfileImage") {
+      folder = "studio/ProfilePictures";
+    } else if (file.fieldname === "backgroundImage") {
+      folder = "studio/coverPictures";
+    }
+
+    return {
+      folder: folder,
+      public_id: file.originalname.split(".")[0], // Store with the original file name (excluding extension)
+      resource_type: "auto", // Automatically detect resource type (image, video, etc.)
+    };
+  },
+});
+
 // Set up multer with Cloudinary storage for multiple files
 const upload = multer({ storage: storage });
+const uploadUser = multer({ storage: storageUser }).fields([
+  { name: "profilePicture", maxCount: 1 },
+  { name: "coverPicture", maxCount: 1 },
+]);
 
-module.exports = { storage, upload };
+const uploadStudio = multer({ storage: storageStudio }).fields([
+  { name: "studioProfileImage", maxCount: 1 },
+  { name: "backgroundImage", maxCount: 1 },
+]);
+
+module.exports = { storage, upload, uploadUser, uploadStudio };

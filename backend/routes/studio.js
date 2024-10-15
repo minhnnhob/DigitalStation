@@ -8,6 +8,8 @@ const {
 
 const { requireAuth } = require("../middleware/requireAuth");
 
+const { uploadStudio } = require("../config/cloudinary");
+
 const router = express.Router();
 
 // Existing routes
@@ -16,6 +18,6 @@ router.get("/:studioId", getStudio); // Get studio details
 router.get("/:studioId/jobs", getAllJobsStudio); // Get all jobs posted by studio
 
 router.use(requireAuth);
-router.patch("/:studioId", updateStudios); // Studio owner can edit
+router.patch("/:studioId",uploadStudio, updateStudios); // Studio owner can edit
 
 module.exports = router;

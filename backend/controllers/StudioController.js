@@ -41,6 +41,17 @@ const updateStudios = async (req, res) => {
     const { studioId } = req.params;
     const userId = req.user.id; // Assume the user ID is retrieved from authentication middleware
     const studio = await Studio.findById(studioId);
+    const studioData = req.body;
+
+    if (req.files) {
+      if (req.files.studioProfileImage) {
+        studioData.studioProfileImage = req.files.studioProfileImage[0].path;
+      }
+
+      if (req.files.backgroundImage) {
+        studioData.backgroundImage = req.files.backgroundImage[0].path;
+      }
+    }
 
     // Check if the user is the studio admin
     if (studio.studioAdminId.toString() !== userId) {
@@ -49,8 +60,8 @@ const updateStudios = async (req, res) => {
         .json({ error: "You are not authorized to edit this studio" });
     }
 
-    Object.assign(studio, req.body); // Update the studio with the request body fields
-    await studio.save();
+    Object.assign(studio, studioData); // Update the studio with the request body fields
+    // await studio.save();
 
     res.status(200).json(studio);
   } catch (error) {

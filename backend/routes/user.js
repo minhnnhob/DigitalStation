@@ -8,8 +8,8 @@ const {
   getAuthUser,
   updateUser,
   getVerifyToken,
-  upload,
 } = require("../controllers/userController");
+const { uploadUser } = require("../config/cloudinary");
 
 const router = express.Router();
 
@@ -23,9 +23,9 @@ router.get("/:id/verify/:token", getVerifyToken);
 
 router.use(requireAuth);
 
-router.get('/',getAuthUser);
+router.get("/", getAuthUser);
 
-router.patch("/",upload, updateUser);
+router.patch("/", uploadUser, updateUser);
 
 router.get("/:id", getUserById);
 

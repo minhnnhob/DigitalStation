@@ -4,34 +4,6 @@ const Follower = require("../models/followersModel");
 const jwt = require("jsonwebtoken");
 const VfToken = require("../models/vfTokenModel");
 const cloudinary = require("cloudinary").v2;
-const multer = require("multer");
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
-
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: async (req, file) => {
-    let folder = "profilePicture"; // Default folder for user uploads
-
-    // Determine which folder to store the file in based on file field
-    if (file.mimetype.fieldname === "profilePicture") {
-      folder = "profilePicture";
-    } else if (file.fieldname === "coverPicture") {
-      folder = "coverPicture";
-    }
-
-    return {
-      folder: folder,
-      public_id: file.originalname.split(".")[0], // Store with the original file name (excluding extension)
-      resource_type: "auto", // Automatically detect resource type (image, video, etc.)
-    };
-  },
-});
-
-// Set up multer with Cloudinary storage for profile and cover pictures
-const upload = multer({ storage: storage }).fields([
-  { name: "profilePicture", maxCount: 1 },
-  { name: "coverPicture", maxCount: 1 },
-]);
 
 const generateToken = (_id, userType) => {
   return jwt.sign({ _id: _id, userType: userType }, process.env.JWT_SECRET, {
@@ -41,7 +13,7 @@ const generateToken = (_id, userType) => {
 
 const getVerifyToken = async (req, res) => {
   const id = req.params.id;
-  console.log(id);
+
   try {
     const user = await User.findOne({ _id: id });
 
@@ -123,8 +95,6 @@ const getUserById = async (req, res) => {
       followersCount: followers,
       followingCount: following,
     };
-
-    console.log(userData);
 
     res.status(200).json(userData);
   } catch (error) {
@@ -211,27 +181,13 @@ const updateUser = async (req, res) => {
       // Upload profile picture if present
       if (req.files.profilePicture) {
         const profilePic = req.files.profilePicture[0];
-        const profileUploadResult = await cloudinary.uploader.upload(
-          profilePic.path,
-          {
-            folder: "profilePictures",
-          }
-        );
-        profilePicture = profileUploadResult.secure_url;
-        userData.profilePicture = profilePicture; // Add profile picture to userData
+        userData.profilePicture = profilePic.path; // Add profile picture to userData
       }
 
       // Upload cover picture if present
       if (req.files.coverPicture) {
         const coverPic = req.files.coverPicture[0];
-        const coverUploadResult = await cloudinary.uploader.upload(
-          coverPic.path,
-          {
-            folder: "coverPictures",
-          }
-        );
-        coverPicture = coverUploadResult.secure_url;
-        userData.coverPicture = coverPicture; // Add cover picture to userData
+        userData.coverPicture = coverPic.path; // Add cover picture to userData
       }
     }
 
@@ -257,5 +213,4 @@ module.exports = {
   getAuthUser,
   updateUser,
   getVerifyToken,
-  upload,
 };
