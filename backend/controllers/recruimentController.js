@@ -74,7 +74,7 @@ const applyJob = async (req, res) => {
     session.endSession();
 
     res
-      .status(201)
+      .status(200)
       .json({ message: "Application submitted successfully", newRecruiment });
   } catch (error) {
     await session.abortTransaction();

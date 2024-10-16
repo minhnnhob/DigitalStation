@@ -8,6 +8,7 @@ import topicReducer from "./slices/category/topicSlice";
 import tagReducer from "./slices/category/tagSlice";
 import jobReducer from "./slices/jobSlice";
 import studioReducer from "./slices/studioSlice";
+import recruitmentReducer from "./slices/recruitmentSlice";
 
 // });
 
@@ -22,6 +23,7 @@ const store = configureStore({
     tag: tagReducer,
     job: jobReducer,
     studio: studioReducer,
+    recruitment: recruitmentReducer,
   },
 });
 

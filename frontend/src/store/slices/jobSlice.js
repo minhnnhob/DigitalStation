@@ -3,7 +3,8 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 // Async Thunks
-const fetchAllJobs = createAsyncThunk(//studioJob
+const fetchAllJobs = createAsyncThunk(
+  //studioJob
   "jobs/fetchAll",
   async (_, { getState, rejectWithValue }) => {
     const { filters } = getState().job;
@@ -35,9 +36,6 @@ const fetchJobById = createAsyncThunk(
       const response = await axios.get(`http://localhost:4000/api/jobs/${id}`, {
         withCredentials: true,
       });
-
-      console.log(response.data);
-
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -67,9 +65,12 @@ const getOwnJobs = createAsyncThunk(
   "jobs/getOwnJobs",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get("http://localhost:4000/api/jobs/owned/Jobs", {
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        "http://localhost:4000/api/jobs/owned/Jobs",
+        {
+          withCredentials: true,
+        }
+      );
 
       return response.data;
     } catch (error) {
@@ -153,5 +154,5 @@ const jobState = createSlice({
 });
 
 export default jobState.reducer;
-export { fetchAllJobs, fetchJobById, createJob , getOwnJobs};
+export { fetchAllJobs, fetchJobById, createJob, getOwnJobs };
 export const { setFilters } = jobState.actions;

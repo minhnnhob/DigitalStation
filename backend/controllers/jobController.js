@@ -21,12 +21,19 @@ const getAllJobs = async (req, res) => {
       }
     }
     let jobs;
-    const { posterType } = Job.findById(req.user.id);
-    if (posterType === "studio") {
-      queryFilters.posterType = "studio";
-    } else if (posterType === "artist") {
-      queryFilters.posterType = "artist";
-    }
+    // console.log(req.user);
+    // const { posterType } = Job.findById(req.user.id);
+    
+    // if (posterType === "studio") {
+    //   queryFilters.posterType = "studio";
+    // } else if (posterType === "artist") {
+    //   queryFilters.posterType = "artist";
+    // }
+    jobs = await Job.find(queryFilters)
+      .sort(sort)
+      .limit(parseInt(limit))
+      .skip((parseInt(page) - 1) * parseInt(limit))
+      .exec();
 
     const total = await Job.countDocuments(filters);
 
