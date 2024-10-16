@@ -5,7 +5,7 @@ import ManageJobBar from "../components/sideBar/MangeJobBar";
 export const ManageJobLayout = () => {
   return (
     <div className="container flex  justify-between min-w-full">
-        <ManageJobBar />
+      <ManageJobBar />
       <main className="flex justify-center">
         <Outlet />
       </main>

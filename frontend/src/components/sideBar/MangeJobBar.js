@@ -21,7 +21,7 @@ const ManageJobBar = () => {
             to="recuitment"
             className={({ isActive }) => (isActive ? "active" : "")}
           >
-            <Handshake /> Resume
+            <Handshake /> Recuiment
           </NavLink>
         </li>
       </ul>

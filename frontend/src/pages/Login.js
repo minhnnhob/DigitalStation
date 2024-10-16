@@ -21,6 +21,11 @@ const Login = () => {
       window.location.href = "/admin";
     } else if (result.payload.userType === "artist") {
       window.location.href = "/";
+    }else if (result.payload.userType === "studio") {
+      window.location.href = "/";
+    }else{
+      return alert("Hello! I am an alert box hehehehehehehheheheehheh!!"); ;
+
     }
   };
 

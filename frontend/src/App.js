@@ -5,7 +5,6 @@ import {
   RouterProvider,
 } from "react-router-dom";
 
-
 import { Provider } from "react-redux";
 
 import Register from "./pages/Register";
@@ -39,9 +38,7 @@ import JobApplication from "./pages/JobApplication";
 import Collections from "./pages/Collections";
 import { ManageJobLayout } from "./layouts/ManageJobLayout";
 import Recuitment from "./pages/Recuitment";
-
-
-
+import { StudioLayout } from "./layouts/StudioLayout";
 
 function App() {
   useEffect(() => {
@@ -55,51 +52,51 @@ function App() {
     createRoutesFromElements(
       <Route path="/" element={<RootLayout />}>
         <Route index element={<Explore />} />
-        <Route path="job" element={<JobBoardLayout/>}>
+        <Route path="job" element={<JobBoardLayout />}>
           <Route index element={<JobBoard />} />
           <Route path="job-listings" element={<JobBoard />} />
-          <Route path="studios" element={< StudiosListing/>} />
+          <Route path="studios" element={<StudiosListing />} />
           <Route path="saved-jobs" element={<SavedJobsListing />} />
           <Route path="job-preferences" element={<JobPreferences />} />
-          
         </Route>
         <Route path="/job/:jobId" element={<DetailJob />} />
 
         <Route path="/artwork/:artworkId" element={<ArtworkDetail />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
-        <Route path= "portfolio" element={<PortfolioPage/>}/>
-       
+        <Route path="portfolio" element={<PortfolioPage />} />
+
         <Route path="edit-profile" element={<ProfileLayout />}>
           <Route index element={<ProfileForm />} />
         </Route>
-        <Route path="project/new" element={<UploadArtwork/>} />
+        <Route path="project/new" element={<UploadArtwork />} />
 
         <Route path="studio/:id" element={<DetailStudio />} />
 
-
-
-        <Route path="job_manage" element={<ManageJobLayout/>}>
-          <Route  index element={<JobApplication/>} />
-          <Route path="recuitment/*" element={<Recuitment/>} />
-        
+        <Route path="job_manage" element={<ManageJobLayout />}>
+          <Route index element={<JobApplication />} />
+          <Route path="recuitment/*" element={<Recuitment />} />
         </Route>
-        <Route path="collections" element={<Collections/>} />
+        <Route path="collections" element={<Collections />} />
 
-      {/* Admin Route */}
+        {/* Studio Route */}
 
-      <Route path="admin" element={<AdminLayout/>} >
-        <Route index element={<div>Users</div>} />
-        <Route path="dashboard" element={<div>Jobs</div>} />
-        <Route path="manage-users" element={<div>Jobs</div>} />
-        <Route path="manage-topics" element={<div>Toic</div>} />
+        <Route path="studio" element={<StudioLayout />}/>
+        {/* Admin Route */}
+
+        <Route path="admin" element={<AdminLayout />}>
+          <Route index element={<div>Users</div>} />
+          <Route path="dashboard" element={<div>Jobs</div>} />
+          <Route path="manage-users" element={<div>Jobs</div>} />
+          <Route path="manage-topics" element={<div>Toic</div>} />
+        </Route>
+        <Route path="*" element={<div>Not Found</div>} />
+
+
+
       </Route>
 
-
-
-      </Route>
-
-
+    
     )
   );
 
