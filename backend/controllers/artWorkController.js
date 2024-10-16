@@ -372,13 +372,16 @@ const addArtwork = async (req, res) => {
   session.startTransaction();
 
   try {
-    const { title, description, artistId, tags, fileDescriptions, topic } = req.body;
-    
+    const { title, description, artistId, tags, fileDescriptions, topic } =
+      req.body;
+
     // Validate required fields
     if (!title || !req.files || !artistId) {
       await session.abortTransaction();
       session.endSession();
-      return res.status(400).json({ error: "Title, files, and artist are required." });
+      return res
+        .status(400)
+        .json({ error: "Title, files, and artist are required." });
     }
 
     // Validate artistId
@@ -391,28 +394,48 @@ const addArtwork = async (req, res) => {
     // Handle Topics: Convert topic names to ObjectIds (same as before)
     let topicIds = [];
     if (topic) {
-      const topicNames = Array.isArray(topic) ? topic : topic.split(",").map((t) => t.trim());
+      const topicNames = Array.isArray(topic)
+        ? topic
+        : topic.split(",").map((t) => t.trim());
 
-      const existingTopics = await Topic.find({ name: { $in: topicNames } }).session(session);
+      const existingTopics = await Topic.find({
+        name: { $in: topicNames },
+      }).session(session);
       const existingTopicNames = existingTopics.map((t) => t.name);
       const existingTopicIds = existingTopics.map((t) => t._id);
 
-      const newTopicNames = topicNames.filter((t) => !existingTopicNames.includes(t));
+      const newTopicNames = topicNames.filter(
+        (t) => !existingTopicNames.includes(t)
+      );
 
       let newTopics = [];
       if (newTopicNames.length > 0) {
-        newTopics = await Topic.insertMany(newTopicNames.map((name) => ({ name, artworkCount: 1 })), { session });
+        newTopics = await Topic.insertMany(
+          newTopicNames.map((name) => ({ name, artworkCount: 1 })),
+          { session }
+        );
       }
 
       topicIds = [...existingTopicIds, ...newTopics.map((t) => t._id)];
 
       if (existingTopicIds.length > 0) {
-        await Topic.updateMany({ _id: { $in: existingTopicIds } }, { $inc: { artworkCount: 1 } }, { session });
+        await Topic.updateMany(
+          { _id: { $in: existingTopicIds } },
+          { $inc: { artworkCount: 1 } },
+          { session }
+        );
       }
     }
 
     // Handle Tags: (same as before)
-    const tagsArray = tags ? Array.isArray(tags) ? tags : tags.split(",").map((tag) => tag.trim()).filter((tag) => tag) : [];
+    const tagsArray = tags
+      ? Array.isArray(tags)
+        ? tags
+        : tags
+            .split(",")
+            .map((tag) => tag.trim())
+            .filter((tag) => tag)
+      : [];
     const tagUpdateOperations = tagsArray.map((tag) => ({
       updateOne: {
         filter: { name: tag },
@@ -437,15 +460,17 @@ const addArtwork = async (req, res) => {
         thumbnailUrl = cloudinary.url(file.filename, {
           resource_type: "video",
           format: "jpg",
-          start_offset: "10",
-          transformation: [{ effect: "sharpen" }],
+          transformation: [{ start_offset: "10", effect: "sharpen" }],
         });
       }
 
       return {
-        fileUrl: file.path,  // Use the path/secure_url from req.files
+        fileUrl: file.path, // Use the path/secure_url from req.files
         fileType: file.mimetype.startsWith("video/") ? "video" : "image",
-        description: fileDescriptions && fileDescriptions[index] ? fileDescriptions[index] : "",
+        description:
+          fileDescriptions && fileDescriptions[index]
+            ? fileDescriptions[index]
+            : "",
       };
     });
 
@@ -472,7 +497,6 @@ const addArtwork = async (req, res) => {
     res.status(500).json({ error: "Server Error" });
   }
 };
-
 
 //Update Artwork function
 const updateArtwork = async (req, res) => {

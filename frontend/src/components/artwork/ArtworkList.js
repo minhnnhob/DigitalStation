@@ -43,11 +43,11 @@ const ArtworkList = () => {
 
   return (
     <div>
-      <div >
+      <div>
         <TopicList topics={topics} className="flex" />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-0.5 p-2 bg-[#121212]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 xxl:grid-cols-6 gap-0.5 p-2 bg-[#121212]">
         {artworks.map((artwork) => (
           <ArtworkCart key={artwork._id} artwork={artwork} />
         ))}
