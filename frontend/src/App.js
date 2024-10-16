@@ -35,6 +35,11 @@ import JobPreferences from "./pages/JobPreferences";
 import DetailJob from "./pages/JobDetail";
 import AdminLayout from "./layouts/AdminLayout";
 import DetailStudio from "./components/studio/DetailStudio";
+import JobApplication from "./pages/JobApplication";
+import Collections from "./pages/Collections";
+import { ManageJobLayout } from "./layouts/ManageJobLayout";
+import Recuitment from "./pages/Recuitment";
+
 
 
 
@@ -71,6 +76,15 @@ function App() {
         <Route path="project/new" element={<UploadArtwork/>} />
 
         <Route path="studio/:id" element={<DetailStudio />} />
+
+
+
+        <Route path="job_manage" element={<ManageJobLayout/>}>
+          <Route  index element={<JobApplication/>} />
+          <Route path="recuitment/*" element={<Recuitment/>} />
+        
+        </Route>
+        <Route path="collections" element={<Collections/>} />
 
       {/* Admin Route */}
 

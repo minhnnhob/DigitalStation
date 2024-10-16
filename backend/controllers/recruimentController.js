@@ -84,6 +84,25 @@ const applyJob = async (req, res) => {
   }
 };
 
+const getOwnRecruitment = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const recruitment = await Recruiment.find({ applicant: userId }).populate(
+      "job",
+      "status"
+    );
+    if (!recruitment) {
+      return res.status(404).json({ error: "No applications found" });
+    }
+
+    res.status(200).json(recruitment);
+  } catch (error) {
+    console.log("Error getting recruitment:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 const updateRecruitment = async (req, res) => {
   const { applicationId } = req.params;
   const { updateStatus } = req.body;
@@ -235,4 +254,6 @@ module.exports = {
   scheduleInterview,
   confirmInterview,
   addFeedback,
+
+  getOwnRecruitment,
 };

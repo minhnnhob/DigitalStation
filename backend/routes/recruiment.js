@@ -5,7 +5,7 @@ const {
   addFeedback,
   scheduleInterview,
   confirmInterview,
-  autoCloseJob,
+  getOwnRecruitment
 
 } = require("../controllers/recruimentController");
 const { upload } = require("../config/cloudinary");
@@ -24,5 +24,6 @@ router.patch('/:applicationId/updateStatus', updateRecruitment);
 router.patch('/:applicationId/addInterviewFeedback', addFeedback);
 router.post('/:applicationId/scheduleInterview', scheduleInterview);
 router.patch('/:applicationId/confirmInterview', confirmInterview);
+router.get('/my_recuitment', getOwnRecruitment);
 
 module.exports = router;
