@@ -15,6 +15,9 @@ import {
   hideNotification,
 } from "../../store/slices/notificationSlice";
 
+import ButtonUpload from "../Button/Button";
+import { ArrowUp } from "lucide-react";
+
 const EditProfile = () => {
   const dispatch = useDispatch();
   const { id, userInfor } = useSelector((state) => state.user);
@@ -84,10 +87,9 @@ const EditProfile = () => {
     console.log(profilePicture);
 
     for (var pair of fromData.entries()) {
-      console.log(pair[0]+ ', ' + pair[1]); 
-  }  
+      console.log(pair[0] + ", " + pair[1]);
+    }
 
-    
     try {
       const response = await axios.patch(
         `http://localhost:4000/api/users`,
@@ -131,13 +133,16 @@ const EditProfile = () => {
       </div>
     );
   }
-
   return (
-    <>
-      <h1 className="profile-h-edit ">Edit Profile</h1>
-      <div className="profile-container bg-bg-df">
-        <div className="profile-content">
-          <div className="profile-info ">
+    <div className="w-full mt-6">
+      <h1 className="w-full text-3xl rounded-t-md font-bold bg-bg-pf px-10 py-6">
+        {" "}
+        Profile
+      </h1>
+      <div className="  bg-[#19191f] w-full h-full  px-8 py-8">
+        <div className="flex gap-4 justify-around">
+          {/* Information */}
+          <div className=" w-[45%] space-y-6">
             <label>
               Name
               <input
@@ -172,26 +177,39 @@ const EditProfile = () => {
             </label>
           </div>
 
-          <div className="avatar-section">
-            {/* <div> */}
-            <div>
-              <img src={avatar} alt="Avatar" className="avatarProfile" />
+          <div className="w-[55%] ">
+            <label>Avatar</label>
+            <div className=" flex-col justify-center items-center  bg-bg-pf rounded-sm border-2 border-gray-500 p-4  mb-4">
+              <div className="flex justify-center items-center  p-4">
+                <img
+                  src={avatar}
+                  alt="Avatar"
+                  className="w-28 h-28 rounded-full object-cover"
+                />
+              </div>
+              <div className="flex justify-center items-center">
+                <ButtonUpload onChange={handleAvatarChange}>
+                  Upload Avatar
+                </ButtonUpload>
+              </div>
             </div>
-            {/* <button className="upload-avatar-btn"> */}
-            Upload New Avatar
-            <input type="file" onChange={handleAvatarChange} />
-            {/* </button> */}
-            {/* </div> */}
-            {/* <div> */}
-            <div
-              className="cover-image"
-              style={{ backgroundImage: `url(${coverImage})` }}
-            >
-              {/* <button className="change-cover-btn"> */}
-              Change cover image (1920x640)
-              <input type="file" onChange={handleCoverImageChange} />
-              {/* </button> */}
+            <label>Cover Image</label>
+            <div className=" flex-col justify-center items-center  bg-bg-pf rounded-sm border-2 border-gray-500 p-4 mb-4">
+              <div className="flex justify-center items-center w-full  p-4">
+                <img
+                  src={coverImage}
+                  alt="coverImage"
+                  className="w-32 h-full  object-cover"
+                />
+              </div>
+              <div className=" ">
+                <ButtonUpload onChange={handleCoverImageChange}>
+                  {" "}
+                  Change cover image (1920x640+)
+                </ButtonUpload>
+              </div>
             </div>
+
             {/* </div> */}
           </div>
         </div>
@@ -199,7 +217,7 @@ const EditProfile = () => {
           Save
         </button>
       </div>
-    </>
+    </div>
   );
 };
 

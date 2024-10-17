@@ -68,9 +68,7 @@ const getUserById = async (req, res) => {
 
   try {
     const user = await User.findById(id)
-      .select(
-        " email name profilePicture coverPicture interestedTopics headline city country socialLinks"
-      )
+      
       .populate("interestedTopics", "name");
 
     const followers = await Follower.countDocuments({ followingId: id });
@@ -94,6 +92,7 @@ const getUserById = async (req, res) => {
       interestedTopics: user.interestedTopics,
       followersCount: followers,
       followingCount: following,
+      createdAt: user.createdAt,
     };
 
     res.status(200).json(userData);

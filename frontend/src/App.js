@@ -66,7 +66,7 @@ function App() {
         <Route path="register" element={<Register />} />
         <Route path="portfolio" element={<PortfolioPage />} />
 
-        <Route path="edit-profile" element={<ProfileLayout />}>
+        <Route path="profile" element={<ProfileLayout />}>
           <Route index element={<ProfileForm />} />
         </Route>
         <Route path="project/new" element={<UploadArtwork />} />
