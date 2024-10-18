@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../store/slices/userSlice";
 import { MdAirlineSeatIndividualSuite } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const error = useSelector((state) => state.user.error);
@@ -10,6 +11,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,15 +19,16 @@ const Login = () => {
     const currUser = { email, password };
     await dispatch(login(currUser));
     const result = await dispatch(login(currUser));
-    if (result.payload.userType === "admin") {
-      window.location.href = "/admin";
-    } else if (result.payload.userType === "artist") {
-      window.location.href = "/";
-    }else if (result.payload.userType === "studio") {
-      window.location.href = "/";
-    }else{
-      return alert("Hello! I am an alert box hehehehehehehheheheehheh!!"); ;
+    console.log(result.payload.userType);
 
+    if (result.payload.userType === "admin") {
+      navigate("/admin");
+    } else if (result.payload.userType === "artist") {
+      navigate("/");
+    } else if (result.payload.userType === "studio") {
+      navigate("/");
+    } else {
+      return alert("Hello! I am an alert box hehehehehehehheheheehheh!!");
     }
   };
 

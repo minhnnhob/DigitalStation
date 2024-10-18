@@ -94,85 +94,91 @@ const userSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchUserInfo.pending, (state, action) => {
-      state.loading = true;
-    });
+    builder
+      .addCase(fetchUserInfo.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(fetchUserInfo.fulfilled, (state, action) => {
+        state.loading = false;
+        state.userInfor = action.payload;
+      })
+      .addCase(fetchUserInfo.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
 
-    builder.addCase(fetchUserInfo.fulfilled, (state, action) => {
-      state.loading = false;
-      state.userInfor = action.payload;
-    });
+    builder
+      .addCase(fetchCurrentUser.pending, (state, action) => {
+        state.fetchCurrentUserLoading = true;
+        state.loading = true;
+      })
+      .addCase(fetchCurrentUser.fulfilled, (state, action) => {
+        state.fetchCurrentUserLoading = false;
+        state.loading = false;
+        state.loggedIn = true;
+        state.id = action.payload.userId;
+        state.email = action.payload.email;
+        state.name = action.payload.name;
+        state.profilePicture = action.payload.profilePicture;
+        state.role = action.payload.role;
+      })
 
-    builder.addCase(fetchUserInfo.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.error.message;
-    });
+      .addCase(fetchCurrentUser.rejected, (state, action) => {
+        state.fetchCurrentUserLoading = false;
+        state.loading = false;
+        state.loggedIn = false;
+        state.id = null;
+        state.email = null;
+        state.name = null;
+      });
 
-    builder.addCase(fetchCurrentUser.pending, (state, action) => {
-      state.fetchCurrentUserLoading = true;
-      state.loading = true;
-    });
-    builder.addCase(fetchCurrentUser.fulfilled, (state, action) => {
-      state.fetchCurrentUserLoading = false;
-      state.loading = false;
-      state.loggedIn = true;
-      state.id = action.payload.id;
-      state.email = action.payload.email;
-      state.name = action.payload.name;
-      state.profilePicture = action.payload.profilePicture;
-      state.role = action.payload.role;
-    });
+    builder
+      .addCase(login.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(login.fulfilled, (state, action) => {
+        state.loading = false;
+        state.loggedIn = true;
+        state.id = action.payload.userId;
+        state.email = action.payload.email;
+        state.role = action.payload.userType;
+        console.log(action.payload);
+      })
+      .addCase(login.rejected, (state, action) => {
+        state.loading = false;
+      });
 
-    builder.addCase(fetchCurrentUser.rejected, (state, action) => {
-      state.fetchCurrentUserLoading = false;
-      state.loading = false;
-      state.loggedIn = false;
-      state.id = null;
-      state.email = null;
-      state.name = null;
-    });
+    builder
+      .addCase(register.pending, (state, action) => {
+        state.loading = true;
+      })
 
-    builder.addCase(login.pending, (state, action) => {
-      state.loading = true;
-    });
-    builder.addCase(login.fulfilled, (state, action) => {
-      state.loading = false;
-      state.loggedIn = true;
-      state.id = action.payload.id;
-      state.email = action.payload.email;
-      state.role = action.payload.role;
-    });
-    builder.addCase(login.rejected, (state, action) => {
-      state.loading = false;
-    });
+      .addCase(register.fulfilled, (state, action) => {
+        state.loading = false;
+        state.loggedIn = true;
+        state.id = action.payload.id;
+        state.email = action.payload.email;
+        state.role = action.payload.role;
+      })
 
-    builder.addCase(register.pending, (state, action) => {
-      state.loading = true;
-    });
-    builder.addCase(register.fulfilled, (state, action) => {
-      state.loading = false;
-      state.loggedIn = true;
-      state.id = action.payload.id;
-      state.email = action.payload.email;
-      state.role = action.payload.role;
-    });
-    builder.addCase(register.rejected, (state, action) => {
-      state.loading = false;
-    });
+      .addCase(register.rejected, (state, action) => {
+        state.loading = false;
+      });
 
-    builder.addCase(logout.pending, (state, action) => {
-      state.loading = true;
-    });
-    builder.addCase(logout.fulfilled, (state, action) => {
-      state.loading = false;
-      state.loggedIn = false;
-      state.id = null;
-      state.email = null;
-      state.role = null;
-    });
-    builder.addCase(logout.rejected, (state, action) => {
-      state.loading = false;
-    });
+    builder
+      .addCase(logout.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(logout.fulfilled, (state, action) => {
+        state.loading = false;
+        state.loggedIn = false;
+        state.id = null;
+        state.email = null;
+        state.role = null;
+      })
+      .addCase(logout.rejected, (state, action) => {
+        state.loading = false;
+      });
   },
 });
 

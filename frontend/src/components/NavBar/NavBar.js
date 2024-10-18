@@ -7,6 +7,7 @@ import { IoIosNotifications, IoMdCart } from "react-icons/io";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { useState } from "react";
 import ProfileMenu from "../profileMenu/ProfileMenu";
+import { useNavigate } from "react-router-dom";
 
 import logo from "../../assets/Artboard 1@22x.png";
 
@@ -15,10 +16,10 @@ const NavBar = () => {
   const loggedIn = useSelector((state) => state.user.loggedIn);
   const { profilePicture } = useSelector((state) => state.user);
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
   const handleLogout = () => {
     dispatch(logout());
-    window.location.href = "/login";
+    navigate("/login");
   };
 
   const toggleMenu = () => {
@@ -30,7 +31,11 @@ const NavBar = () => {
         <div className="flex text-gray-color ml-5 text-3xl font-black items-start min-w-max">
           <Link to="/">
             {/* <h1> DigiStation</h1> */}
-            <img src={logo} alt="DigiStation" className="w-10 h-10 object-fit " />
+            <img
+              src={logo}
+              alt="DigiStation"
+              className="w-10 h-10 object-fit "
+            />
           </Link>
         </div>
         {/* link */}
@@ -75,7 +80,6 @@ const NavBar = () => {
           <div className=" min-w-max">
             {loggedIn ? (
               <div className="flex items-center gap-5 ">
-                
                 <Link
                   to="/project/new"
                   className="no-underline  text-gray-color "
@@ -95,12 +99,17 @@ const NavBar = () => {
               </div>
             ) : (
               <div className="flex w-full gap-4">
-                
-                <Link to="/register" className="bg-bg-pf font-semibold rounded-md px-6 py-2">
+                <Link
+                  to="/register"
+                  className="bg-bg-pf font-semibold rounded-md px-6 py-2"
+                >
                   Register
                 </Link>
 
-                <Link to="/login" className="login-link bg-primary font-semibold rounded-md px-6 py-2 ">
+                <Link
+                  to="/login"
+                  className="login-link bg-primary font-semibold rounded-md px-6 py-2 "
+                >
                   Log in
                 </Link>
               </div>

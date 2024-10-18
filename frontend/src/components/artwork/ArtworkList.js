@@ -11,6 +11,7 @@ import {
   hideNotification,
 } from "../../store/slices/notificationSlice";
 import TopicList from "../topic/topicList";
+import { fetchAllTopics } from "../../store/slices/category/topicSlice";
 
 const ArtworkList = () => {
   const dispatch = useDispatch();
@@ -32,6 +33,12 @@ const ArtworkList = () => {
     };
 
     fetchData();
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (topics.length === 0) {
+      dispatch(fetchAllTopics());
+    }
   }, [dispatch]);
 
   if (artworks === null) {
