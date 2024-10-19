@@ -42,9 +42,7 @@ import { StudioLayout } from "./layouts/StudioLayout";
 
 function App() {
   useEffect(() => {
-    // store.dispatch(fetchCurrentUser());
-    // store.dispatch(fetchAllTopics());
-
+    store.dispatch(fetchCurrentUser());
     // eslint-disable-next-line
   }, []);
 

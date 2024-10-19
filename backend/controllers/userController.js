@@ -5,9 +5,9 @@ const jwt = require("jsonwebtoken");
 const VfToken = require("../models/vfTokenModel");
 const cloudinary = require("cloudinary").v2;
 
-const generateToken = (_id, userType) => {
-  return jwt.sign({ _id: _id, userType: userType }, process.env.JWT_SECRET, {
-    expiresIn: "1h",
+const generateToken = (_id) => {
+  return jwt.sign({ _id: _id }, process.env.JWT_SECRET, {
+    expiresIn: "180d",
   });
 };
 
@@ -49,7 +49,7 @@ const getAuthUser = async (req, res) => {
     const userData = await User.findById(req.user._id);
 
     // Structure the response to include only the necessary user details
-
+    console.log(userData.profilePicture);
     res.status(200).json({
       id: userData._id,
       email: userData.email,
@@ -64,12 +64,10 @@ const getAuthUser = async (req, res) => {
 };
 
 const getUserById = async (req, res) => {
-  const id = req.params.id;
+  const id = req.user.id;
 
   try {
-    const user = await User.findById(id)
-      
-      .populate("interestedTopics", "name");
+    const user = await User.findById(id).populate("interestedTopics", "name");
 
     const followers = await Follower.countDocuments({ followingId: id });
     const following = await Follower.countDocuments({ followerId: id });
@@ -108,12 +106,15 @@ const loginUser = async (req, res) => {
   try {
     const user = await User.login(email, password);
     // create jwt token
-    const token = generateToken(user._id, user.userType);
-    res.cookie("token", token);
-
-    res
-      .status(200)
-      .json({ email, userId: user._id, token, userType: user.userType });
+    const token = generateToken(user._id);
+    res.cookie("token", token, {
+      httpOnly: true, // Prevent access by JavaScript
+      secure: process.env.NODE_ENV === "production", // Use HTTPS in production
+      sameSite: "Strict", // Strict CSRF prevention
+    });
+    res.status(200).json({
+      email,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

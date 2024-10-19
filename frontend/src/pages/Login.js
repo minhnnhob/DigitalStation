@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { login } from "../store/slices/userSlice";
 import { MdAirlineSeatIndividualSuite } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { fetchCurrentUser } from "../store/slices/userSlice";
 
 const Login = () => {
   const error = useSelector((state) => state.user.error);
@@ -18,14 +19,15 @@ const Login = () => {
 
     const currUser = { email, password };
     await dispatch(login(currUser));
-    const result = await dispatch(login(currUser));
-    console.log(result.payload.userType);
+    await dispatch(login(currUser));
+    const user = await dispatch(fetchCurrentUser());
+    console.log(user.payload.role) 
 
-    if (result.payload.userType === "admin") {
+    if (user.payload.role === "admin") {
       navigate("/admin");
-    } else if (result.payload.userType === "artist") {
+    } else if (user.payload.role === "artist") {
       navigate("/");
-    } else if (result.payload.userType === "studio") {
+    } else if (user.payload.role === "studio") {
       navigate("/");
     } else {
       return alert("Hello! I am an alert box hehehehehehehheheheehheh!!");

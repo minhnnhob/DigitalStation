@@ -8,6 +8,7 @@ const {
   getAuthUser,
   updateUser,
   getVerifyToken,
+  
 } = require("../controllers/userController");
 const { uploadUser } = require("../config/cloudinary");
 
@@ -19,7 +20,11 @@ router.post("/register", registerUser);
 
 router.get("/logout", logoutUser);
 
+
+
 router.get("/:id/verify/:token", getVerifyToken);
+
+
 
 router.use(requireAuth);
 
@@ -27,6 +32,6 @@ router.get("/", getAuthUser);
 
 router.patch("/", uploadUser, updateUser);
 
-router.get("/:id", getUserById);
+router.get("/infor", getUserById);
 
 module.exports = router;

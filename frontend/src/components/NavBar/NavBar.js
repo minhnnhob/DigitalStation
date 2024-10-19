@@ -3,13 +3,14 @@ import { logout } from "../../store/slices/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { FaSearch } from "react-icons/fa";
 import { MdFileUpload } from "react-icons/md";
-import { IoIosNotifications, IoMdCart } from "react-icons/io";
+import { IoIosNotifications } from "react-icons/io";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProfileMenu from "../profileMenu/ProfileMenu";
 import { useNavigate } from "react-router-dom";
 
 import logo from "../../assets/Artboard 1@22x.png";
+import { fetchCurrentUser } from "../../store/slices/userSlice";
 
 const NavBar = () => {
   const [menuVisible, setMenuVisible] = useState(false);
@@ -17,6 +18,7 @@ const NavBar = () => {
   const { profilePicture } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const handleLogout = () => {
     dispatch(logout());
     navigate("/login");

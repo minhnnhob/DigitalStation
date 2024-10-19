@@ -17,9 +17,7 @@ const requireAuth = async (req, res, next) => {
     // Find the user associated with the token
     req.user = await User.findOne({ _id }).select("_id");
     next();
-    
   } catch (err) {
-    console.log(err);
     return res.status(401).json({ error: "You must be logged in" });
   }
 };

@@ -20,23 +20,12 @@ import { ArrowUp } from "lucide-react";
 
 const EditProfile = () => {
   const dispatch = useDispatch();
-  const { id, userInfor } = useSelector((state) => state.user);
 
-  const [loadingl, setLoadingl] = useState(false);
+  const id = useSelector((state) => state.user.id);
+  const userInfor = useSelector((state) => state.user.userInfor);
+  const user = useSelector((state) => state.user);
 
-  const [name, setName] = useState(userInfor.name || "");
-  const [headline, setHeadline] = useState(userInfor.headline || "");
-  const [city, setCity] = useState(userInfor.city || "");
-  const [country, setCountry] = useState(userInfor.country || "");
-
-  const [avatar, setAvatar] = useState(userInfor.profilePicture || "");
-  const [coverImage, setCoverImage] = useState(userInfor.coverPicture || "");
-  const [profilePicture, setProfilePicture] = useState(
-    userInfor.profilePicture || null
-  );
-  const [coverPicture, setCoverPicture] = useState(
-    userInfor.coverPicture || null
-  );
+  const loading = useSelector((state) => state.user.loading);
 
   useEffect(() => {
     if (!id) {
@@ -45,10 +34,19 @@ const EditProfile = () => {
   }, [dispatch, id]);
 
   useEffect(() => {
-    if (id) {
-      dispatch(fetchUserInfo(id));
-    }
+    dispatch(fetchUserInfo(id));
   }, [dispatch, id]);
+
+  const [loadingl, setLoadingl] = useState(false);
+
+  const [name, setName] = useState(userInfor?.name || "");
+  const [headline, setHeadline] = useState(userInfor?.headline || "");
+  const [city, setCity] = useState(userInfor?.city || "");
+  const [country, setCountry] = useState(userInfor?.country || "");
+
+  const [avatar, setAvatar] = useState(userInfor?.profilePicture || "");
+  const [coverImage, setCoverImage] = useState(userInfor?.coverPicture || "");
+
 
   useEffect(() => {
     if (userInfor) {
@@ -56,19 +54,19 @@ const EditProfile = () => {
       setHeadline(userInfor.headline || "");
       setCity(userInfor.city || "");
       setCountry(userInfor.country || "");
-      setAvatar(userInfor.profilePicture || "");
-      setCoverImage(userInfor.coverPicture || "");
+      setAvatar(userInfor?.profilePicture || "");
+      setCoverImage(userInfor?.coverPicture || "");
     }
   }, [dispatch, userInfor]);
 
   const handleAvatarChange = (e) => {
     setAvatar(URL.createObjectURL(e.target.files[0]));
-    setProfilePicture(e.target.files[0]);
+    
   };
 
   const handleCoverImageChange = (e) => {
     setCoverImage(URL.createObjectURL(e.target.files[0]));
-    setCoverPicture(e.target.files[0]);
+    
   };
 
   const handleSave = async (e) => {
@@ -80,12 +78,9 @@ const EditProfile = () => {
     fromData.append("headline", headline);
     fromData.append("city", city);
     fromData.append("country", country);
-    fromData.append("profilePicture", profilePicture);
-    fromData.append("coverPicture", coverPicture);
+    fromData.append("profilePicture", avatar);
+    fromData.append("coverPicture", coverImage);
     setLoadingl(true);
-
-    console.log(profilePicture);
-
     for (var pair of fromData.entries()) {
       console.log(pair[0] + ", " + pair[1]);
     }
@@ -125,6 +120,15 @@ const EditProfile = () => {
     }
     setLoadingl(false);
   };
+
+  if (loading) {
+    return (
+      <div className="profile-container w-1/2">
+        <Loading />
+      </div>
+    );
+  }
+
 
   if (loadingl) {
     return (

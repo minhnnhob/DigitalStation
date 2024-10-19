@@ -15,6 +15,7 @@ import {
 
 const ArtworkUpload = () => {
   const { id } = useSelector((state) => state.user);
+  console.log(id);
 
   const {loading} = useSelector(state => state.artwork);
 
