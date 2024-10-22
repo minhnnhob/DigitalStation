@@ -26,6 +26,23 @@ const applyJob = createAsyncThunk(
   }
 );
 
+const getOwnRecruitment = createAsyncThunk(
+  "recruitment/getOwnRecruitment",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        "http://localhost:4000/api/recruitment/my_recuitment",
+        {
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 const recruitmentState = createSlice({
   name: "recruitment",
   initialState,
@@ -43,9 +60,22 @@ const recruitmentState = createSlice({
       state.loading = false;
       state.error = action.payload;
     });
+
+    builder.addCase(getOwnRecruitment.pending, (state, action) => {
+      state.loading = true;
+      state.error = null;
+    }).addCase(getOwnRecruitment.fulfilled, (state, action) => {
+      state.applyDefaults = action.payload;
+      state.loading = false;
+    })
+    .addCase(getOwnRecruitment.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload
+    })
+    ;
   },
 });
 
 export default recruitmentState.reducer;
-export { applyJob };
+export { applyJob, getOwnRecruitment };
 

@@ -67,7 +67,7 @@ const RightSidebar = ({ userInfor, isCollapsed, toggleCollapse }) => {
           isCollapsed ? " h-10 w-full] " : "w-full py-1"
         }`}
         onClick={() => {
-          window.location.href = "/edit-profile";
+          window.location.href = "/profile";
         }}
       >
         <button>

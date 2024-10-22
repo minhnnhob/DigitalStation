@@ -32,12 +32,25 @@ const ProfileMenu = ({ visible, onClose, handleLogout }) => {
           </>
         ) : null}
 
-        <Link to="/collections">My Collections</Link>
+        <Link to="/collections" onClick={onClose}>
+          My Collections
+        </Link>
 
-        <Link to="/job_manage">Manage Job</Link>
+        <Link to="/job_manage" onClick={onClose}>
+          Manage Job
+        </Link>
         <hr className="opacity-40"></hr>
-        <Link to="/portfolio">Manage Portfolio</Link>
-        <button onClick={handleLogout}>Log out</button>
+        <Link to="/portfolio" onClick={onClose}>
+          Manage Portfolio
+        </Link>
+        <button
+          onClick={() => {
+            handleLogout();
+            onClose();
+          }}
+        >
+          Log out
+        </button>
       </div>
     </div>
   );

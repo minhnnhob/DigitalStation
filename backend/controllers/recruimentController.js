@@ -88,10 +88,22 @@ const getOwnRecruitment = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    const recruitment = await Recruiment.find({ applicant: userId }).populate(
-      "job",
-      "status"
-    );
+    const recruitment = await Recruiment.find({ applicant: userId }).populate({
+      path: "job",
+      select: "status title postedBy studioId",
+      populate: [
+      {
+        path: "studioId",
+        model: "Studio", // Assuming the model name for the studio is "Studio"
+        select: "name", // Select the name field from the studio
+      },
+      {
+        path: "postedBy",
+        model: "User", // Assuming the model name for the user is "User"
+        select: "name", // Select the name field from the user
+      },
+      ],
+    });
     if (!recruitment) {
       return res.status(404).json({ error: "No applications found" });
     }

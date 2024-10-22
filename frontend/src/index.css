@@ -3,6 +3,10 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Import custom fonts */
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 
@@ -45,12 +49,13 @@ body {
 label,
 input {
   display: block;
+  
 }
 input {
-  /* padding: 10px;
-  margin-top: 10px;
-  margin-bottom: 20px; */
-  color: black;
+  color: white;
+  background: black;
+  background-color: #101014;
+
   width: 100%;
   border: 1px solid #ddd;
   border-radius: 4px;

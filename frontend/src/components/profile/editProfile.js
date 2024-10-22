@@ -16,6 +16,7 @@ import {
 } from "../../store/slices/notificationSlice";
 
 import ButtonUpload from "../Button/Button";
+import InforInput from "../input/inforInput";
 import { ArrowUp } from "lucide-react";
 
 const EditProfile = () => {
@@ -47,6 +48,8 @@ const EditProfile = () => {
   const [avatar, setAvatar] = useState(userInfor?.profilePicture || "");
   const [coverImage, setCoverImage] = useState(userInfor?.coverPicture || "");
 
+  const [avatarFile, setAvatarFile] = useState(userInfor?.profilePicture);
+  const [coverImageFile, setCoverImageFile] = useState(userInfor?.coverPicture);
 
   useEffect(() => {
     if (userInfor) {
@@ -61,12 +64,12 @@ const EditProfile = () => {
 
   const handleAvatarChange = (e) => {
     setAvatar(URL.createObjectURL(e.target.files[0]));
-    
+    setAvatarFile(e.target.files[0]);
   };
 
   const handleCoverImageChange = (e) => {
     setCoverImage(URL.createObjectURL(e.target.files[0]));
-    
+    setCoverImageFile(e.target.files[0]);
   };
 
   const handleSave = async (e) => {
@@ -78,8 +81,8 @@ const EditProfile = () => {
     fromData.append("headline", headline);
     fromData.append("city", city);
     fromData.append("country", country);
-    fromData.append("profilePicture", avatar);
-    fromData.append("coverPicture", coverImage);
+    fromData.append("profilePicture", avatarFile);
+    fromData.append("coverPicture", coverImageFile);
     setLoadingl(true);
     for (var pair of fromData.entries()) {
       console.log(pair[0] + ", " + pair[1]);
@@ -129,14 +132,6 @@ const EditProfile = () => {
     );
   }
 
-
-  if (loadingl) {
-    return (
-      <div className="profile-container w-1/2">
-        <Loading />
-      </div>
-    );
-  }
   return (
     <div className="w-full mt-6">
       <h1 className="w-full text-3xl rounded-t-md font-bold bg-bg-pf px-10 py-6">
@@ -147,38 +142,33 @@ const EditProfile = () => {
         <div className="flex gap-4 justify-around">
           {/* Information */}
           <div className=" w-[45%] space-y-6">
-            <label>
-              Name
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </label>
-            <label>
-              Professional Headline
-              <input
-                type="text"
-                value={headline}
-                onChange={(e) => setHeadline(e.target.value)}
-              />
-            </label>
-            <label>
-              City
-              <input
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-              />
-            </label>
-            <label>
-              Country
-              <input
-                type="text"
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-              />
-            </label>
+            <InforInput
+              label="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              type="text"
+            />
+
+            <InforInput
+              label={"Professional Headline"}
+              type="text"
+              value={headline}
+              onChange={(e) => setHeadline(e.target.value)}
+            />
+
+            <InforInput
+              label={"City"}
+              type="text"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+            />
+
+            <InforInput
+              label={"Country"}
+              type="text"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+            />
           </div>
 
           <div className="w-[55%] ">
@@ -192,9 +182,19 @@ const EditProfile = () => {
                 />
               </div>
               <div className="flex justify-center items-center">
-                <ButtonUpload onChange={handleAvatarChange}>
+                <label className="flex  border-2 border-gray-600  gap-2 px-3 py-2 bg-bg-df text-white rounded-sm cursor-pointer hover:bg-gray-700 transition-colors mb-2">
+                  <ArrowUp size={16} />
+                  <span className="text-sm font-medium">
+                    {" "}
                   Upload Avatar
-                </ButtonUpload>
+                  </span>
+                  <input
+                    type="file"
+                    className="hidden"
+                    onChange={handleAvatarChange}
+                    accept="image/*"
+                  />
+                </label>
               </div>
             </div>
             <label>Cover Image</label>
@@ -207,10 +207,19 @@ const EditProfile = () => {
                 />
               </div>
               <div className=" ">
-                <ButtonUpload onChange={handleCoverImageChange}>
-                  {" "}
-                  Change cover image (1920x640+)
-                </ButtonUpload>
+                <label className="flex  border-2 border-gray-600  gap-2 px-3 py-2 bg-bg-df text-white rounded-sm cursor-pointer hover:bg-gray-700 transition-colors mb-2">
+                  <ArrowUp size={16} />
+                  <span className="text-sm font-medium">
+                    {" "}
+                    Change cover image (1920x640+)
+                  </span>
+                  <input
+                    type="file"
+                    className="hidden"
+                    onChange={handleCoverImageChange}
+                    accept="image/*"
+                  />
+                </label>
               </div>
             </div>
 

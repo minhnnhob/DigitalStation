@@ -14,7 +14,6 @@ import { useEffect } from "react";
 // redux
 import store from "./store/index";
 import { fetchCurrentUser } from "./store/slices/userSlice";
-import { fetchAllTopics } from "./store/slices/category/topicSlice";
 
 //layouts
 import RootLayout from "./layouts/RootLayout";
@@ -39,6 +38,7 @@ import Collections from "./pages/Collections";
 import { ManageJobLayout } from "./layouts/ManageJobLayout";
 import Recuitment from "./pages/Recuitment";
 import { StudioLayout } from "./layouts/StudioLayout";
+import DetailUserApplication from "./pages/DetailUserApplication";
 
 function App() {
   useEffect(() => {
@@ -49,37 +49,49 @@ function App() {
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path="/" element={<RootLayout />}>
+        {/* Explore */}
         <Route index element={<Explore />} />
+        {/* Job Route */}
         <Route path="job" element={<JobBoardLayout />}>
           <Route index element={<JobBoard />} />
           <Route path="job-listings" element={<JobBoard />} />
           <Route path="studios" element={<StudiosListing />} />
           <Route path="saved-jobs" element={<SavedJobsListing />} />
           <Route path="job-preferences" element={<JobPreferences />} />
+          
         </Route>
         <Route path="/job/:jobId" element={<DetailJob />} />
-
-        <Route path="/artwork/:artworkId" element={<ArtworkDetail />} />
-        <Route path="login" element={<Login />} />
-        <Route path="register" element={<Register />} />
-        <Route path="portfolio" element={<PortfolioPage />} />
-
-        <Route path="profile" element={<ProfileLayout />}>
-          <Route index element={<ProfileForm />} />
-        </Route>
-        <Route path="project/new" element={<UploadArtwork />} />
-
-        <Route path="studio/:id" element={<DetailStudio />} />
 
         <Route path="job_manage" element={<ManageJobLayout />}>
           <Route index element={<JobApplication />} />
           <Route path="recuitment/*" element={<Recuitment />} />
+          <Route path="job-application" element={<JobApplication />} />
         </Route>
+
+        <Route path="recruitment/job/:recuitmentId" element={<DetailUserApplication />} />
+
+
+        
+
+        <Route path="/artwork/:artworkId" element={<ArtworkDetail />} />
+        <Route path="project/new" element={<UploadArtwork />} />
+
+        {/* Account */}
+        <Route path="login" element={<Login />} />
+        <Route path="register" element={<Register />} />
+        <Route path="portfolio" element={<PortfolioPage />} />
         <Route path="collections" element={<Collections />} />
+
+        <Route path="profile" element={<ProfileLayout />}>
+          <Route index element={<ProfileForm />} />
+        </Route>
+
+        <Route path="studio/:id" element={<DetailStudio />} />
 
         {/* Studio Route */}
 
-        <Route path="studio" element={<StudioLayout />}/>
+        <Route path="studio" element={<StudioLayout />} />
+        
         {/* Admin Route */}
 
         <Route path="admin" element={<AdminLayout />}>
@@ -89,12 +101,7 @@ function App() {
           <Route path="manage-topics" element={<div>Toic</div>} />
         </Route>
         <Route path="*" element={<div>Not Found</div>} />
-
-
-
       </Route>
-
-    
     )
   );
 
