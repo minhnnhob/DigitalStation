@@ -83,6 +83,13 @@ const getUserById = async (req, res) => {
       coverPicture: user.coverPicture,
       userType: user.userType,
 
+      hiring: user.hiring,
+      experience: user.experience,
+      proSumarry: user.proSumarry,
+      resume: user.resume.link,
+      skills: user.skills,
+      resumeName: user.resume.resumeName,
+
       headline: user.headline,
       city: user.city,
       country: user.country,
@@ -148,9 +155,11 @@ const updateUser = async (req, res) => {
     }
 
     const userData = req.body; // Extract all fields from the request body dynamically
-    let profilePicture, coverPicture; // Variables to store URLs for uploaded images
+    const resume = req.files.resume ? req.files.resume[0].path : null;
+    userData.resume = resume; // Resume file path
 
     const user = await User.findById(id);
+
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -161,7 +170,6 @@ const updateUser = async (req, res) => {
         .status(403)
         .json({ error: "Unauthorized to update this profile" });
     }
-
     // Handle interestedTopics if provided
     if (
       Array.isArray(userData.interestedTopics) &&
@@ -174,6 +182,50 @@ const updateUser = async (req, res) => {
         return res.status(400).json({ error: "No valid topics found" });
       }
       userData.interestedTopics = interested;
+    }
+
+    if (userData.skills && Array.isArray(userData.skills)) {
+      if (!Array.isArray(user.skills)) {
+        user.skills = [];
+      }
+      userData.skills.forEach((skill, index) => {
+        if (user.skills[index]) {
+          user.skills[index] = skill;
+        } else {
+          user.skills.push(skill);
+        }
+      });
+    } else if (userData.skills === null || userData.skills === "") {
+      userData.skills = [];
+    }
+
+    if (Array.isArray(userData.experience)) {
+      // If experience exists in request
+      user.experience = []; // Reset existing experiences
+
+      if (userData.experience.length > 0) {
+        // Process each experience if array is not empty
+        userData.experience.forEach((exp) => {
+          const formattedExp = {
+            company: exp.company || "",
+            title: exp.title || "",
+            country: exp.country || "",
+            city: exp.city || "",
+            startDate: exp.startDate ? new Date(exp.startDate) : null,
+            endDate:
+              exp.endDate && exp.endDate !== "null"
+                ? new Date(exp.endDate)
+                : null,
+            currentlyWorking:
+              exp.currentlyWorking === "true" || exp.currentlyWorking === true,
+            description: exp.description || "",
+          };
+          user.experience.push(formattedExp);
+        });
+      }
+    } else if (userData.experience === null || userData.experience === "") {
+      // Handle null or empty string case
+      userData.experience = [];
     }
 
     // If files are present in the request, upload them to Cloudinary
@@ -189,6 +241,14 @@ const updateUser = async (req, res) => {
         const coverPic = req.files.coverPicture[0];
         userData.coverPicture = coverPic.path; // Add cover picture to userData
       }
+    }
+
+    if (userData.resume) {
+      const resume = req.files.resume[0];
+      userData.resume = {
+        link: resume.path,
+        resumeName: resume.originalname,
+      };
     }
 
     // Update the user document with new information dynamically

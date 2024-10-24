@@ -8,15 +8,15 @@ import { useNavigate } from "react-router-dom";
 const JobApplication = () => {
   const navigate = useNavigate();
 
+  useEffect(() => {
+    dispatch(getOwnRecruitment());
+  }, []);
+
   const applyDefaults = useSelector((state) => state.recruitment.applyDefaults);
   const loading = useSelector((state) => state.recruitment.loading);
   const error = useSelector((state) => state.recruitment.error);
 
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(getOwnRecruitment());
-  }, []);
 
   const goToDetail = (recuitmentId) => {
     navigate(`/recruitment/job/${recuitmentId}`);

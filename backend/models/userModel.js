@@ -7,6 +7,8 @@ const crypto = require("crypto");
 require("dotenv").config();
 
 const Studio = require("./studioModel");
+const { link } = require("fs");
+const { title } = require("process");
 
 const Schema = mongoose.Schema;
 
@@ -49,6 +51,10 @@ const userSchema = new Schema(
       // required: true,
     },
 
+    proSumarry: {
+      type: String,
+    },
+
     profilePicture: {
       type: String,
       default: "",
@@ -84,16 +90,33 @@ const userSchema = new Schema(
       },
     ],
 
+    hiring: [
+      {
+        type: String,
+      },
+    ],
+
     experience: [
-      { jobTitle: String, company: String, startDate: Date, endDate: Date },
+      {
+        jobTitle: String,
+        title: String,
+        company: String,
+        coutry: String,
+        city: String,
+        startDate: Date,
+        endDate: Date,
+        description: String,
+      },
     ],
 
     education: [
       { institution: String, degree: String, startDate: Date, endDate: Date },
     ],
 
-    resume: String, // Cloudinary URL for the resume // URL to uploaded CV
-
+    resume: {
+      link : String,
+      resumeName: String,
+    } ,
     interestedTopics: [
       {
         type: Schema.Types.ObjectId,
@@ -145,10 +168,10 @@ userSchema.statics.register = async function (
   const salt = bcrypt.genSaltSync(10);
   const hash = bcrypt.hashSync(password, salt);
 
-  let user =null
+  let user = null;
 
   if (role === "artist") {
-     user = await this.create({
+    user = await this.create({
       email,
       password: hash,
       userType: role,
@@ -169,7 +192,7 @@ userSchema.statics.register = async function (
       throw Error("Studio information is incomplete");
     }
 
-     user = await this.create({
+    user = await this.create({
       email,
       password: hash,
       userType: role,

@@ -38,6 +38,11 @@ const storageUser = new CloudinaryStorage({
       folder = "user/profilePictures";
     } else if (file.fieldname === "coverPicture") {
       folder = "user/coverPictures";
+    }else if (
+      file.mimetype === "text/plain" ||
+      file.mimetype === "application/pdf"
+    ) {
+      folder = "resumes";
     }
 
     return {
@@ -73,6 +78,7 @@ const upload = multer({ storage: storage });
 const uploadUser = multer({ storage: storageUser }).fields([
   { name: "profilePicture", maxCount: 1 },
   { name: "coverPicture", maxCount: 1 },
+  {name: "resume", maxCount: 1},
 ]);
 
 const uploadStudio = multer({ storage: storageStudio }).fields([

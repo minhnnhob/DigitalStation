@@ -17,7 +17,7 @@ const { requireAuth } = require('../middleware/requireAuth');
 
 
 
-router.use(requireAuth);
+router.use(requireAuth); 
 
 router.post('/apply',upload.single("resumeVersion"), applyJob);
 router.patch('/:applicationId/updateStatus', updateRecruitment);

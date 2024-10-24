@@ -76,7 +76,7 @@ const fetchCurrentUser = createAsyncThunk("user/fetchCurrentUser", async () => {
     const response = await axios.get("http://localhost:4000/api/users", {
       withCredentials: true,
     });
- 
+
     return response.data;
   } catch (error) {
     throw new Error(error.message);
@@ -102,7 +102,6 @@ const userSlice = createSlice({
       .addCase(fetchUserInfo.fulfilled, (state, action) => {
         state.loading = false;
         state.userInfor = action.payload;
-        console.log(action.payload);
       })
       .addCase(fetchUserInfo.rejected, (state, action) => {
         state.loading = false;
@@ -123,7 +122,6 @@ const userSlice = createSlice({
         state.name = action.payload.name;
         state.role = action.payload.role;
         state.profilePicture = action.payload.profilePicture;
-        
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
         state.fetchCurrentUserLoading = false;
