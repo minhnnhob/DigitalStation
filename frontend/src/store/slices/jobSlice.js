@@ -15,7 +15,7 @@ const fetchAllJobs = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        "http://localhost:4000/api/jobs/jobByStudio",
+        "http://localhost:4000/api/jobs",
         { params },
         {
           withCredentials: true,
@@ -73,6 +73,42 @@ const getOwnJobs = createAsyncThunk(
       );
 
       return response.data;
+
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+const updateJob = createAsyncThunk(
+  "jobs/update",
+  async ({ jobId, jobData }, { rejectWithValue }) => {
+    try {
+      const response = await axios.patch(
+        `http://localhost:4000/api/jobs/${jobId}`,
+        jobData,
+        {
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+const deleteJob = createAsyncThunk(
+  "jobs/delete",
+  async (jobId, { rejectWithValue }) => {
+    try {
+      const response = await axios.delete(
+        `http://localhost:4000/api/jobs/${jobId}`,
+        {
+          withCredentials: true,
+        }
+      );
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -117,6 +153,7 @@ const jobState = createSlice({
       .addCase(fetchJobById.fulfilled, (state, action) => {
         state.loading = false;
         state.selectedJob = action.payload;
+        console.log("state.selectedJob", state.selectedJob);
       })
       .addCase(fetchJobById.rejected, (state, action) => {
         state.loading = false;
@@ -144,9 +181,40 @@ const jobState = createSlice({
       })
       .addCase(getOwnJobs.fulfilled, (state, action) => {
         state.loading = false;
-        state.jobs = action.payload;
+        state.jobs = action.payload.jobsWithRecruitmentCount;
+      
       })
       .addCase(getOwnJobs.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    builder
+      .addCase(updateJob.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateJob.fulfilled, (state, action) => {
+        state.loading = false;
+        state.selectedJob = action.payload;
+        
+      })
+      .addCase(updateJob.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+
+    builder
+      .addCase(deleteJob.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteJob.fulfilled, (state, action) => {
+        state.loading = false;
+        state.jobs = state.jobs.filter((job) => job._id !== action.payload);
+      })
+      .addCase(deleteJob.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
@@ -154,5 +222,5 @@ const jobState = createSlice({
 });
 
 export default jobState.reducer;
-export { fetchAllJobs, fetchJobById, createJob, getOwnJobs };
+export { fetchAllJobs, fetchJobById, createJob, getOwnJobs , updateJob, deleteJob };
 export const { setFilters } = jobState.actions;

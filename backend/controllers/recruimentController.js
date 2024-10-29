@@ -92,16 +92,16 @@ const getOwnRecruitment = async (req, res) => {
       path: "job",
       select: "status title postedBy studioId",
       populate: [
-      {
-        path: "studioId",
-        model: "Studio", // Assuming the model name for the studio is "Studio"
-        select: "name", // Select the name field from the studio
-      },
-      {
-        path: "postedBy",
-        model: "User", // Assuming the model name for the user is "User"
-        select: "name", // Select the name field from the user
-      },
+        {
+          path: "studioId",
+          model: "Studio", // Assuming the model name for the studio is "Studio"
+          select: "name", // Select the name field from the studio
+        },
+        {
+          path: "postedBy",
+          model: "User", // Assuming the model name for the user is "User"
+          select: "name", // Select the name field from the user
+        },
       ],
     });
     if (!recruitment) {
@@ -115,24 +115,70 @@ const getOwnRecruitment = async (req, res) => {
   }
 };
 
-const updateRecruitment = async (req, res) => {
+const getRecruitmentById = async (req, res) => {
   const { applicationId } = req.params;
-  const { updateStatus } = req.body;
+  const userId = req.user._id;
 
   try {
-    if (!updateStatus) {
+    const checkRecruitment = await Recruiment.findOne({}).select("applicant");
+    if (!checkRecruitment) {
+      return res.status(404).json({ error: "Application not found" });
+    }
+
+    if (checkRecruitment.applicant.toString() !== userId.toString()) {
+      return res
+        .status(401)
+        .json({ error: "You are not authorized to view this application" });
+    }
+
+    const recruitment = await Recruiment.findById(applicationId).populate({
+      path: "job",
+      select: "status title postedBy studioId budget salaryRange ",
+      populate: [
+        {
+          path: "studioId",
+          model: "Studio", // Assuming the model name for the studio is "Studio"
+          select: "name contactInfor  ",
+        },
+        {
+          path: "postedBy",
+          model: "User", // Assuming the model name for the user is "User"
+          select: "name bud", // Select the name field from the user
+        },
+      ],
+    });
+    res.status(200).json(recruitment);
+  } catch (error) {
+    console.log("Error getting recruitment by ID:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+const updateRecruitment = async (req, res) => {
+  const { applicationId } = req.params;
+
+  const updateData = req.body;
+  console.log(updateData.status);
+
+  try {
+    if (!updateData) {
       return res.status(400).json({ error: "Status is required" });
     }
 
     // Find the recruitment application
-    const recruitment = await Recruiment.findById(applicationId);
+    const recruitment = await Recruiment.findByIdAndUpdate(
+      applicationId,
+      updateData,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
     // Check if the application exists
     if (!recruitment) {
       return res.status(404).json({ error: "Application not found" });
     }
-
-    recruitment.status = updateStatus;
 
     await recruitment.save();
 
@@ -144,6 +190,7 @@ const updateRecruitment = async (req, res) => {
 };
 
 const addFeedback = async (req, res) => {
+  const userId = req.user._id;
   const { applicationId } = req.params;
   const { text, rating } = req.body;
   try {
@@ -152,10 +199,12 @@ const addFeedback = async (req, res) => {
         .status(400)
         .json({ error: "Feedback text and rating is required " });
     }
-
+    
     // Find the recruitment application
     const recruitment = await Recruiment.findById(applicationId);
-
+    if(recruitment.applicant.toString() !== userId.toString()){
+      return res.status(401).json({error: "You are not authorized to add feedback"});
+    }
     // Check if the application exists
     if (!recruitment) {
       return res.status(404).json({ error: "Application not found" });
@@ -173,7 +222,7 @@ const addFeedback = async (req, res) => {
       rating,
     };
 
-    recruitment.feedback.push(feedback);
+    recruitment.feedback = feedback;
 
     await recruitment.save();
 
@@ -247,6 +296,12 @@ const confirmInterview = async (req, res) => {
       return res.status(404).json({ error: "Application not found" });
     }
 
+    if (recruitment.applicant.toString() !== userId.toString()) {
+      return res
+        .status(401)
+        .json({ error: "You are not authorized to confirm interview" });
+    }
+
     recruitment.interviews.confirmed = true;
 
     await recruitment.save();
@@ -266,6 +321,7 @@ module.exports = {
   scheduleInterview,
   confirmInterview,
   addFeedback,
+  getRecruitmentById,
 
   getOwnRecruitment,
 };

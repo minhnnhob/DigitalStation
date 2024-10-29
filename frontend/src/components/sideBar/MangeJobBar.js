@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { FileUser, Handshake } from "lucide-react";
+import { FileUser, Handshake, FileUp } from "lucide-react";
 
 const ManageJobBar = () => {
   return (
@@ -21,7 +21,16 @@ const ManageJobBar = () => {
             to="recuitment"
             className={({ isActive }) => (isActive ? "active" : "")}
           >
-            <Handshake /> Recuiment
+            <Handshake /> Resume
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="job_posting"
+            end 
+            className={({ isActive }) => (isActive ? "active" : "")}
+          >
+            <FileUp /> My Job
           </NavLink>
         </li>
       </ul>

@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getOwnRecruitment } from "../store/slices/recruitmentSlice";
 
 import { useNavigate } from "react-router-dom";
-
+import {Link} from "react-router-dom";
 const JobApplication = () => {
   const navigate = useNavigate();
 
@@ -18,9 +18,9 @@ const JobApplication = () => {
 
   const dispatch = useDispatch();
 
-  const goToDetail = (recuitmentId) => {
-    navigate(`/recruitment/job/${recuitmentId}`);
-  };
+  // const goToDetail = (recuitmentId) => {
+  //   navigate(`/recruitment/${recuitmentId}`);
+  // };
 
   return (
     <div className="w-full bg-bg-pf ml-2 py-4 rounded-sm">
@@ -77,7 +77,7 @@ const JobApplication = () => {
                       scope="col"
                       className="relative py-3.5 pl-3 pr-4 sm:pr-0"
                     >
-                      <span className="sr-only">View</span>
+                      <span  className="sr-only">HEHE</span>
                     </th>
                   </tr>
                 </thead>
@@ -100,12 +100,12 @@ const JobApplication = () => {
                         {/* <Link
                           to={`recruitment/job/${app.job._id}`}
                           className="text-blue-500 hover:text-blue-400">View</Link> */}
-                        <h3
+                        <Link to={`${app._id}`}
                           className="pr-4 text-blue-500 m-0 p-0 hover:text-blue-400"
-                          onClick={() => goToDetail(app._id)}
+                          // onClick={() => goToDetail(app._id)}
                         >
                           View
-                        </h3>
+                        </Link>
                       </td>
                     </tr>
                   ))}

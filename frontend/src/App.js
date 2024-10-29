@@ -39,6 +39,9 @@ import { ManageJobLayout } from "./layouts/ManageJobLayout";
 import Recuitment from "./pages/Recuitment";
 import { StudioLayout } from "./layouts/StudioLayout";
 import DetailUserApplication from "./pages/DetailUserApplication";
+import JobPosting from "./pages/JobPosting";
+import OwnerJob from "./pages/OwnerJob";
+import UpdateOwnerJob from "./pages/UpdateOwnerJob";
 
 function App() {
   useEffect(() => {
@@ -58,20 +61,19 @@ function App() {
           <Route path="studios" element={<StudiosListing />} />
           <Route path="saved-jobs" element={<SavedJobsListing />} />
           <Route path="job-preferences" element={<JobPreferences />} />
-          
         </Route>
         <Route path="/job/:jobId" element={<DetailJob />} />
 
         <Route path="job_manage" element={<ManageJobLayout />}>
           <Route index element={<JobApplication />} />
-          <Route path="recuitment/*" element={<Recuitment />} />
+          <Route path="recuitment/*" element={<Recuitment />}></Route>
+          <Route path=":recuitmentId" element={<DetailUserApplication />} />
+
           <Route path="job-application" element={<JobApplication />} />
+          <Route path="job_posting/*" element={<OwnerJob />}></Route>
+          <Route path="job_posting/:jobId" element={<UpdateOwnerJob />} />
+          <Route path="job_posting/new" element={<JobPosting />} />
         </Route>
-
-        <Route path="recruitment/job/:recuitmentId" element={<DetailUserApplication />} />
-
-
-        
 
         <Route path="/artwork/:artworkId" element={<ArtworkDetail />} />
         <Route path="project/new" element={<UploadArtwork />} />
@@ -91,7 +93,7 @@ function App() {
         {/* Studio Route */}
 
         <Route path="studio" element={<StudioLayout />} />
-        
+
         {/* Admin Route */}
 
         <Route path="admin" element={<AdminLayout />}>

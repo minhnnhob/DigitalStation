@@ -125,6 +125,8 @@ const getJobById = async (req, res) => {
 
     let jobView = await Job.findById(jobId);
 
+    console.log(jobView);
+
     let job;
 
     if (jobView.posterType === "studio") {
@@ -297,10 +299,10 @@ const getJobsByUser = async (req, res) => {
     let jobs;
     let total;
     if (userType === "artist") {
-      jobs = await IndividualJob.find({ posterBy: user });
+      jobs = await IndividualJob.find({ posterBy: user }).sort({ createdAt: -1 });;
       total = await IndividualJob.countDocuments({ posterBy: user });
     } else if (userType === "studio") {
-      jobs = await StudioJob.find({ studioId: studioId });
+      jobs = await StudioJob.find({ studioId: studioId }).sort({ createdAt: -1 });
       total = await StudioJob.countDocuments({ studioId: studioId });
     }
 
@@ -308,11 +310,22 @@ const getJobsByUser = async (req, res) => {
       return res.status(404).json({ error: "Jobs not found" });
     }
 
+    const jobsWithRecruitmentCount = await Promise.all(
+      jobs.map(async (job) => {
+      const recruitmentCount = await Recruitment.countDocuments({ job: job._id });
+      return {
+        ...job.toObject(),
+        recruitmentCount,
+      };
+      })
+    );
+    
+
     res.json({
       message: "Jobs retrieved successfully",
-      total,
-      jobs,
+      total,     
       own: user,
+      jobsWithRecruitmentCount,
     });
   } catch (error) {
     console.error("Error fetching jobs:", error);

@@ -23,37 +23,33 @@ const recruitmentSchema = new mongoose.Schema(
       originalName: String,
     }, // URL or identifier for the version of the resume used for this application
     recruiterNotes: String, // Internal notes added by the recruiter regarding the candidate
-    interviews: 
-      {
-        date: Date,
-        type: {
-          type: String,
-          enum: ["phone", "video", "inPerson"],
-        },
-        confirmed: {
-          type: Boolean,
-          default: false,
-        },
-        notes: String,
-
-        recruiter: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-        }, // The recruiter handling the application
+    interviews: {
+      date: Date,
+      type: {
+        type: String,
+        enum: ["phone", "video", "inPerson"],
       },
-    
-
-    feedback: [
-      {
-        providedBy: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-        }, // Feedback provider (e.g., interviewer)
-        text: String, // Feedback text
-        rating: { type: Number, min: 1, max: 5 }, // Optional rating system for candidates
-        date: { type: Date, default: Date.now }, // Feedback date
+      confirmed: {
+        type: Boolean,
+        default: false,
       },
-    ],
+      notes: String,
+
+      recruiter: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      }, // The recruiter handling the application
+    },
+
+    feedback: {
+      providedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      }, // Feedback provider (e.g., interviewer)
+      text: String, // Feedback text
+      rating: { type: Number, min: 1, max: 5 }, // Optional rating system for candidates
+      date: { type: Date, default: Date.now }, // Feedback date
+    },
   },
   { timestamps: true }
 );

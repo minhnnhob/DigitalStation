@@ -12,8 +12,9 @@ const JobBoard = () => {
 
   const dispatch = useDispatch();
 
-  const jobs = useSelector((state) => state.job.jobs);
-  console.log(jobs);
+  const jobsSudios = useSelector((state) => state.job.jobs);
+  const jobs = jobsSudios.filter((job) => job.posterType === "studio");
+
   useEffect(() => {
     const fetchData = async () => {
       try {

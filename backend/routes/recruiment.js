@@ -5,8 +5,8 @@ const {
   addFeedback,
   scheduleInterview,
   confirmInterview,
-  getOwnRecruitment
-
+  getOwnRecruitment,
+  getRecruitmentById
 } = require("../controllers/recruimentController");
 const { upload } = require("../config/cloudinary");
 
@@ -20,6 +20,7 @@ const { requireAuth } = require('../middleware/requireAuth');
 router.use(requireAuth); 
 
 router.post('/apply',upload.single("resumeVersion"), applyJob);
+router.get('/my_recuitment/:applicationId', getRecruitmentById);
 router.patch('/:applicationId/updateStatus', updateRecruitment);
 router.patch('/:applicationId/addInterviewFeedback', addFeedback);
 router.post('/:applicationId/scheduleInterview', scheduleInterview);

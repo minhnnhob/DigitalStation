@@ -22,13 +22,13 @@ const jobSchema = new Schema(
 
     location: {
       type: String,
-      enum: ["Remote", "On-site", "Hybrid"],
+      enum: ["Remote", "On-site", "Hybrid","Other"],
       required: true,
     },
 
     employmentType: {
       type: String,
-      enum: ["Freelance", "Full-time", "Part-time", "Contract"],
+      enum: ["Freelance", "Full-time", "Part-time", "Contract","Intern","Other"],
       required: true,
     },
 
@@ -46,7 +46,7 @@ const jobSchema = new Schema(
 
     experienceLevel: {
       type: String,
-      enum: ["Entry Level", "Mid Level", "Senior", "Lead", "Any"],
+      enum: ["Entry Level", "Mid Level", "Senior", "Leader", "Any"],
       required: true,
     },
 
@@ -57,7 +57,7 @@ const jobSchema = new Schema(
 
     maxApplicants: {
       type: Number,
-      default: 1, // Default max applicants allowed before auto-closing
+      default: null, 
     },
 
     status: {
