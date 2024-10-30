@@ -23,13 +23,15 @@ const getAllJobs = async (req, res) => {
     let jobs;
     // console.log(req.user);
     // const { posterType } = Job.findById(req.user.id);
-    
+
     // if (posterType === "studio") {
     //   queryFilters.posterType = "studio";
     // } else if (posterType === "artist") {
     //   queryFilters.posterType = "artist";
     // }
     jobs = await Job.find(queryFilters)
+      .populate("posterBy", " email profilePicture")
+      .populate("studioId", "studioProfileImage location")
       .sort(sort)
       .limit(parseInt(limit))
       .skip((parseInt(page) - 1) * parseInt(limit))
@@ -299,10 +301,14 @@ const getJobsByUser = async (req, res) => {
     let jobs;
     let total;
     if (userType === "artist") {
-      jobs = await IndividualJob.find({ posterBy: user }).sort({ createdAt: -1 });;
+      jobs = await IndividualJob.find({ posterBy: user }).sort({
+        createdAt: -1,
+      });
       total = await IndividualJob.countDocuments({ posterBy: user });
     } else if (userType === "studio") {
-      jobs = await StudioJob.find({ studioId: studioId }).sort({ createdAt: -1 });
+      jobs = await StudioJob.find({ studioId: studioId }).sort({
+        createdAt: -1,
+      });
       total = await StudioJob.countDocuments({ studioId: studioId });
     }
 
@@ -312,18 +318,19 @@ const getJobsByUser = async (req, res) => {
 
     const jobsWithRecruitmentCount = await Promise.all(
       jobs.map(async (job) => {
-      const recruitmentCount = await Recruitment.countDocuments({ job: job._id });
-      return {
-        ...job.toObject(),
-        recruitmentCount,
-      };
+        const recruitmentCount = await Recruitment.countDocuments({
+          job: job._id,
+        });
+        return {
+          ...job.toObject(),
+          recruitmentCount,
+        };
       })
     );
-    
 
     res.json({
       message: "Jobs retrieved successfully",
-      total,     
+      total,
       own: user,
       jobsWithRecruitmentCount,
     });

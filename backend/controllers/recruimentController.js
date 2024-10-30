@@ -90,7 +90,7 @@ const getOwnRecruitment = async (req, res) => {
 
     const recruitment = await Recruiment.find({ applicant: userId }).populate({
       path: "job",
-      select: "status title postedBy studioId",
+      select: "status title posterBy studioId",
       populate: [
         {
           path: "studioId",
@@ -98,7 +98,7 @@ const getOwnRecruitment = async (req, res) => {
           select: "name", // Select the name field from the studio
         },
         {
-          path: "postedBy",
+          path: "posterBy",
           model: "User", // Assuming the model name for the user is "User"
           select: "name", // Select the name field from the user
         },
@@ -110,7 +110,6 @@ const getOwnRecruitment = async (req, res) => {
 
     res.status(200).json(recruitment);
   } catch (error) {
-    console.log("Error getting recruitment:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -120,7 +119,10 @@ const getRecruitmentById = async (req, res) => {
   const userId = req.user._id;
 
   try {
-    const checkRecruitment = await Recruiment.findOne({}).select("applicant");
+    const checkRecruitment = await Recruiment.findById(applicationId).select(
+      "applicant"
+    );
+
     if (!checkRecruitment) {
       return res.status(404).json({ error: "Application not found" });
     }
@@ -133,7 +135,7 @@ const getRecruitmentById = async (req, res) => {
 
     const recruitment = await Recruiment.findById(applicationId).populate({
       path: "job",
-      select: "status title postedBy studioId budget salaryRange ",
+      select: "status title posterBy studioId budget salaryRange currency ",
       populate: [
         {
           path: "studioId",
@@ -141,25 +143,48 @@ const getRecruitmentById = async (req, res) => {
           select: "name contactInfor  ",
         },
         {
-          path: "postedBy",
+          path: "posterBy",
           model: "User", // Assuming the model name for the user is "User"
-          select: "name bud", // Select the name field from the user
+          select: "name email", // Select the name field from the user
         },
       ],
     });
     res.status(200).json(recruitment);
   } catch (error) {
-    console.log("Error getting recruitment by ID:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+const getRecruitmentByJob = async (req, res) => {
+  // get recruitment by job
+  const userId = req.user.id;
+  const { jobId } = req.params;
+  try {
+    const recruitment = await Recruiment.find({ job: jobId });
+
+    if (!recruitment || recruitment.length === 0) {
+      return res.status(404).json({ error: "No applications found" });
+    }
+
+    const unauthorized = recruitment.some(
+      (app) => app.applicant.toString() !== userId.toString()
+    );
+
+    if (unauthorized) {
+      return res
+        .status(401)
+        .json({ error: "You are not authorized to view this application" });
+    }
+
+    res.status(200).json(recruitment);
+  } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
 const updateRecruitment = async (req, res) => {
   const { applicationId } = req.params;
-
   const updateData = req.body;
-  console.log(updateData.status);
-
   try {
     if (!updateData) {
       return res.status(400).json({ error: "Status is required" });
@@ -184,7 +209,6 @@ const updateRecruitment = async (req, res) => {
 
     res.status(200).json(recruitment);
   } catch (error) {
-    console.log("Error updating status:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -199,11 +223,13 @@ const addFeedback = async (req, res) => {
         .status(400)
         .json({ error: "Feedback text and rating is required " });
     }
-    
+
     // Find the recruitment application
     const recruitment = await Recruiment.findById(applicationId);
-    if(recruitment.applicant.toString() !== userId.toString()){
-      return res.status(401).json({error: "You are not authorized to add feedback"});
+    if (recruitment.applicant.toString() !== userId.toString()) {
+      return res
+        .status(401)
+        .json({ error: "You are not authorized to add feedback" });
     }
     // Check if the application exists
     if (!recruitment) {
@@ -228,7 +254,6 @@ const addFeedback = async (req, res) => {
 
     res.status(200).json(recruitment);
   } catch (error) {
-    console.log("Error adding feedback:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -310,7 +335,6 @@ const confirmInterview = async (req, res) => {
       interviews: recruitment.interviews,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -322,6 +346,8 @@ module.exports = {
   confirmInterview,
   addFeedback,
   getRecruitmentById,
+
+  getRecruitmentByJob,
 
   getOwnRecruitment,
 };

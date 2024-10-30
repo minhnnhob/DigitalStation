@@ -92,38 +92,62 @@ const DetailUserApplication = () => {
 
       <div className="mt-8 flex items-center gap-4">
         <Building2 />
-        <p className="font-bold text-lg">{applyDetails.job.studioId.name}</p>
+        <p className="font-bold text-lg">
+          {applyDetails.job.studioId?.name || applyDetails.job.posterBy?.name}
+        </p>
       </div>
 
       <div className="mt-2 space-y-4 flex items-center justify-between">
         <p>Apply Date: {applyDetails.createdAt.toString().split("T")[0]}</p>
 
         <div className="space-y-4">
-          <h2 className="font-bold ">Contract:</h2>
-          {applyDetails.job.studioId.contactInfor.email ? (
-            <p>email: {applyDetails.job.studioId.contactInfor.email}</p>
+          <h2 className="font-bold ">Contact:</h2>
+          {applyDetails.job.studioId?.contactInfor?.email ||
+          applyDetails.job.posterBy?.email ? (
+            <p>
+              Email:{" "}
+              {applyDetails.job.studioId?.contactInfor?.email ||
+                applyDetails.job.posterBy?.email}
+            </p>
           ) : (
-            <p>email: </p>
+            <p>Email: N/A</p>
           )}
-          {applyDetails.job.studioId.contactInfor.phone ? (
-            <p>phone number: {applyDetails.job.studioId.contactInfor.phone}</p>
+          {applyDetails.job.studioId?.contactInfor?.phone ||
+          applyDetails.job.posterBy?.phone ? (
+            <p>
+              Phone:{" "}
+              {applyDetails.job.studioId?.contactInfor?.phone ||
+                applyDetails.job.posterBy?.phone}
+            </p>
           ) : (
-            <p>phone number: </p>
+            <p>Phone: N/A</p>
           )}
         </div>
 
         <div className="space-y-4">
-          <h2 className="font-bold ">Salary:</h2>
-          {applyDetails.job.salaryRange ? (
-            <div className="">
-              <p>
-                {applyDetails.job.salaryRange.min.toLocaleString("vi")} -{" "}
-                {applyDetails.job.salaryRange.max.toLocaleString("vi")} /{" "}
-                {applyDetails.job.salaryRange.currency}
-              </p>
-            </div>
+          {applyDetails.job.studioId ? (
+            applyDetails.job.salaryRange ? (
+              <>
+                <h2 className="font-bold ">Salary:</h2>
+                <div className="">
+                  <p>
+                    {applyDetails.job.salaryRange.min?.toLocaleString("vi")} -{" "}
+                    {applyDetails.job.salaryRange.max?.toLocaleString("vi")} /{" "}
+                    {applyDetails.job.salaryRange?.currency}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <p>Negotiate</p>
+            )
           ) : (
-            <p>Negotiate</p>
+            <>
+              <h2 className="font-bold ">Budget:</h2>
+              <p>
+                {applyDetails.job.budget?.toLocaleString("vi")}{" "}
+                {applyDetails.job.currency}
+              </p>
+            </>
           )}
         </div>
       </div>
@@ -139,7 +163,7 @@ const DetailUserApplication = () => {
           </p>
           <button
             className=" bg-blue-500 hover:bg-blue-700 disabled:opacity-35"
-            disabled={applyDetails.job.interviews?.date || isConfirmed}
+            disabled={applyDetails.job.interviews?.date || !isConfirmed}
             type="button"
             onClick={handleConfirmInterview}
           >
@@ -202,37 +226,3 @@ const DetailUserApplication = () => {
 };
 
 export default DetailUserApplication;
-
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/
-// export default function Example() {
-//     return (
-//       <div>
-//         <label htmlFor="location" className="block text-sm font-medium leading-6 text-gray-900">
-//           Location
-//         </label>
-//         <select
-//           id="location"
-//           name="location"
-//           defaultValue="Canada"
-//           className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-//         >
-//           <option>United States</option>
-//           <option>Canada</option>
-//           <option>Mexico</option>
-//         </select>
-//       </div>
-//     )
-//   }

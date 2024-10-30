@@ -122,7 +122,7 @@ const jobState = createSlice({
     jobs: [],
     selectedJob: null,
     filters: {},
-    loading: false,
+    loading: true,
     error: null,
   },
   reducers: {

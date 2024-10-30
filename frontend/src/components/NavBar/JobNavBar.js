@@ -72,7 +72,7 @@ const JobNavBar = () => {
           </li>
           <li>
             <NavLink
-              to="job-preferences"
+              to="job-freelance"
               className={({ isActive }) =>
                 isActive ? "border-b-2 border-blue-500" : ""
               }

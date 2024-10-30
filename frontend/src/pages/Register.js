@@ -11,10 +11,13 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const Newuser = { email, password };
-    dispatch(register(Newuser));
-
-    console.log(Newuser);
+    const newUser = { email, password, role: "artist" };
+    try {
+      await dispatch(register(newUser)).unwrap();
+      console.log("User registered successfully:", newUser);
+    } catch (error) {
+      console.error("Failed to register user:", error);
+    }
   };
 
   return (

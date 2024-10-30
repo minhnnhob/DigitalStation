@@ -196,7 +196,7 @@ const UpdateOwnerJob = () => {
                 className="bg-bg-pf p-2 border rounded-md"
                 required
               >
-                <option value="" disabled>
+                <option value={formData.currency} disabled>
                   Select Currency
                 </option>
                 <option value="VND">VND</option>

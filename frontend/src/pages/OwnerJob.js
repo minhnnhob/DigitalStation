@@ -120,7 +120,7 @@ const OwnerJob = () => {
                         <td>
                           <div>
                             <Link
-                              to={`/job_manage/job_posting/${app._id}`}
+                              to={`/job_manage/job_posting/recruitment`}
                               className="pr-4 text-gray-400 m-0 px-10 hover:text-gray-200"
                             >
                               <ContactRound />

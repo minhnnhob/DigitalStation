@@ -121,8 +121,12 @@ const loginUser = async (req, res) => {
     });
     res.status(200).json({
       email,
+      
     });
+   
   } catch (error) {
+   
+    console.error("Error logging in user:", error.message);
     res.status(400).json({ error: error.message });
   }
 };

@@ -42,6 +42,9 @@ import DetailUserApplication from "./pages/DetailUserApplication";
 import JobPosting from "./pages/JobPosting";
 import OwnerJob from "./pages/OwnerJob";
 import UpdateOwnerJob from "./pages/UpdateOwnerJob";
+import RecruimentByJob from "./pages/RecruimentByJob";
+import JobFreelace from "./pages/JobFreelace";
+
 
 function App() {
   useEffect(() => {
@@ -60,7 +63,7 @@ function App() {
           <Route path="job-listings" element={<JobBoard />} />
           <Route path="studios" element={<StudiosListing />} />
           <Route path="saved-jobs" element={<SavedJobsListing />} />
-          <Route path="job-preferences" element={<JobPreferences />} />
+          <Route path="job-freelance" element={<JobFreelace />} />
         </Route>
         <Route path="/job/:jobId" element={<DetailJob />} />
 
@@ -73,6 +76,7 @@ function App() {
           <Route path="job_posting/*" element={<OwnerJob />}></Route>
           <Route path="job_posting/:jobId" element={<UpdateOwnerJob />} />
           <Route path="job_posting/new" element={<JobPosting />} />
+          <Route path="job_posting/recruitment" element={<RecruimentByJob />} />
         </Route>
 
         <Route path="/artwork/:artworkId" element={<ArtworkDetail />} />

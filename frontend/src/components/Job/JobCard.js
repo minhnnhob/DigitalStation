@@ -17,7 +17,8 @@ const JobCard = ({ job }) => {
     );
     if (newWindow) newWindow.opener = null;
   };
-  console.log(job);
+
+  // console.log("job", job.posterBy.profilePicture  );
 
   return (
     <div className="bg-gray-800 rounded-lg p-4 mb-4" onClick={goToDetail}>
@@ -25,15 +26,28 @@ const JobCard = ({ job }) => {
         <div className=" mt-4 ml-4">
           <div className="flex items-center ">
             <div className="flex items-center  ">
-              <img
-                src={
-                  job.studioId && job.studioId.studioProfileImage
-                    ? job.studioId.studioProfileImage
-                    : "https://via.placeholder.com/150"
-                }
-                alt={job.company}
-                className="w-16 h-16 rounded-full aspect-* object-cover "
-              />
+              {job.posterType === "studio" ? (
+                  <img
+                  src={
+                    job.studioId && job.studioId.studioProfileImage
+                      ? job.studioId.studioProfileImage
+                      : "https://via.placeholder.com/150"
+                  }
+                  alt={job.company}
+                  className="w-16 h-16 rounded-full aspect-square object-cover "
+                />
+              ):(
+                <img
+                  src={
+                    job.posterBy.profilePicture
+                      ? job.posterBy.profilePicture
+                      : "https://via.placeholder.com/150"
+                  }
+                  alt={job.company}
+                  className="w-16 h-16 rounded-full aspect-square object-cover "
+                />
+              )}
+            
               <div className="mx-4 mb-4">
                 <h2 className="font-bold">{job.title}</h2>
                 <p className="text-gray-400">{job.company}</p>
@@ -56,7 +70,6 @@ const JobCard = ({ job }) => {
                   key={job.employmentType}
                   className="flex items-center text-gray-400 text-sm"
                 >
-                 
                   {job.employmentType}
                 </div>
               </div>

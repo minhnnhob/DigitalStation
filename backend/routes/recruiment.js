@@ -6,25 +6,26 @@ const {
   scheduleInterview,
   confirmInterview,
   getOwnRecruitment,
-  getRecruitmentById
+  getRecruitmentById,
+  getRecruitmentByJob,
 } = require("../controllers/recruimentController");
 const { upload } = require("../config/cloudinary");
 
 const router = express.Router();
 
 // Middleware to check if the user is authenticated (Assuming you have auth middleware)
-const { requireAuth } = require('../middleware/requireAuth');
+const { requireAuth } = require("../middleware/requireAuth");
 
+router.use(requireAuth);
 
+router.post("/apply", upload.single("resumeVersion"), applyJob);
+router.get("/my_recuitment/:applicationId", getRecruitmentById);
+router.patch("/:applicationId/updateStatus", updateRecruitment);
+router.patch("/:applicationId/addInterviewFeedback", addFeedback);
+router.post("/:applicationId/scheduleInterview", scheduleInterview);
+router.patch("/:applicationId/confirmInterview", confirmInterview);
+router.get("/my_recuitment", getOwnRecruitment);
 
-router.use(requireAuth); 
-
-router.post('/apply',upload.single("resumeVersion"), applyJob);
-router.get('/my_recuitment/:applicationId', getRecruitmentById);
-router.patch('/:applicationId/updateStatus', updateRecruitment);
-router.patch('/:applicationId/addInterviewFeedback', addFeedback);
-router.post('/:applicationId/scheduleInterview', scheduleInterview);
-router.patch('/:applicationId/confirmInterview', confirmInterview);
-router.get('/my_recuitment', getOwnRecruitment);
+router.get("/job/:jobId", getRecruitmentByJob);
 
 module.exports = router;

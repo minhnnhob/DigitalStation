@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getOwnRecruitment } from "../store/slices/recruitmentSlice";
 
 import { useNavigate } from "react-router-dom";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 const JobApplication = () => {
   const navigate = useNavigate();
 
@@ -12,7 +12,9 @@ const JobApplication = () => {
     dispatch(getOwnRecruitment());
   }, []);
 
-  const applyDefaults = useSelector((state) => state.recruitment.applyDefaults);
+  const applyDefaults = useSelector(
+    (state) => state.recruitment?.applyDefaults
+  );
   const loading = useSelector((state) => state.recruitment.loading);
   const error = useSelector((state) => state.recruitment.error);
 
@@ -21,6 +23,10 @@ const JobApplication = () => {
   // const goToDetail = (recuitmentId) => {
   //   navigate(`/recruitment/${recuitmentId}`);
   // };
+
+  if (!Array.isArray(applyDefaults)) {
+    return <div>No applications found.</div>;
+  }
 
   return (
     <div className="w-full bg-bg-pf ml-2 py-4 rounded-sm">
@@ -77,7 +83,7 @@ const JobApplication = () => {
                       scope="col"
                       className="relative py-3.5 pl-3 pr-4 sm:pr-0"
                     >
-                      <span  className="sr-only">HEHE</span>
+                      <span className="sr-only">HEHE</span>
                     </th>
                   </tr>
                 </thead>
@@ -85,7 +91,7 @@ const JobApplication = () => {
                   {applyDefaults.map((app) => (
                     <tr key={app._id}>
                       <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-300 sm:pl-0">
-                        {app.job.studioId.name || app.job.postedBy.name}
+                        {app.job.studioId?.name || app.job.posterBy?.name}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         {app.job.title}
@@ -100,7 +106,8 @@ const JobApplication = () => {
                         {/* <Link
                           to={`recruitment/job/${app.job._id}`}
                           className="text-blue-500 hover:text-blue-400">View</Link> */}
-                        <Link to={`${app._id}`}
+                        <Link
+                          to={`${app._id}`}
                           className="pr-4 text-blue-500 m-0 p-0 hover:text-blue-400"
                           // onClick={() => goToDetail(app._id)}
                         >

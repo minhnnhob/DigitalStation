@@ -96,6 +96,23 @@ const addFeedback = createAsyncThunk(
   }
 );
 
+const getRecruitmentByJob = createAsyncThunk(
+  "recruitment/getRecruitmentByJob",
+  async (jobId, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:4000/api/recruitment/job/${jobId}`,
+        {
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 const recruitmentState = createSlice({
   name: "recruitment",
   initialState,

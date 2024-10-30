@@ -24,6 +24,8 @@ const DetailJob = () => {
     return <Loading />;
   }
 
+  console.log("selectedJob", loading);
+
   if (!selectedJob) {
     return <div className="text-center text-white">Job not found</div>;
   }
@@ -44,19 +46,27 @@ const DetailJob = () => {
     <div className="w-[80%] mx-auto p-4 text-white">
       {/* Header Section */}
       <div className="bg-dark-900 p-6 rounded-lg shadow-md flex flex-col space-y-4">
-        <h1 className="text-3xl font-bold">{selectedJob.title}</h1>
-        <a
-          href={`https://${selectedJob.studioId.website}`}
-          className="text-blue-500"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {selectedJob.studioId.website}
-        </a>
-        <p className="text-lg">
-          {selectedJob.salaryRange.min} - {selectedJob.salaryRange.max} /{" "}
-          {selectedJob.salaryRange.currency} Monthly
-        </p>
+      <h1 className="text-3xl font-bold">{selectedJob.title}</h1>
+        {selectedJob.posterType === "studio" ? (
+          <>
+            <a
+              href={`https://${selectedJob.studioId?.website}`}
+              className="text-blue-500"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {selectedJob.studioId.website}
+            </a>
+            <p className="text-lg">
+              {selectedJob.salaryRange.min} - {selectedJob.salaryRange.max} /{" "}
+              {selectedJob.salaryRange.currency} Monthly
+            </p>
+          </>
+        ) : (
+          <p className="text-lg">
+            {selectedJob.budget} {selectedJob.currency} Monthly
+          </p>
+        )}
         <div className="flex items-center space-x-4">
           <button
             onClick={handleApplyClick}
@@ -64,9 +74,11 @@ const DetailJob = () => {
           >
             Apply
           </button>
-          <button className="bg-gray-700 hover:bg-gray-800 px-4 py-2 rounded-md">
-            View all {selectedJob.studioId.name} jobs →
-          </button>
+          {selectedJob.posterType === "studio" && (
+            <button className="bg-gray-700 hover:bg-gray-800 px-4 py-2 rounded-md">
+              View all {selectedJob.studioId.name} jobs →
+            </button>
+          )}
         </div>
       </div>
 
@@ -97,13 +109,13 @@ const DetailJob = () => {
             <div>
               <h2 className="text-xl font-semibold">Recruitment Requirements</h2>
               <p className="bg-bg-pf p-4 mt-4 rounded-xl">
-                {selectedJob.requirements}
+                {selectedJob?.requirements}
               </p>
             </div>
           )}
 
           {/* About the Company */}
-          {selectedJob.studioId.description && (
+          {selectedJob.posterType === "studio" && selectedJob.studioId?.description && (
             <div>
               <h2 className="text-xl font-semibold">About the Company</h2>
               <p className="bg-bg-pf p-6 mt-4 rounded-xl space-y-8 text-justify">
@@ -132,12 +144,14 @@ const DetailJob = () => {
           </div>
 
           {/* Industry */}
-          <div className="bg-dark-400 p-6 rounded-md">
-            <h2 className="text-lg font-semibold">Industry</h2>
-            <p className="bg-bg-pf p-6 mt-4 rounded-xl space-y-8 text-justify">
-              {selectedJob.studioId.industry}
-            </p>
-          </div>
+          {selectedJob.posterType === "studio" && (
+            <div className="bg-dark-400 p-6 rounded-md">
+              <h2 className="text-lg font-semibold">Industry</h2>
+              <p className="bg-bg-pf p-6 mt-4 rounded-xl space-y-8 text-justify">
+                {selectedJob.studioId?.industry}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 

@@ -6,7 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { fetchCurrentUser } from "../store/slices/userSlice";
 
 const Login = () => {
-  const error = useSelector((state) => state.user.error);
+  const { error } = useSelector((state) => state.user);
+  console.log("error", error);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,15 +20,22 @@ const Login = () => {
 
     const currUser = { email, password };
     await dispatch(login(currUser));
-    await dispatch(login(currUser));
+
+    if (error) {
+      return alert("Login failed: " + error);
+    }
+    if (error) {
+      return alert("Failed to fetch user: " + error);
+    }
+
     const user = await dispatch(fetchCurrentUser());
-    console.log(user.payload.role) 
 
     if (user.payload.role === "admin") {
       navigate("/admin");
-    } else if (user.payload.role === "artist") {
-      navigate("/");
-    } else if (user.payload.role === "studio") {
+    } else if (
+      user.payload.role === "artist" ||
+      user.payload.role === "studio"
+    ) {
       navigate("/");
     } else {
       return alert("Hello! I am an alert box hehehehehehehheheheehheh!!");

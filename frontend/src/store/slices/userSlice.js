@@ -26,7 +26,7 @@ const fetchUserInfo = createAsyncThunk("user/fetchUserInfo", async () => {
   }
 });
 
-const login = createAsyncThunk("user/login", async (user) => {
+const login = createAsyncThunk("user/login", async (user,{rejectWithValue}) => {
   try {
     const response = await axios.post(
       "http://localhost:4000/api/users/login",
@@ -37,8 +37,7 @@ const login = createAsyncThunk("user/login", async (user) => {
 
     return response.data;
   } catch (error) {
-    user.error = error.response.data;
-    throw new Error(error.response.data);
+    return rejectWithValue(error.response.data);
   }
 });
 
@@ -146,6 +145,8 @@ const userSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
+        state.error = action.payload.error;
+        console.log(state.error);
       });
 
     builder
