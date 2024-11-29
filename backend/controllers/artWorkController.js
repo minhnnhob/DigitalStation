@@ -180,140 +180,99 @@ const getUserRecommentExplore = async (req, res) => {
 
     // Fetch user's interested topics
     const user = await User.findById(userId);
+    const userInterestedTopics = user?.interestedTopics.map((t) => t._id) || [];
 
-    let userInterestedTopics = [];
-    userInterestedTopics = user.interestedTopics.map((topic) => topic._id);
-
-    const query = {};
-
-    if (userId) {
-      query.userId = userId;
-    }
-
-    if (userInterestedTopics) {
-      query.topic = userInterestedTopics;
-    }
-
-    if (tags) {
-      query.tags = { $in: tags.split(",") };
-    }
-
-    if (search) {
-      query.$text = { $search: search };
-    }
+    // Build query for artworks
+    const query = {
+      ...(userInterestedTopics.length && { topic: { $in: userInterestedTopics } }),
+      ...(tags && { tags: { $in: tags.split(",") } }),
+      ...(search && { $text: { $search: search } }),
+      ...(topic && { topic }),
+    };
 
     // Set sorting options
-    let sortOption = {};
-    switch (sort) {
-      case "popular":
-        sortOption = { likesCount: -1 };
-        break;
-      case "trending":
-        sortOption = { viewsCount: -1, createdAt: -1 };
-        break;
-      case "staff-picks":
-        query.isStaffPick = true;
-        sortOption = { createdAt: -1 };
-        break;
-      case "random":
-        // Handle random sorting
-        break;
-      case "recent":
-      default:
-        sortOption = { createdAt: -1 };
-    }
+    const sortOptions = {
+      popular: { likesCount: -1 },
+      trending: { viewsCount: -1, createdAt: -1 },
+      "staff-picks": { createdAt: -1 },
+      random: null, // Random handled separately
+      recent: { createdAt: -1 },
+    };
+    const sortOption = sortOptions[sort] || sortOptions["recent"];
 
-    // Retrieve artworks based on query and sort option
-    let artworks;
+    // Fetch artworks based on query and sort option
     const totalArtworks = await Artwork.countDocuments(query);
+    const artworks =
+      sort === "random" || (!userInterestedTopics.length && !tags)
+        ? await Artwork.aggregate([
+            { $match: query },
+            { $sample: { size: parseInt(limit) } },
+          ])
+        : await Artwork.find(query)
+            .sort(sortOption)
+            .skip((page - 1) * limit)
+            .limit(parseInt(limit))
+            .populate("artist", "name profilePicture")
+            .lean();
 
-    if (sort === "random") {
-      artworks = await Artwork.aggregate([
-        { $match: query },
-        { $sample: { size: parseInt(limit) } },
-      ]);
-    } else {
-      artworks = await Artwork.find(query)
-        .sort(sortOption)
-        .skip((page - 1) * limit)
-        .limit(parseInt(limit))
-        .populate("artist", "name profilePicture")
-        // .populate("topic", "name")
-        .lean();
-    }
-
-    // Enhance artwork data with additional information
-    artworks = await Promise.all(
+    // Enhance artworks with user-specific data
+    const enhancedArtworks = await Promise.all(
       artworks.map(async (artwork) => {
-        const enhancedArtwork = {
+        const isLiked = !!(await UserActivity.exists({
+          userId,
+          artworkId: artwork._id,
+          activityType: "like",
+        }));
+
+        const isArtistFollowed = !!(await UserActivity.exists({
+          userId,
+          followedUserId: artwork.artist._id,
+          activityType: "follow",
+        }));
+
+        return {
           ...artwork,
           filePreview: artwork.files[0]?.fileUrl,
           fileCount: artwork.files.length,
           topicName: artwork.topic?.name,
+          isLiked,
+          isArtistFollowed,
         };
-
-        // Check if the logged-in user has liked this artwork
-        const userLike = await UserActivity.findOne({
-          userId,
-          artworkId: artwork._id,
-          activityType: "like",
-        });
-        enhancedArtwork.isLiked = !!userLike;
-
-        // Check if the logged-in user follows the artist
-        const userFollow = await UserActivity.findOne({
-          userId,
-          followedUserId: artwork.artist._id,
-          activityType: "follow",
-        });
-        enhancedArtwork.isArtistFollowed = !!userFollow;
-
-        return enhancedArtwork;
       })
     );
 
-    // Personalized recommendation logic
+    // Personalized recommendations
     let recommendations = [];
     if (userId) {
-      // Get user interests from their activity
       const userInterests = await UserActivity.aggregate([
-        { $match: { userId: userId } },
+        { $match: { userId } },
         { $group: { _id: "$artworkId", count: { $sum: 1 } } },
         { $sort: { count: -1 } },
         { $limit: 10 },
       ]);
-
       const interestIds = userInterests.map((interest) => interest._id);
 
       recommendations = await Artwork.find({
-        topic: { $in: userInterestedTopics }, // Find artworks matching user's interested topics
-        _id: { $nin: interestIds }, // Exclude already interacted artworks
+        topic: { $in: userInterestedTopics },
+        _id: { $nin: interestIds },
       })
         .limit(10)
         .populate("artist", "name profilePicture")
         .lean();
 
-      console.log("Topic-based recommendations:", recommendations);
-
       if (!recommendations.length) {
+        const similarTopicsAndTags = await Artwork.find({
+          _id: { $in: interestIds },
+        })
+          .select("topic tags")
+          .lean();
+
+        const topicsFromInterests = [...new Set(similarTopicsAndTags.map((a) => a.topic))];
+        const tagsFromInterests = [...new Set(similarTopicsAndTags.flatMap((a) => a.tags))];
+
         recommendations = await Artwork.find({
           _id: { $nin: interestIds },
-          $or: [
-            {
-              topic: {
-                $in: await Artwork.distinct("topic", {
-                  _id: { $in: interestIds },
-                }),
-              },
-            },
-            {
-              tags: {
-                $in: await Artwork.distinct("tags", {
-                  _id: { $in: interestIds },
-                }),
-              },
-            },
-          ],
+          $or: [{ topic: { $in: topicsFromInterests } }, { tags: { $in: tagsFromInterests } }],
         })
           .limit(10)
           .populate("artist", "name profilePicture")
@@ -321,19 +280,24 @@ const getUserRecommentExplore = async (req, res) => {
       }
     }
 
-    // Return paginated artworks and recommendations
+    if (!recommendations.length) {
+      recommendations = await Artwork.aggregate([{ $sample: { size: 10 } }]);
+    }
+
+    // Return paginated results with recommendations
     res.status(200).json({
-      artworks,
+      artworks: enhancedArtworks,
       recommendations,
       currentPage: parseInt(page),
       totalPages: Math.ceil(totalArtworks / limit),
       totalArtworks,
     });
   } catch (error) {
-    console.error("Error in getUserRecommentExplore:", error);
+    console.error("Error in getUserRecommendExplore:", error);
     res.status(500).json({ error: "Server Error" });
   }
 };
+
 
 //getArtworks of own user
 const getArtworks = async (req, res) => {

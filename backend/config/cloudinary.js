@@ -73,6 +73,26 @@ const storageStudio = new CloudinaryStorage({
   },
 });
 
+const storegeTopic = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => {
+    let folder = "topic"; // Default folder for topic uploads
+
+    console.log(file);
+
+    // Determine which folder to store the file in based on file field
+    if (file.fieldname === "imageUrl") {
+      folder = "topic/images";
+    } 
+
+    return {
+      folder: folder,
+      public_id: file.originalname.split(".")[0], // Store with the original file name (excluding extension)
+      resource_type: "auto", // Automatically detect resource type (image, video, etc.)
+    };
+  },
+})
+
 // Set up multer with Cloudinary storage for multiple files
 const upload = multer({ storage: storage });
 const uploadUser = multer({ storage: storageUser }).fields([
@@ -86,4 +106,8 @@ const uploadStudio = multer({ storage: storageStudio }).fields([
   { name: "backgroundImage", maxCount: 1 },
 ]);
 
-module.exports = { storage, upload, uploadUser, uploadStudio };
+const uploadTopic = multer({ storage: storegeTopic }).fields([
+  { name: "imageUrl", maxCount: 1 },
+]);
+
+module.exports = { storage, upload, uploadUser, uploadStudio, uploadTopic };

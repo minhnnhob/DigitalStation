@@ -4,6 +4,8 @@ import axios from "axios";
 const initialState = {
   applyDefaults: [],
   applyDetails: null,
+  recruitmentByJob: [],
+  recruitmentDetails: null,
   loading: null,
   error: null,
 };
@@ -45,10 +47,27 @@ const getOwnRecruitment = createAsyncThunk(
 
 const getRecruitmentById = createAsyncThunk(
   "recruitment/getRecruitmentById",
-  async (recruitmentId, { rejectWithValue }) => {
+  async (applicantId, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `http://localhost:4000/api/recruitment/my_recuitment/${recruitmentId}`,
+        `http://localhost:4000/api/recruitment/applicant/${applicantId}`,
+        {
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+const getOwnRecruitmentById = createAsyncThunk(
+  "recruitment/getOwnRecruitmentById",
+  async (applicationId, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:4000/api/recruitment/${applicationId}/detail_recuitment`,
         {
           withCredentials: true,
         }
@@ -101,7 +120,45 @@ const getRecruitmentByJob = createAsyncThunk(
   async (jobId, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `http://localhost:4000/api/recruitment/job/${jobId}`,
+        `http://localhost:4000/api/recruitment/${jobId}`,
+        {
+          withCredentials: true,
+        }
+      );
+      console.log("jobId", jobId);
+      console.log("response", response);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+const updateRecruitment = createAsyncThunk(
+  "recruitment/updateRecruitment",
+  async (recruitmentData, { rejectWithValue }) => {
+    try {
+      const response = await axios.patch(
+        `http://localhost:4000/api/recruitment/${recruitmentData._id}/updateStatus`,
+        recruitmentData,
+        {
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+const scheduleInterview = createAsyncThunk(
+  "recruitment/scheduleInterview",
+  async ({ applicationId, interviewData }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:4000/api/recruitment/${applicationId}/scheduleInterview`,
+        interviewData,
         {
           withCredentials: true,
         }
@@ -151,7 +208,8 @@ const recruitmentState = createSlice({
         state.error = null;
       })
       .addCase(getRecruitmentById.fulfilled, (state, action) => {
-        state.applyDetails = action.payload;
+        state.recruitmentDetails = action.payload;
+ 
         state.loading = false;
       })
       .addCase(getRecruitmentById.rejected, (state, action) => {
@@ -184,8 +242,73 @@ const recruitmentState = createSlice({
         state.loading = false;
         state.error = action.payload;
       });
+
+    builder
+      .addCase(getRecruitmentByJob.pending, (state, action) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getRecruitmentByJob.fulfilled, (state, action) => {
+        state.recruitmentByJob = action.payload;
+        console.log("recruitmentByJob", action.payload);
+        state.loading = false;
+      })
+      .addCase(getRecruitmentByJob.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    builder
+      .addCase(updateRecruitment.pending, (state, action) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateRecruitment.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(updateRecruitment.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    builder
+      .addCase(scheduleInterview.pending, (state, action) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(scheduleInterview.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(scheduleInterview.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    builder
+      .addCase(getOwnRecruitmentById.pending, (state, action) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getOwnRecruitmentById.fulfilled, (state, action) => {
+        state.applyDetails = action.payload;
+        state.loading = false;
+      })
+      .addCase(getOwnRecruitmentById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
 export default recruitmentState.reducer;
-export { applyJob, getOwnRecruitment, getRecruitmentById, confirmInterview,addFeedback };
+export {
+  applyJob,
+  getOwnRecruitment,
+  getRecruitmentById,
+  confirmInterview,
+  addFeedback,
+  getRecruitmentByJob,
+  updateRecruitment,
+  scheduleInterview,
+  getOwnRecruitmentById,
+};

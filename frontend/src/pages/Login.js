@@ -6,8 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { fetchCurrentUser } from "../store/slices/userSlice";
 
 const Login = () => {
-  const { error } = useSelector((state) => state.user);
-  console.log("error", error);
+  // const { error } = useSelector((state) => state.user);
+  // console.log("error", error);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,18 +19,22 @@ const Login = () => {
     e.preventDefault();
 
     const currUser = { email, password };
-    await dispatch(login(currUser));
 
-    if (error) {
-      return alert("Login failed: " + error);
+    try {
+      await dispatch(login(currUser));
+    }catch (error) {
+      if (error) {
+        return alert("Login failed: " + error);
+      }
+      if (error) {
+        return alert("Failed to fetch user: " + error);
+      }
+  
     }
-    if (error) {
-      return alert("Failed to fetch user: " + error);
-    }
-
+   
     const user = await dispatch(fetchCurrentUser());
 
-    if (user.payload.role === "admin") {
+    if (user.payload?.role === "admin") {
       navigate("/admin");
     } else if (
       user.payload.role === "artist" ||
@@ -96,7 +100,7 @@ const Login = () => {
         />
 
         <button className="login-button">Login</button>
-        {error && <div className="error">{error}</div>}
+        {/* {error && <div className="error">{error}</div>} */}
 
         <div className="login-footer">
           <a href="/forgot-password" className="forgot-password">

@@ -15,6 +15,11 @@ const commentSchema = new Schema(
       required: true,
       index: true,
     },
+    parentId: {
+      type: Schema.Types.ObjectId,
+      ref: "Comment",
+      default: null,
+    },
     comment: {
       type: String,
       required: true,

@@ -20,6 +20,13 @@ const userSchema = new Schema(
       required: true,
       unique: true,
     },
+    phone:{
+      type: String,
+    } ,
+
+    dob:{
+      type: Date,
+    },
 
     password: {
       type: String,
@@ -124,6 +131,15 @@ const userSchema = new Schema(
       },
     ],
 
+    followersCount: {
+      type: Number,
+      default: 0,
+    },
+    followingCount: {
+      type: Number,
+      default: 0,
+    },
+
     isVerified: {
       type: Boolean,
       default: false,
@@ -162,6 +178,7 @@ userSchema.statics.register = async function (
   const exists = await this.findOne({ email });
 
   if (exists) {
+
     throw new Error("User with this email already exists");
   }
 
@@ -216,9 +233,7 @@ userSchema.statics.register = async function (
     const url = `${process.env.API_ENDPOINT}/api/users/${user._id}/verify/${tokenVf.tokenVf}`;
     await sendEmail(user.email, "Verify your email", url);
   }
-
-  console.log(user);
-
+ 
   return user;
 };
 

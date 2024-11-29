@@ -1,25 +1,94 @@
 const Topic = require("../models/topicModel");
 const Artwork = require("../models/artWorkModel");
+const Tag = require("../models/tagsModel");
 
 const createTopic = async (req, res) => {
   try {
-    const { name, slug, tags } = req.body;
+    const { name, slug, tags, description } = req.body;
 
-    const existingTopic = await Topic.findOne({ slug: slug });
+    console.tag
 
+    // Handle image upload
+    let imageUrl = "";
+    if (req.files && req.files.imageUrl) {
+      imageUrl = req.files.imageUrl[0].path; // Cloudinary URL or local file path
+    }
+
+    // Check if a topic with the same slug already exists
+    const existingTopic = await Topic.findOne({ slug });
     if (existingTopic) {
       return res.status(400).json({ error: "Topic already exists" });
     }
+
+    let tagIds = [];
+    if (Array.isArray(tags) && tags.length > 0) {
+      const tagsList = await Tag.find({ name: { $in: tags } }).select("_id");
+      tagIds = tagsList.map((tag) => tag._id);
+    }
+
+    // Find and map tags to their IDs
+    const tagsList = await Tag.find({ name: { $in: tags } }).select("_id");
+
+    // Create the new topic
     const newTopic = new Topic({
       name,
       slug,
-      tags,
+      tags: tagIds, // Save tags as an array of IDs
+      description,
+      imageUrl,
     });
 
     await newTopic.save();
     res.status(201).json(newTopic);
   } catch (error) {
     console.error("Error in creating topic:", error);
+    res.status(500).json({ error: "Server Error" });
+  }
+};
+
+const updateTopic = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, slug, tags, description } = req.body;
+
+    // Handle image upload
+    let imageUrl = "";
+    if (req.files && req.files.imageUrl) {
+      imageUrl = req.files.imageUrl[0].path; // Cloudinary URL or local file path
+    }
+
+    // Check if a topic with the same slug already exists (excluding the current topic)
+    const existingTopic = await Topic.findOne({ slug, _id: { $ne: id } });
+    if (existingTopic) {
+      return res.status(400).json({ error: "Topic with this slug already exists" });
+    }
+
+    let tagIds = [];
+    if (Array.isArray(tags) && tags.length > 0) {
+      const tagsList = await Tag.find({ name: { $in: tags } }).select("_id");
+      tagIds = tagsList.map((tag) => tag._id);
+    }
+
+    // Find the topic by ID and update it
+    const updatedTopic = await Topic.findByIdAndUpdate(
+      id,
+      {
+        name,
+        slug,
+        tags: tagIds, // Save tags as an array of IDs
+        description,
+        ...(imageUrl && { imageUrl }), // Only update imageUrl if a new image is provided
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedTopic) {
+      return res.status(404).json({ error: "Topic not found" });
+    }
+
+    res.status(200).json(updatedTopic);
+  } catch (error) {
+    console.error("Error in updating topic:", error);
     res.status(500).json({ error: "Server Error" });
   }
 };
@@ -86,4 +155,5 @@ module.exports = {
   getArtworkByTopic,
   getAllTopics,
   deleteTopicById,
+  updateTopic,
 };

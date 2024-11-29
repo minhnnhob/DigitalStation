@@ -135,13 +135,14 @@ const registerUser = async (req, res) => {
   const { email, password, role, studioData } = req.body;
 
   try {
-    const user = await User.register(email, password, role, studioData);
+     await User.register(email, password, role, studioData);
 
     res.status(201).json({
       message:
         "An email has been sent to your email address. Please verify your email address to complete registration.",
     });
   } catch (error) {
+    console.error("Error registering user:", error.message);
     res.status(400).json({ error: error.message });
   }
 };

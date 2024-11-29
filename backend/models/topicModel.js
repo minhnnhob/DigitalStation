@@ -24,6 +24,10 @@ const topicSchema = new Schema(
         ref: "Tag",
       },
     ],
+    description: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,

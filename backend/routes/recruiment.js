@@ -8,6 +8,7 @@ const {
   getOwnRecruitment,
   getRecruitmentById,
   getRecruitmentByJob,
+  getOwnRecruitmentById
 } = require("../controllers/recruimentController");
 const { upload } = require("../config/cloudinary");
 
@@ -19,13 +20,15 @@ const { requireAuth } = require("../middleware/requireAuth");
 router.use(requireAuth);
 
 router.post("/apply", upload.single("resumeVersion"), applyJob);
-router.get("/my_recuitment/:applicationId", getRecruitmentById);
+router.get("/applicant/:applicationId", getRecruitmentById);
+router.get("/:applicationId/detail_recuitment", getOwnRecruitmentById);
 router.patch("/:applicationId/updateStatus", updateRecruitment);
 router.patch("/:applicationId/addInterviewFeedback", addFeedback);
 router.post("/:applicationId/scheduleInterview", scheduleInterview);
 router.patch("/:applicationId/confirmInterview", confirmInterview);
 router.get("/my_recuitment", getOwnRecruitment);
 
-router.get("/job/:jobId", getRecruitmentByJob);
+router.get("/:jobId", getRecruitmentByJob);
+
 
 module.exports = router;

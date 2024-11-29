@@ -127,6 +127,59 @@ const getRecruitmentById = async (req, res) => {
       return res.status(404).json({ error: "Application not found" });
     }
 
+    const recruitment = await Recruiment.findById(applicationId)
+      .populate({
+        path: "job",
+        select:
+          "status title posterType posterBy  studioId budget salaryRange currency ",
+        populate: [
+          {
+            path: "studioId",
+            model: "Studio", // Assuming the model name for the studio is "Studio"
+            select: "name contactInfor studioProfileImage ",
+          },
+          {
+            path: "posterBy",
+            model: "User", // Assuming the model name for the user is "User"
+            select: "name email profilePicture", // Select the name field from the user
+          },
+        ],
+      })
+      .populate("applicant");
+
+    if (recruitment.job.posterType === "studio") {
+      if (recruitment.job.studioId._id.toString() !== userId.toString()) {
+        return res
+          .status(401)
+          .json({ error: "You are not authorized to view this application" });
+      }
+    } else if (recruitment.job.posterType === "artist") {
+      if (recruitment.job.posterBy._id.toString() !== userId.toString()) {
+        return res
+          .status(401)
+          .json({ error: "You are not authorized to view this application" });
+      }
+    }
+
+    res.status(200).json(recruitment);
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+const getOwnRecruitmentById = async (req, res) => {
+  const { applicationId } = req.params;
+  const userId = req.user._id;
+
+  try {
+    const checkRecruitment = await Recruiment.findById(applicationId).select(
+      "applicant"
+    );
+
+    if (!checkRecruitment) {
+      return res.status(404).json({ error: "Application not found" });
+    }
+
     if (checkRecruitment.applicant.toString() !== userId.toString()) {
       return res
         .status(401)
@@ -159,21 +212,30 @@ const getRecruitmentByJob = async (req, res) => {
   // get recruitment by job
   const userId = req.user.id;
   const { jobId } = req.params;
+
   try {
-    const recruitment = await Recruiment.find({ job: jobId });
+    const job = await Job.findById(jobId).populate("posterBy studioId", "id");
+
+    if (!job) {
+      return res.status(404).json({ error: "Job not found" });
+    }
+
+    const isAuthorized =
+      job.posterBy._id.toString() === userId.toString() ||
+      job.studioId._id.toString() === userId.toString();
+
+    if (!isAuthorized) {
+      return res
+        .status(401)
+        .json({ error: "You are not authorized to view this job" });
+    }
+
+    const recruitment = await Recruiment.find({ job: jobId })
+      .populate("job", "posterType posterBy studioId")
+      .populate("applicant", "name email");
 
     if (!recruitment || recruitment.length === 0) {
       return res.status(404).json({ error: "No applications found" });
-    }
-
-    const unauthorized = recruitment.some(
-      (app) => app.applicant.toString() !== userId.toString()
-    );
-
-    if (unauthorized) {
-      return res
-        .status(401)
-        .json({ error: "You are not authorized to view this application" });
     }
 
     res.status(200).json(recruitment);
@@ -190,10 +252,18 @@ const updateRecruitment = async (req, res) => {
       return res.status(400).json({ error: "Status is required" });
     }
 
+    if (!updateData || Object.keys(updateData).length === 0) {
+      return res.status(400).json({ error: "No update data provided" });
+    }
+
+    const cleanedUpdateData = Object.fromEntries(
+      Object.entries(updateData).filter(([_, value]) => value != null)
+    );
+
     // Find the recruitment application
     const recruitment = await Recruiment.findByIdAndUpdate(
       applicationId,
-      updateData,
+      { $set: cleanedUpdateData },
       {
         new: true,
         runValidators: true,
@@ -350,4 +420,5 @@ module.exports = {
   getRecruitmentByJob,
 
   getOwnRecruitment,
+  getOwnRecruitmentById,
 };

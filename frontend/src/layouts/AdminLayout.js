@@ -3,6 +3,7 @@ import { Outlet, Link, useNavigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { useSelector } from "react-redux";
 import Loading from "../components/loading/Loading";
+import AdminSideBar from "../components/admin/AdminSideBar";
 
 const AdminLayout = () => {
   const id = useSelector((state) => state.user.id);
@@ -28,22 +29,9 @@ const AdminLayout = () => {
   if (loading) return <Loading />;
 
   return (
-    <div className=" flex justify-center w-full">
-      <nav className=" items-start">
-        <ul>
-          <li>
-            <Link to="/admin/dashboard">Dashboard</Link>
-          </li>
-          <li>
-            <Link to="/admin/manage-users">Manage Users</Link>
-          </li>{" "}
-          <li>
-            <Link to="/admin/manage-topics">Manage Topics</Link>
-          </li>
-          {/* Add more admin links as needed */}
-        </ul>
-      </nav>
-      <main className="main-content w-full">
+    <div className=" flex justify-between w-full p-4 ">
+     <AdminSideBar />
+      <main className=" w-[80%] ">
         <Outlet />
       </main>
       <Toaster

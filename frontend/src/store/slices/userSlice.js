@@ -26,24 +26,27 @@ const fetchUserInfo = createAsyncThunk("user/fetchUserInfo", async () => {
   }
 });
 
-const login = createAsyncThunk("user/login", async (user,{rejectWithValue}) => {
-  try {
-    const response = await axios.post(
-      "http://localhost:4000/api/users/login",
-      user,
-      { withCredentials: true }
-    );
-    // console.log(response.data);
+const login = createAsyncThunk(
+  "user/login",
+  async (user, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/users/login",
+        user,
+        { withCredentials: true }
+      );
+      // console.log(response.data);
 
-    return response.data;
-  } catch (error) {
-    return rejectWithValue(error.response.data);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
   }
-});
+);
 
 // Update user profile
 
-const register = createAsyncThunk("user/register", async (user) => {
+const register = createAsyncThunk("user/register", async (user,{rejectWithValue}) => {
   try {
     const response = await axios.post(
       "http://localhost:4000/api/users/register",
@@ -53,8 +56,8 @@ const register = createAsyncThunk("user/register", async (user) => {
 
     return response.data;
   } catch (error) {
-    console.log(error.response.data);
-    throw new Error(error.response.data);
+    
+    return rejectWithValue(error.response.data);
   }
 });
 
@@ -146,7 +149,7 @@ const userSlice = createSlice({
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload.error;
-        console.log(state.error);
+        console.log(action.payload.error);
       });
 
     builder
@@ -164,6 +167,8 @@ const userSlice = createSlice({
 
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
+        state.error = action.payload.error;
+        console.log(action.payload.error);
       });
 
     builder

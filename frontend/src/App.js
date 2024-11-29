@@ -44,7 +44,9 @@ import OwnerJob from "./pages/OwnerJob";
 import UpdateOwnerJob from "./pages/UpdateOwnerJob";
 import RecruimentByJob from "./pages/RecruimentByJob";
 import JobFreelace from "./pages/JobFreelace";
+import RecruitmentDetail from "./pages/RecruitmentDetail";
 
+import AdminTopic from "./components/topic/AdminTopic";
 
 function App() {
   useEffect(() => {
@@ -54,60 +56,74 @@ function App() {
 
   const router = createBrowserRouter(
     createRoutesFromElements(
-      <Route path="/" element={<RootLayout />}>
-        {/* Explore */}
-        <Route index element={<Explore />} />
-        {/* Job Route */}
-        <Route path="job" element={<JobBoardLayout />}>
-          <Route index element={<JobBoard />} />
-          <Route path="job-listings" element={<JobBoard />} />
-          <Route path="studios" element={<StudiosListing />} />
-          <Route path="saved-jobs" element={<SavedJobsListing />} />
-          <Route path="job-freelance" element={<JobFreelace />} />
+      <>
+        <Route path="/" element={<RootLayout />}>
+          {/* Explore */}
+          <Route index element={<Explore />} />
+          {/* Job Route */}
+          <Route path="job" element={<JobBoardLayout />}>
+            <Route index element={<JobBoard />} />
+            <Route path="job-listings" element={<JobBoard />} />
+            <Route path="studios" element={<StudiosListing />} />
+            <Route path="saved-jobs" element={<SavedJobsListing />} />
+            <Route path="job-freelance" element={<JobFreelace />} />
+          </Route>
+          <Route path="/job/:jobId" element={<DetailJob />} />
+
+          <Route path="job_manage" element={<ManageJobLayout />}>
+            <Route index element={<JobApplication />} />
+            <Route path="recuitment/*" element={<Recuitment />}></Route>
+            <Route path=":recuitmentId" element={<DetailUserApplication />} />
+
+            <Route path="job-application" element={<JobApplication />} />
+            <Route path="job_posting/*" element={<OwnerJob />}></Route>
+            <Route path="job_posting/:jobId" element={<UpdateOwnerJob />} />
+            <Route path="job_posting/new" element={<JobPosting />} />
+            <Route
+              path="job_posting/recruitment/:jobId"
+              element={<RecruimentByJob />}
+            />
+          </Route>
+
+          <Route
+            path="job_manage/applicant/:applicantId"
+            element={<RecruitmentDetail />}
+          />
+
+          <Route path="/artwork/:artworkId" element={<ArtworkDetail />} />
+          <Route path="project/new" element={<UploadArtwork />} />
+
+          {/* Account */}
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+          <Route path="portfolio" element={<PortfolioPage />} />
+          <Route path="collections" element={<Collections />} />
+
+          <Route path="profile" element={<ProfileLayout />}>
+            <Route index element={<ProfileForm />} />
+          </Route>
+
+          <Route path="studio/:id" element={<DetailStudio />} />
+
+          {/* Studio Route */}
+
+          <Route path="studio" element={<StudioLayout />} />
+
+        
+
+          <Route path="*" element={<div>Not Found</div>} />
         </Route>
-        <Route path="/job/:jobId" element={<DetailJob />} />
 
-        <Route path="job_manage" element={<ManageJobLayout />}>
-          <Route index element={<JobApplication />} />
-          <Route path="recuitment/*" element={<Recuitment />}></Route>
-          <Route path=":recuitmentId" element={<DetailUserApplication />} />
+          {/* Admin Route */}
 
-          <Route path="job-application" element={<JobApplication />} />
-          <Route path="job_posting/*" element={<OwnerJob />}></Route>
-          <Route path="job_posting/:jobId" element={<UpdateOwnerJob />} />
-          <Route path="job_posting/new" element={<JobPosting />} />
-          <Route path="job_posting/recruitment" element={<RecruimentByJob />} />
-        </Route>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<div>Dashboard</div>} />
+            <Route path="dashboard" element={<AdminTopic/>} />
+            <Route path="manage-users" element={<div>Users</div>} />
+            <Route path="manage-topics" element={<AdminTopic/>} />
+          </Route>
 
-        <Route path="/artwork/:artworkId" element={<ArtworkDetail />} />
-        <Route path="project/new" element={<UploadArtwork />} />
-
-        {/* Account */}
-        <Route path="login" element={<Login />} />
-        <Route path="register" element={<Register />} />
-        <Route path="portfolio" element={<PortfolioPage />} />
-        <Route path="collections" element={<Collections />} />
-
-        <Route path="profile" element={<ProfileLayout />}>
-          <Route index element={<ProfileForm />} />
-        </Route>
-
-        <Route path="studio/:id" element={<DetailStudio />} />
-
-        {/* Studio Route */}
-
-        <Route path="studio" element={<StudioLayout />} />
-
-        {/* Admin Route */}
-
-        <Route path="admin" element={<AdminLayout />}>
-          <Route index element={<div>Users</div>} />
-          <Route path="dashboard" element={<div>Jobs</div>} />
-          <Route path="manage-users" element={<div>Jobs</div>} />
-          <Route path="manage-topics" element={<div>Toic</div>} />
-        </Route>
-        <Route path="*" element={<div>Not Found</div>} />
-      </Route>
+      </>
     )
   );
 

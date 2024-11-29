@@ -9,6 +9,8 @@ import tagReducer from "./slices/category/tagSlice";
 import jobReducer from "./slices/jobSlice";
 import studioReducer from "./slices/studioSlice";
 import recruitmentReducer from "./slices/recruitmentSlice";
+import followReducer from "./slices/activity/followSlice";
+import commentReducer from "./slices/activity/commentSlice";
 
 // });
 
@@ -24,6 +26,8 @@ const store = configureStore({
     job: jobReducer,
     studio: studioReducer,
     recruitment: recruitmentReducer,
+    follow: followReducer,
+    comment: commentReducer,
   },
 });
 

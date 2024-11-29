@@ -91,16 +91,16 @@ const JobApplication = () => {
                   {applyDefaults.map((app) => (
                     <tr key={app._id}>
                       <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-300 sm:pl-0">
-                        {app.job.studioId?.name || app.job.posterBy?.name}
+                        {app.job?.studioId?.name || app.job?.posterBy?.name}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        {app.job.title}
+                        {app.job?.title}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         {app.status}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        {app.job.status}
+                        {app.job?.status}
                       </td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                         {/* <Link

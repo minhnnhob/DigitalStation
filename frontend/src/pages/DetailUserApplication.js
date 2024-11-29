@@ -1,10 +1,10 @@
-import { Building2, CodeSquare } from "lucide-react";
+import { Building2 } from "lucide-react";
 import TextArea from "../components/input/textArea";
 
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-import { getRecruitmentById } from "../store/slices/recruitmentSlice";
+import { getOwnRecruitmentById } from "../store/slices/recruitmentSlice";
 import { useSelector } from "react-redux";
 import { confirmInterview } from "../store/slices/recruitmentSlice";
 import { addFeedback } from "../store/slices/recruitmentSlice";
@@ -18,12 +18,13 @@ const DetailUserApplication = () => {
 
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [isFeedback, setIsFeedback] = useState(false);
-  console.log(applyDetails);
+ console.log(applyDetails?.interviews);
 
   useEffect(() => {
     if (!applyDetails || applyDetails.job._id !== recuitmentId) {
-      dispatch(getRecruitmentById(recuitmentId));
+      dispatch(getOwnRecruitmentById(recuitmentId));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, recuitmentId]);
 
   useEffect(() => {
@@ -163,7 +164,7 @@ const DetailUserApplication = () => {
           </p>
           <button
             className=" bg-blue-500 hover:bg-blue-700 disabled:opacity-35"
-            disabled={applyDetails.job.interviews?.date || !isConfirmed}
+            disabled={applyDetails.job?.interviews?.date || isConfirmed}
             type="button"
             onClick={handleConfirmInterview}
           >

@@ -7,9 +7,15 @@ const {
   getArtworkByTopic,
   getAllTopics,
   deleteTopicById,
+  updateTopic,
 } = require("../controllers/topicController");
 
-router.post("/", createTopic);
+
+const { uploadTopic } = require("../config/cloudinary");
+
+router.post("/", uploadTopic, createTopic);
+
+router.put("/:id", uploadTopic, updateTopic);
 
 router.get("/:slug", getArtworkByTopic);
 
