@@ -12,6 +12,7 @@ const initialState = {
   error: null,
   profilePicture: null,
   role: null,
+  artistInfor: [],
 };
 
 const fetchUserInfo = createAsyncThunk("user/fetchUserInfo", async () => {
@@ -46,20 +47,22 @@ const login = createAsyncThunk(
 
 // Update user profile
 
-const register = createAsyncThunk("user/register", async (user,{rejectWithValue}) => {
-  try {
-    const response = await axios.post(
-      "http://localhost:4000/api/users/register",
-      user,
-      { withCredentials: true }
-    );
+const register = createAsyncThunk(
+  "user/register",
+  async (user, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/users/register",
+        user,
+        { withCredentials: true }
+      );
 
-    return response.data;
-  } catch (error) {
-    
-    return rejectWithValue(error.response.data);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
   }
-});
+);
 
 const logout = createAsyncThunk("user/logout", async () => {
   try {
@@ -84,6 +87,25 @@ const fetchCurrentUser = createAsyncThunk("user/fetchCurrentUser", async () => {
     throw new Error(error.message);
   }
 });
+
+const fetchArtistInfor = createAsyncThunk(
+  "user/fetchArtistInfor",
+  async (id) => {
+    console.log(id);
+    try {
+      const response = await axios.get(
+        `http://localhost:4000/api/users/artist/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }
+);
 
 const userSlice = createSlice({
   name: "user",
@@ -149,7 +171,6 @@ const userSlice = createSlice({
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload.error;
-        console.log(action.payload.error);
       });
 
     builder
@@ -159,7 +180,6 @@ const userSlice = createSlice({
 
       .addCase(register.fulfilled, (state, action) => {
         state.loading = false;
-        state.loggedIn = true;
         state.id = action.payload.id;
         state.email = action.payload.email;
         state.role = action.payload.role;
@@ -185,9 +205,30 @@ const userSlice = createSlice({
       .addCase(logout.rejected, (state, action) => {
         state.loading = false;
       });
+
+    builder
+      .addCase(fetchArtistInfor.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(fetchArtistInfor.fulfilled, (state, action) => {
+        state.loading = false;
+        state.artistInfor = action.payload;
+        console.log(action.payload);
+      })
+      .addCase(fetchArtistInfor.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
   },
 });
 
 export default userSlice.reducer;
 export const { updateUser } = userSlice.actions;
-export { login, register, logout, fetchCurrentUser, fetchUserInfo };
+export {
+  login,
+  register,
+  logout,
+  fetchCurrentUser,
+  fetchUserInfo,
+  fetchArtistInfor,
+};

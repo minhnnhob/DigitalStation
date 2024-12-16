@@ -29,7 +29,7 @@ import JobBoard from "./pages/Jobs";
 import JobBoardLayout from "./layouts/JobBoardLayout";
 import StudiosListing from "./pages/Studios";
 import SavedJobsListing from "./pages/SaveJob";
-import JobPreferences from "./pages/JobPreferences";
+
 import DetailJob from "./pages/JobDetail";
 import AdminLayout from "./layouts/AdminLayout";
 import DetailStudio from "./components/studio/DetailStudio";
@@ -46,7 +46,10 @@ import RecruimentByJob from "./pages/RecruimentByJob";
 import JobFreelace from "./pages/JobFreelace";
 import RecruitmentDetail from "./pages/RecruitmentDetail";
 
+import ArtworkForm from "./components/artwork/ArtworkForm";
+
 import AdminTopic from "./components/topic/AdminTopic";
+import Portfolios from "./pages/Portfolios";
 
 function App() {
   useEffect(() => {
@@ -92,12 +95,14 @@ function App() {
 
           <Route path="/artwork/:artworkId" element={<ArtworkDetail />} />
           <Route path="project/new" element={<UploadArtwork />} />
+          <Route path ="edit-artwork/:artworkId" element={<ArtworkForm />} />
 
           {/* Account */}
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
           <Route path="portfolio" element={<PortfolioPage />} />
           <Route path="collections" element={<Collections />} />
+          <Route path="portfolio/:id" element={<Portfolios />} />
 
           <Route path="profile" element={<ProfileLayout />}>
             <Route index element={<ProfileForm />} />

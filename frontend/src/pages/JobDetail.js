@@ -47,7 +47,7 @@ const DetailJob = () => {
       {/* Header Section */}
       <div className="bg-dark-900 p-6 rounded-lg shadow-md flex flex-col space-y-4">
       <h1 className="text-3xl font-bold">{selectedJob.title}</h1>
-        {selectedJob.posterType === "studio" ? (
+        {selectedJob?.posterType === "studio" ? (
           <>
             <a
               href={`https://${selectedJob.studioId?.website}`}
@@ -55,16 +55,16 @@ const DetailJob = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              {selectedJob.studioId.website}
+              {selectedJob?.studioId?.website}
             </a>
             <p className="text-lg">
-              {selectedJob.salaryRange.min} - {selectedJob.salaryRange.max} /{" "}
-              {selectedJob.salaryRange.currency} Monthly
+              {selectedJob?.salaryRange.min} - {selectedJob?.salaryRange.max} /{" "}
+              {selectedJob?.salaryRange.currency} Monthly
             </p>
           </>
         ) : (
           <p className="text-lg">
-            {selectedJob.budget} {selectedJob.currency} Monthly
+            {selectedJob?.budget} {selectedJob?.currency} Monthly
           </p>
         )}
         <div className="flex items-center space-x-4">
@@ -74,9 +74,9 @@ const DetailJob = () => {
           >
             Apply
           </button>
-          {selectedJob.posterType === "studio" && (
+          {selectedJob?.posterType === "studio" && (
             <button className="bg-gray-700 hover:bg-gray-800 px-4 py-2 rounded-md">
-              View all {selectedJob.studioId.name} jobs →
+              View all {selectedJob?.studioId?.name} jobs →
             </button>
           )}
         </div>
@@ -90,7 +90,7 @@ const DetailJob = () => {
           <div>
             <h2 className="text-xl font-semibold">Job Description</h2>
             <p className="bg-bg-pf p-4 mt-4 rounded-xl">
-              {selectedJob.description}
+              {selectedJob?.description}
             </p>
           </div>
 
@@ -98,14 +98,14 @@ const DetailJob = () => {
           <div>
             <h2 className="text-xl font-semibold">Skills</h2>
             <div className="bg-bg-pf p-4 mt-4 rounded-xl space-y-2">
-              {selectedJob.skillsRequired.map((skill, index) => (
+              {selectedJob?.skillsRequired.map((skill, index) => (
                 <p key={index}>- {skill}</p>
               ))}
             </div>
           </div>
 
           {/* Recruitment Requirements */}
-          {selectedJob.requirements && (
+          {selectedJob?.requirements && (
             <div>
               <h2 className="text-xl font-semibold">Recruitment Requirements</h2>
               <p className="bg-bg-pf p-4 mt-4 rounded-xl">

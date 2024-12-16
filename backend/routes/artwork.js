@@ -25,13 +25,16 @@ router.get("/artwork/:artworkId", getArtworkById);
 
 router.post("/", upload.array("files", 10), addArtwork); // Allows up to 10 files to be uploaded
 
-// Route to update artwork
-router.patch("/:artistId/:artworkId", updateArtwork);
-// Route to delete artwork
-router.delete("/:artistId/:artworkId", deleteArtwork);
+
+
 
 router.use(requireAuth);
 router.post("/explore",getUserRecommentExplore ); 
 
+// Route to delete artwork
+router.delete("/:artworkId", deleteArtwork);
+
+// Route to update artwork
+router.patch("/:artworkId",upload.array("files", 10), updateArtwork);
 
 module.exports = router;

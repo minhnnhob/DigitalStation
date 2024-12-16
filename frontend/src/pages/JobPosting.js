@@ -2,11 +2,13 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { createJob } from "../store/slices/jobSlice";
+import { showNotification, hideNotification } from "../store/slices/notificationSlice";
 
 const JobPosting = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.job);
+  console.log("error", loading);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -22,11 +24,11 @@ const JobPosting = () => {
     currency: "",
     maxApplicants: "",
   });
-  console.log("formData", formData);
+  // console.log("formData", formData);
 
   const [skills, setSkills] = useState([]);
   const [newSkill, setNewSkill] = useState("");
-  console.log("skills", skills);
+  // console.log("skills", skills);
 
   const handleAddSkill = () => {
     if (newSkill.trim() && !skills.includes(newSkill)) {
@@ -44,8 +46,43 @@ const JobPosting = () => {
   };
 
   const handleChange = (e) => {
-    console.log("e.target", e.target);
+    // console.log("e.target", e.target);
     const { name, value } = e.target;
+    console.log("name", isNaN(value/0));
+
+    if (name === "budget"&&(  value < 0 || isNaN(value/0))&& value!=="") {
+      dispatch(
+        showNotification({ type: "error", message: "Invalid number" })
+      );
+      setTimeout(() => {
+        dispatch(hideNotification());
+      }, 3000);
+      // setFormData((prev) => ({ ...prev, [name]: 0 }));
+      return
+      
+    } 
+    
+    if (name === "maxApplicants"&&(  value < 0 || isNaN(value/0))&& value!=="") {
+      dispatch(
+        showNotification({ type: "error", message: "Invalid number" })
+      );
+      setTimeout(() => {
+        dispatch(hideNotification());
+      }, 3000);
+      // setFormData((prev) => ({ ...prev, [name]: 0 }));
+      return
+    }
+    
+    if (name === "expiresAt" && new Date(value) < new Date()) {
+      dispatch(
+        showNotification({ type: "error", message: "Invalid date" })
+      );
+      setTimeout(() => {
+        dispatch(hideNotification());
+      }, 3000);
+      return
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -252,6 +289,7 @@ const JobPosting = () => {
                 onChange={handleChange}
                 placeholder="If unlimited leave blank"
                 className="bg-bg-pf flex-1 p-2 border rounded-md"
+                required
               />
             </div>
           </div>

@@ -8,6 +8,7 @@ const {
   getAuthUser,
   updateUser,
   getVerifyToken,
+  getArtitsById,
   
 } = require("../controllers/userController");
 const { uploadUser } = require("../config/cloudinary");
@@ -24,7 +25,7 @@ router.get("/logout", logoutUser);
 
 router.get("/:id/verify/:token", getVerifyToken);
 
-
+router.get("/artist/:id", getArtitsById);
 
 router.use(requireAuth);
 

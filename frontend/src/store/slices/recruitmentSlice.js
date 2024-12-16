@@ -182,10 +182,12 @@ const recruitmentState = createSlice({
     builder.addCase(applyJob.fulfilled, (state, action) => {
       state.applyDefaults = action.payload;
       state.loading = false;
+      console.log("fulfilled", action.payload);
     });
     builder.addCase(applyJob.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
+      console.log("rehject", action.payload);
     });
 
     builder

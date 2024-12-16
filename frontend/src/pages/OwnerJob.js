@@ -50,7 +50,7 @@ const OwnerJob = () => {
               {jobs && jobs.length > 0 ? (
                 <table className="min-w-full divide-y divide-gray-300">
                   <thead>
-                    <tr>
+                   
                       <th
                         scope="col"
                         className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-300 sm:pl-0"
@@ -93,10 +93,10 @@ const OwnerJob = () => {
                       >
                         <span className="sr-only">HEHE</span>
                       </th>
-                    </tr>
+                   
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {jobs.map((app) => (
+                    {jobs?.map((app) => (
                       <tr key={app._id}>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {app.title}

@@ -322,7 +322,7 @@ const ArtworkDetail = () => {
                 <img
                   src={file.fileUrl}
                   alt="Artwork"
-                  className=" w-full h-auto object-cover"
+                  className=" w-full h-auto object-fit"
                 />
               )}
 

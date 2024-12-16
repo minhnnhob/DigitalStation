@@ -24,7 +24,7 @@ const JobApplication = () => {
   //   navigate(`/recruitment/${recuitmentId}`);
   // };
 
-  if (!Array.isArray(applyDefaults)) {
+  if (!Array.isArray(applyDefaults)|| applyDefaults.length === 0) {
     return <div>No applications found.</div>;
   }
 
@@ -88,7 +88,7 @@ const JobApplication = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {applyDefaults.map((app) => (
+                  {applyDefaults?.map((app) => (
                     <tr key={app._id}>
                       <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-300 sm:pl-0">
                         {app.job?.studioId?.name || app.job?.posterBy?.name}

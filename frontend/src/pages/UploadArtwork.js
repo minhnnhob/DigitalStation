@@ -15,10 +15,7 @@ import {
 
 const ArtworkUpload = () => {
   const { id } = useSelector((state) => state.user);
-  console.log(id);
-
-  const {loading} = useSelector(state => state.artwork);
-
+   const {loading} = useSelector(state => state.artwork);
   const dispatch = useDispatch();
 
   //   const { title, description, medium, subjectMatter, softwareUsed, tags, images } = useSelector(state => state.artwork);
@@ -79,7 +76,7 @@ const ArtworkUpload = () => {
 
   const mediumOptions = ["Digital 2D", "Digital 3D"];
 
-  const { topics } = useSelector((state) => state.topic);
+  const { topics } = useSelector((state) => state?.topic);
   const [subjectMatterOptions, setSubjectMatterOptions] = useState([]);
 
   useEffect(() => {
@@ -405,7 +402,7 @@ const ArtworkUpload = () => {
                   How would you categorize this work? (Choose up to 3)
                 </p>
                 <div className="flex flex-wrap gap-2 mb-2">
-                  {selectedSubjects.map((subject) => (
+                  {selectedSubjects?.map((subject) => (
                     <button
                       key={subject}
                       onClick={() => handleSubjectRemove(subject)}

@@ -21,7 +21,9 @@ const applyJob = async (req, res) => {
     }
     // Create Job Application Document
     if (!resumeVersion) {
-      resumeVersion = {};
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({ error: "Resume is not found or something wrong" });
     }
 
     const recuitment = await Recruiment.find({
@@ -47,8 +49,7 @@ const applyJob = async (req, res) => {
     if (recuitmentExists) {
       await session.abortTransaction();
       session.endSession();
-      return res
-        .status(400)
+      return res.status(400)
         .json({ error: "You have already applied for this job" });
     }
 
@@ -73,8 +74,7 @@ const applyJob = async (req, res) => {
     await session.commitTransaction();
     session.endSession();
 
-    res
-      .status(200)
+    res.status(200)
       .json({ message: "Application submitted successfully", newRecruiment });
   } catch (error) {
     await session.abortTransaction();
@@ -148,11 +148,11 @@ const getRecruitmentById = async (req, res) => {
       .populate("applicant");
 
     if (recruitment.job.posterType === "studio") {
-      if (recruitment.job.studioId._id.toString() !== userId.toString()) {
-        return res
-          .status(401)
-          .json({ error: "You are not authorized to view this application" });
-      }
+      // if (recruitment.job.studioId._id.toString() !== userId.toString()) {
+      //   return res
+      //     .status(401)
+      //     .json({ error: "You are not authorized to view this application" });
+      // }
     } else if (recruitment.job.posterType === "artist") {
       if (recruitment.job.posterBy._id.toString() !== userId.toString()) {
         return res
@@ -209,20 +209,26 @@ const getOwnRecruitmentById = async (req, res) => {
 };
 
 const getRecruitmentByJob = async (req, res) => {
-  // get recruitment by job
   const userId = req.user.id;
   const { jobId } = req.params;
 
+  console.log("jobId", jobId);
+  console.log("userId", userId);
+
   try {
-    const job = await Job.findById(jobId).populate("posterBy studioId", "id");
+    const job = await Job.findById(jobId);
 
     if (!job) {
       return res.status(404).json({ error: "Job not found" });
     }
 
-    const isAuthorized =
-      job.posterBy._id.toString() === userId.toString() ||
-      job.studioId._id.toString() === userId.toString();
+    let isAuthorized = false;
+
+    if (job.posterType === "studio") {
+      isAuthorized = true;
+    } else if (job.posterType === "artist") {
+      isAuthorized = job.posterBy.toString() === userId.toString();
+    }
 
     if (!isAuthorized) {
       return res

@@ -6,8 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { fetchCurrentUser } from "../store/slices/userSlice";
 
 const Login = () => {
-  // const { error } = useSelector((state) => state.user);
-  // console.log("error", error);
+  const userError  = useSelector((state) => state.user?.error)
+  console.log("error", userError);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,26 +24,42 @@ const Login = () => {
       await dispatch(login(currUser));
     }catch (error) {
       if (error) {
-        return alert("Login failed: " + error);
+        return alert("Login failed: " + userError);
       }
       if (error) {
-        return alert("Failed to fetch user: " + error);
+        return alert("Failed to fetch user: " + userError);
       }
   
     }
    
-    const user = await dispatch(fetchCurrentUser());
-
-    if (user.payload?.role === "admin") {
-      navigate("/admin");
-    } else if (
-      user.payload.role === "artist" ||
-      user.payload.role === "studio"
-    ) {
-      navigate("/");
-    } else {
-      return alert("Hello! I am an alert box hehehehehehehheheheehheh!!");
+    try {
+      const user = await dispatch(fetchCurrentUser());
+      if (user.payload?.role === "admin") {
+        navigate("/admin");
+      } else if (
+        user.payload.role === "artist" ||
+        user.payload.role === "studio"
+      ) {
+        navigate("/");
+      } else {
+        return alert("Hello! I am an alert box hehehehehehehheheheehheh!!");
+      }
+    }catch(error){
+      return alert("Failed to fetch user: " + userError);
     }
+    // const user = await dispatch(fetchCurrentUser());
+    // // if(user.payload?.role )
+    // console.log("user", user.payload?.role);
+    // if (user.payload?.role === "admin") {
+    //   navigate("/admin");
+    // } else if (
+    //   user.payload.role === "artist" ||
+    //   user.payload.role === "studio"
+    // ) {
+    //   navigate("/");
+    // } else {
+    //   return alert("Hello! I am an alert box hehehehehehehheheheehheh!!");
+    // }
   };
 
   return (

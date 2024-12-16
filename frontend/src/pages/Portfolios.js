@@ -1,42 +1,42 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCurrentUser, fetchUserInfo } from "../store/slices/userSlice";
+import { fetchArtistInfor } from "../store/slices/userSlice";
 import { fetchArtwprkOfUser } from "../store/slices/artWorkSlice";
 import ArtworkOfUser from "../components/artwork/ArtWorkOfUser";
 import RightSidebar from "../components/sideBar/rightSideBar";
-
-const PortfolioPage = () => {
+import { useParams } from "react-router-dom";
+const Portfolios = () => {
   const dispatch = useDispatch();
-  const { id, userInfor } = useSelector((state) => state.user);
+  const { id, artistInfor } = useSelector((state) => state?.user);
   const { artworks, loading } = useSelector((state) => state.artwork);
+
+  const artitsId = useParams().id;
 
   const [artworksUser, setArtworksUser] = useState(artworks);
   const [coverPicture, setCoverPicture] = useState(
-    userInfor.coverPicture || null
+    artistInfor.coverPicture || null
   );
 
   // console.log(artworks.map((artwork) => console.log(artwork)));
+  useEffect(() => {
+   
+      dispatch(fetchArtistInfor(artitsId));
+      dispatch(fetchArtwprkOfUser(artitsId));
+    
+  }, [dispatch, artitsId]);
 
   useEffect(() => {
-    if (userInfor && artworks) {
-      setCoverPicture(userInfor.coverPicture || "");
+    if (artistInfor) {
+      setCoverPicture(artistInfor.coverPicture || "");
+    }
+  }, [artistInfor]);
+
+  useEffect(() => {
+    if (artworks) {
       setArtworksUser(artworks);
     }
-  }, [dispatch, userInfor, artworks]);
+  }, [artworks]);
 
-  useEffect(() => {
-    if (!id) {
-      dispatch(fetchCurrentUser());
-    }
-  }, [dispatch, id]);
-
-  useEffect(() => {
-    if (id) {
-      dispatch(fetchUserInfo(id));
-      dispatch(fetchArtwprkOfUser(id));
-    }
-    setArtworksUser(artworks);
-  }, [dispatch, id]);
 
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -81,9 +81,10 @@ const PortfolioPage = () => {
         }`}
       >
         <RightSidebar
-          userInfor={userInfor}
+          userInfor={artistInfor}
           isCollapsed={isCollapsed}
           toggleCollapse={toggleCollapse}
+          onUser={artitsId}
         />
       </div>
 
@@ -92,4 +93,4 @@ const PortfolioPage = () => {
   );
 };
 
-export default PortfolioPage;
+export default Portfolios;

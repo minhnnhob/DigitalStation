@@ -4,6 +4,11 @@ import { useDispatch } from "react-redux";
 import { applyJob } from "../../store/slices/recruitmentSlice";
 import { useSelector } from "react-redux";
 
+import {
+  showNotification,
+  hideNotification,
+} from "../../store/slices/notificationSlice";
+
 const ApplyJobPopup = ({ jobId, onClose, isOpen }) => {
   const [coverLetter, setCoverLetter] = useState("");
   const [resumeFile, setResumeFile] = useState(null);
@@ -11,6 +16,26 @@ const ApplyJobPopup = ({ jobId, onClose, isOpen }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { loading, error } = useSelector((state) => state.recruitment);
+
+  const handleChangeResume = (e) => {
+    console.log("e.target.files[0]", e.target.files[0]);
+    if (
+      e.target.files[0].type === "application/pdf" ||
+      e.target.files[0].type === "application/xls"
+    ) {
+      setResumeFile(e.target.files[0]);
+    } else {
+      dispatch(
+        showNotification({
+          message: "Please upload a PDF file",
+          type: "error",
+        })
+      );
+      setTimeout(() => {
+        dispatch(hideNotification());
+      }, 3000);
+    }
+  };
 
   const dispatch = useDispatch();
   const handleSubmit = async (e) => {
@@ -25,8 +50,9 @@ const ApplyJobPopup = ({ jobId, onClose, isOpen }) => {
     }
 
     try {
-      await dispatch(applyJob(formData));
-      
+      await dispatch(applyJob(formData)).unwrap();
+      setSubmissionStatus("success");
+
       onClose();
     } catch (error) {
       setSubmissionStatus("error");
@@ -163,7 +189,7 @@ const ApplyJobPopup = ({ jobId, onClose, isOpen }) => {
                   name="resume"
                   type="file"
                   accept=".pdf,.doc,.docx"
-                  onChange={(e) => setResumeFile(e.target.files[0])}
+                  onChange={handleChangeResume}
                   className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100"
                 />
               </div>

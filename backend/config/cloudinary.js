@@ -15,7 +15,8 @@ const storage = new CloudinaryStorage({
       folder = "artworks/video";
     } else if (
       file.mimetype === "text/plain" ||
-      file.mimetype === "application/pdf"
+      file.mimetype === "application/pdf"||
+      file.mimetype ==="application/xls"
     ) {
       folder = "resumes";
     }
@@ -23,7 +24,7 @@ const storage = new CloudinaryStorage({
     return {
       folder: folder,
       public_id: file.originalname.split(".")[0], // Store with original name
-      resource_type: "auto", // Automatically detect resource type
+      resource_type: "auto", 
     };
   },
 });

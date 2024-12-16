@@ -18,7 +18,7 @@ const DetailUserApplication = () => {
 
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [isFeedback, setIsFeedback] = useState(false);
- console.log(applyDetails?.interviews);
+  console.log(applyDetails?.interviews);
 
   useEffect(() => {
     if (!applyDetails || applyDetails.job._id !== recuitmentId) {
@@ -36,8 +36,6 @@ const DetailUserApplication = () => {
       setIsFeedback(true);
     }
   }, [applyDetails]);
-
-  console.log(applyDetails?.feedback);
 
   const handleConfirmInterview = async () => {
     try {
@@ -94,7 +92,7 @@ const DetailUserApplication = () => {
       <div className="mt-8 flex items-center gap-4">
         <Building2 />
         <p className="font-bold text-lg">
-          {applyDetails.job.studioId?.name || applyDetails.job.posterBy?.name}
+          {applyDetails.job?.studioId?.name || applyDetails.job?.posterBy?.name}
         </p>
       </div>
 

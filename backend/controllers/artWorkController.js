@@ -4,6 +4,7 @@ const User = require("../models/userModel");
 const Tag = require("../models/tagsModel");
 const UserActivity = require("../models/userActivityModel");
 const cloudinary = require("cloudinary").v2;
+const { logUserActivity } = require("./userActivityController");
 
 const mongoose = require("mongoose");
 
@@ -184,7 +185,9 @@ const getUserRecommentExplore = async (req, res) => {
 
     // Build query for artworks
     const query = {
-      ...(userInterestedTopics.length && { topic: { $in: userInterestedTopics } }),
+      ...(userInterestedTopics.length && {
+        topic: { $in: userInterestedTopics },
+      }),
       ...(tags && { tags: { $in: tags.split(",") } }),
       ...(search && { $text: { $search: search } }),
       ...(topic && { topic }),
@@ -215,31 +218,31 @@ const getUserRecommentExplore = async (req, res) => {
             .populate("artist", "name profilePicture")
             .lean();
 
-    // Enhance artworks with user-specific data
-    const enhancedArtworks = await Promise.all(
-      artworks.map(async (artwork) => {
-        const isLiked = !!(await UserActivity.exists({
-          userId,
-          artworkId: artwork._id,
-          activityType: "like",
-        }));
 
-        const isArtistFollowed = !!(await UserActivity.exists({
-          userId,
-          followedUserId: artwork.artist._id,
-          activityType: "follow",
-        }));
+    // const enhancedArtworks = await Promise.all(
+    //   artworks.map(async (artwork) => {
+    //     const isLiked = !!(await UserActivity.exists({
+    //       userId,
+    //       artworkId: artwork._id,
+    //       activityType: "like",
+    //     }));
 
-        return {
-          ...artwork,
-          filePreview: artwork.files[0]?.fileUrl,
-          fileCount: artwork.files.length,
-          topicName: artwork.topic?.name,
-          isLiked,
-          isArtistFollowed,
-        };
-      })
-    );
+    //     const isArtistFollowed = !!(await UserActivity.exists({
+    //       userId,
+    //       followedUserId: artwork.artist._id,
+    //       activityType: "follow",
+    //     }));
+
+    //     return {
+    //       ...artwork,
+    //       filePreview: artwork.files[0]?.fileUrl,
+    //       fileCount: artwork.files.length,
+    //       topicName: artwork.topic?.name,
+    //       isLiked,
+    //       isArtistFollowed,
+    //     };
+    //   })
+    // );
 
     // Personalized recommendations
     let recommendations = [];
@@ -267,12 +270,19 @@ const getUserRecommentExplore = async (req, res) => {
           .select("topic tags")
           .lean();
 
-        const topicsFromInterests = [...new Set(similarTopicsAndTags.map((a) => a.topic))];
-        const tagsFromInterests = [...new Set(similarTopicsAndTags.flatMap((a) => a.tags))];
+        const topicsFromInterests = [
+          ...new Set(similarTopicsAndTags.map((a) => a.topic)),
+        ];
+        const tagsFromInterests = [
+          ...new Set(similarTopicsAndTags.flatMap((a) => a.tags)),
+        ];
 
         recommendations = await Artwork.find({
           _id: { $nin: interestIds },
-          $or: [{ topic: { $in: topicsFromInterests } }, { tags: { $in: tagsFromInterests } }],
+          $or: [
+            { topic: { $in: topicsFromInterests } },
+            { tags: { $in: tagsFromInterests } },
+          ],
         })
           .limit(10)
           .populate("artist", "name profilePicture")
@@ -281,13 +291,12 @@ const getUserRecommentExplore = async (req, res) => {
     }
 
     if (!recommendations.length) {
-      recommendations = await Artwork.aggregate([{ $sample: { size: 10 } }]);
+      recommendations = await Artwork.aggregate([{ $sample: { size: 20 } }]);
     }
 
-    // Return paginated results with recommendations
     res.status(200).json({
-      artworks: enhancedArtworks,
-      recommendations,
+      // recommendations,
+      artworks: recommendations,
       currentPage: parseInt(page),
       totalPages: Math.ceil(totalArtworks / limit),
       totalArtworks,
@@ -297,7 +306,6 @@ const getUserRecommentExplore = async (req, res) => {
     res.status(500).json({ error: "Server Error" });
   }
 };
-
 
 //getArtworks of own user
 const getArtworks = async (req, res) => {
@@ -464,35 +472,190 @@ const addArtwork = async (req, res) => {
 
 //Update Artwork function
 const updateArtwork = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    const { artistId, artworkId } = req.params; // Destructure artistId and artworkId from URL parameters
-    const { title, description, domain, tags } = req.body; // Destructure updated fields from request body
+    const { artworkId } = req.params;
+    const { title, description, artistId, tags, fileDescriptions, topic } =
+      req.body;
+    console.log("Artwork ID:", artworkId);
+    console.log("Title:", req.body);
 
-    // Find the artwork by ID
-    const artwork = await Artwork.findById(artworkId);
-
-    // Check if artwork exists
-    if (!artwork) {
-      return res.status(404).json({ error: "Artwork not found" });
+    // Validate artwork ID
+    if (!mongoose.Types.ObjectId.isValid(artworkId)) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({ error: "Invalid artwork ID." });
     }
 
-    // Check if the artist is authorized to update this artwork
-    if (artwork.artist.toString() !== artistId) {
-      return res
-        .status(403)
-        .json({ error: "Unauthorized to update this artwork" });
+    // Find existing artwork
+    const existingArtwork = await Artwork.findById(artworkId).session(session);
+    if (!existingArtwork) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({ error: "Artwork not found." });
     }
 
-    // Update the artwork fields
+    // Validate artist ID if provided
+    if (artistId && !mongoose.Types.ObjectId.isValid(artistId)) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({ error: "Invalid artist ID." });
+    }
+
+    // Handle Topics: Update topic references
+    let topicIds = [];
+    if (topic) {
+      const topicNames = Array.isArray(topic)
+        ? topic
+        : topic.split(",").map((t) => t.trim());
+
+      const existingTopics = await Topic.find({
+        name: { $in: topicNames },
+      }).session(session);
+      const existingTopicNames = existingTopics.map((t) => t.name);
+      const existingTopicIds = existingTopics.map((t) => t._id);
+
+      // const newTopicNames = topicNames.filter(
+      //   (t) => !existingTopicNames.includes(t)
+      // );
+
+      // let newTopics = [];
+      // if (newTopicNames.length > 0) {
+      //   newTopics = await Topic.insertMany(
+      //     newTopicNames.map((name) => ({ name, artworkCount: 1 })),
+      //     { session }
+      //   );
+      // }
+
+      topicIds = [...existingTopicIds];
+
+      // Decrement old topics' artwork count
+      if (existingArtwork.topic && existingArtwork.topic.length > 0) {
+        await Topic.updateMany(
+          { _id: { $in: existingArtwork.topic } },
+          { $inc: { artworkCount: -1 } },
+          { session }
+        );
+      }
+
+      // Increment new topics' artwork count
+      if (existingTopicIds.length > 0) {
+        await Topic.updateMany(
+          { _id: { $in: existingTopicIds } },
+          { $inc: { artworkCount: 1 } },
+          { session }
+        );
+      }
+    } else {
+      // Keep existing topics if not provided
+      topicIds = existingArtwork.topic;
+    }
+
+    // Handle Tags: Update tag references
+    const tagsArray = tags
+      ? Array.isArray(tags)
+        ? tags
+        : tags
+            .split(",")
+            .map((tag) => tag.trim())
+            .filter((tag) => tag)
+      : existingArtwork.tags;
+
+    // Decrement old tags' artwork count
+    if (existingArtwork.tags && existingArtwork.tags.length > 0) {
+      const oldTagUpdateOperations = existingArtwork.tags.map((tag) => ({
+        updateOne: {
+          filter: { name: tag },
+          update: { $inc: { artworkCount: -1 } },
+        },
+      }));
+      await Tag.bulkWrite(oldTagUpdateOperations, { session });
+    }
+
+    // Update or create new tags
+    const tagUpdateOperations = tagsArray.map((tag) => ({
+      updateOne: {
+        filter: { name: tag },
+        update: { $inc: { artworkCount: 1 } },
+        upsert: true,
+      },
+    }));
+    if (tagUpdateOperations.length > 0) {
+      await Tag.bulkWrite(tagUpdateOperations, { session });
+    }
+
+    // Handle File Uploads
+    let thumbnailUrl = existingArtwork.thumbnail;
+    let fileUploads = existingArtwork.files;
+
+    if (req.files && req.files.length > 0) {
+      const newFiles = req.files.map((file, index) => {
+        if (thumbnailUrl === null) {
+          // Generate thumbnail for the first file
+          if (index === 0 && file.mimetype.startsWith("image/")) {
+            thumbnailUrl = cloudinary.url(file.filename, {
+              transformation: [{ effect: "sharpen" }],
+              resource_type: "image",
+            });
+          } else if (index === 0 && file.mimetype.startsWith("video/")) {
+            thumbnailUrl = cloudinary.url(file.filename, {
+              resource_type: "video",
+              format: "jpg",
+              transformation: [{ start_offset: "10", effect: "sharpen" }],
+            });
+          }
+        }
+
+        return {
+          fileUrl: file.path,
+          fileType: file.mimetype.startsWith("video/") ? "video" : "image",
+          description:
+            fileDescriptions && fileDescriptions[index]
+              ? fileDescriptions[index]
+              : "",
+        };
+      });
+
+      // Combine existing files with new files
+      fileUploads = [...fileUploads, ...newFiles];
+    } else {
+      // Update captions for existing files
+      fileUploads = fileUploads.map((file, index) => ({
+        ...file,
+        description:
+          fileDescriptions && fileDescriptions[index]
+            ? fileDescriptions[index]
+            : file.description,
+      }));
+    }
+
+    // Update Artwork Document
+    const updateData = {
+      ...(title && { title }),
+      ...(description && { description }),
+      ...(artistId && { artist: artistId }),
+      files: fileUploads,
+      topic: topicIds,
+      tags: tagsArray,
+      thumbnail: thumbnailUrl,
+    };
+
     const updatedArtwork = await Artwork.findByIdAndUpdate(
       artworkId,
-      { title, description, domain, tags },
-      { new: true, runValidators: true } // Return the updated document and run schema validators
+      updateData,
+      { new: true, session }
     );
+
+    await session.commitTransaction();
+    session.endSession();
 
     res.status(200).json(updatedArtwork);
   } catch (error) {
-    console.error("Error updating artwork:", error.message);
+    await session.abortTransaction();
+    session.endSession();
+    console.error("Error in updateArtwork:", error.message);
     res.status(500).json({ error: "Server Error" });
   }
 };
@@ -500,7 +663,10 @@ const updateArtwork = async (req, res) => {
 //Delete Artwork function
 const deleteArtwork = async (req, res) => {
   try {
-    const { artistId, artworkId } = req.params; // Get artistId and artworkId from request parameters
+    const artworkId = req.params.artworkId;
+    const artistId = req.user.id;
+    console.log("Artwork ID:", artworkId);
+    console.log("Artist ID:", artistId);
 
     // Find the artwork by ID
     const artwork = await Artwork.findById(artworkId);
@@ -540,6 +706,7 @@ const deleteArtwork = async (req, res) => {
 const getArtworkById = async (req, res) => {
   try {
     const artworkId = req.params.artworkId;
+    console.log("Artwork ID:", artworkId);
     const artwork = await Artwork.findById(artworkId).populate(
       "artist",
       "name"
@@ -547,6 +714,10 @@ const getArtworkById = async (req, res) => {
     if (!artwork) {
       return res.status(404).json({ error: "Artwork not found" });
     }
+
+    // Log the view activity
+    //  await logUserActivity(userId, artworkId, "view");
+
     return res.status(200).json(artwork);
   } catch (error) {
     console.error(error.message);

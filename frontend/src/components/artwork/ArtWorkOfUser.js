@@ -8,8 +8,8 @@ import Loading from "../loading/Loading";
 const ArtworkOfUser = ({ artworksUser }) => {
   //   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.artwork);
- 
-  const [artworks, setArtworks] = useState(artworksUser );
+
+  const [artworks, setArtworks] = useState(artworksUser);
 
   useEffect(() => {
     if (artworksUser) {
@@ -19,8 +19,7 @@ const ArtworkOfUser = ({ artworksUser }) => {
   }, [artworksUser]);
   console.log(artworksUser);
 
-
-  if (!artworks|| artworks.length === 0) {
+  if (!artworks || artworks.length === 0) {
     return (
       <div className="flex flex-col mt-[5%]  h-screen bg-[#121212] text-white">
         <div className="flex flex-col items-center">
@@ -55,15 +54,15 @@ const ArtworkOfUser = ({ artworksUser }) => {
       </div>
     );
   }
-  
+
   if (loading) return <Loading />;
 
   if (error) return <p>Error: {error}</p>;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-0.5 p-2 bg-[#121212]">
-      {artworks.map((artwork) => (
-        <ArtworkCart key={artwork._id} artwork={artwork} />
+      {artworks?.map((artwork) => (
+        <ArtworkCart key={artwork?._id} artwork={artwork} />
       ))}
     </div>
   );

@@ -1,5 +1,6 @@
 const Like = require("../models/likeModel");
 const Artwork = require("../models/artWorkModel");
+const { logUserActivity } = require("./userActivityController");
 
 // Like an artwork
 const likeArtwork = async (req, res) => {
@@ -9,7 +10,9 @@ const likeArtwork = async (req, res) => {
     // Check if the user already liked the artwork
     const existingLike = await Like.findOne({ userId, artworkId });
     if (existingLike) {
-      return res.status(400).json({ message: "You have already liked this artwork" });
+      return res
+        .status(400)
+        .json({ message: "You have already liked this artwork" });
     }
 
     // Create a new like
@@ -19,6 +22,8 @@ const likeArtwork = async (req, res) => {
     });
 
     await like.save();
+    // Log the like activity
+    await logUserActivity(userId, artworkId, "like");
 
     // Increment the like count in the Artwork model
     await Artwork.findByIdAndUpdate(artworkId, { $inc: { likesCount: 1 } });
@@ -38,7 +43,9 @@ const unlikeArtwork = async (req, res) => {
     // Check if the like exists
     const existingLike = await Like.findOne({ userId, artworkId });
     if (!existingLike) {
-      return res.status(400).json({ message: "You haven't liked this artwork yet" });
+      return res
+        .status(400)
+        .json({ message: "You haven't liked this artwork yet" });
     }
 
     // Remove the like
@@ -59,7 +66,10 @@ const getLikesByArtwork = async (req, res) => {
   try {
     const { artworkId } = req.params;
 
-    const likes = await Like.find({ artworkId }).populate("userId", "name profilePicture");
+    const likes = await Like.find({ artworkId }).populate(
+      "userId",
+      "name profilePicture"
+    );
 
     res.status(200).json({ likes });
   } catch (error) {

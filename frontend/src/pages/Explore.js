@@ -1,5 +1,4 @@
 import ArtworkList from "../components/artwork/ArtworkList";
-import { useState } from "react";
 import { useSelector } from "react-redux";
 import ArtworkForUser from "../components/artwork/ArtworkForUser";
 

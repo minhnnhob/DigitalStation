@@ -105,6 +105,49 @@ const getUserById = async (req, res) => {
     console.error("Error fetching user by ID:", error.message);
     res.status(500).json({ error: "Server Error" });
   }
+};const getArtitsById = async (req, res) => {
+  const id = req.params.id;
+  console.log("artID,",id);
+
+  try {
+    const user = await User.findById(id).populate("interestedTopics", "name");
+
+    const followers = await Follower.countDocuments({ followingId: id });
+    const following = await Follower.countDocuments({ followerId: id });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    userData = {
+      id: user._id,
+      email: user.email,
+      name: user.name,
+      profilePicture: user.profilePicture,
+      coverPicture: user.coverPicture,
+      userType: user.userType,
+
+      hiring: user.hiring,
+      experience: user.experience,
+      proSumarry: user.proSumarry,
+      resume: user.resume.link,
+      skills: user.skills,
+      resumeName: user.resume.resumeName,
+
+      headline: user.headline,
+      city: user.city,
+      country: user.country,
+      socialLinks: user.socialLinks,
+      interestedTopics: user.interestedTopics,
+      followersCount: followers,
+      followingCount: following,
+      createdAt: user.createdAt,
+    };
+
+    res.status(200).json(userData);
+  } catch (error) {
+    console.error("Error fetching user by ID:", error.message);
+    res.status(500).json({ error: "Server Error" });
+  }
 };
 
 const loginUser = async (req, res) => {
@@ -275,6 +318,7 @@ module.exports = {
   registerUser,
   logoutUser,
   getUserById,
+  getArtitsById,
   getAuthUser,
   updateUser,
   getVerifyToken,

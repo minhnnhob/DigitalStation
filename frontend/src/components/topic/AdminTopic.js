@@ -201,7 +201,7 @@ const AdminTopic = () => {
 
         {isModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+            <div className="bg-gray-900 rounded-lg shadow-xl w-full max-w-md p-6">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">
                   {modalMode === "create"
@@ -225,7 +225,7 @@ const AdminTopic = () => {
                   placeholder="Topic Name"
                   value={currentTopic.name}
                   onChange={handleInputChange}
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border rounded px-3 py-2 bg-slate-950"
                   disabled={modalMode === "view"}
                 />
                 <input
@@ -234,13 +234,13 @@ const AdminTopic = () => {
                   placeholder="Slug"
                   value={currentTopic.slug}
                   onChange={handleInputChange}
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border rounded px-3 py-2 bg-slate-950"
                   disabled={modalMode === "view"}
                 />
                 <input
                   type="file"
                   onChange={handleImageChange}
-                  className="border p-2 mr-2"
+                  className="border p-2 mr-2 bg-slate-950"
                   hidden={modalMode === "view"}
                 />
                 {currentTopic.imageUrl && (
@@ -255,7 +255,7 @@ const AdminTopic = () => {
                   placeholder="Description"
                   value={currentTopic.description}
                   onChange={handleInputChange}
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border rounded px-3 py-2 bg-slate-950"
                   disabled={modalMode === "view"}
                 ></textarea>
 

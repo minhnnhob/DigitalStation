@@ -28,6 +28,8 @@ import { useState } from "react";
 const RecruitmentDetail = () => {
   const applicantId = useParams().applicantId;
 
+  console.log(applicantId);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -136,6 +138,10 @@ const RecruitmentDetail = () => {
     );
   };
 
+  const viewPortfolio = () => {
+      navigate(`/portfolio/${recruitmentDetails?.applicant?._id}`);
+  }
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -175,7 +181,7 @@ const RecruitmentDetail = () => {
                 </p>
               </div>
             </div>
-            <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg">
+            <button onClick={viewPortfolio} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg">
               {/* <ExternalLink className="w-4 h-4" /> */}
               View Portfolio
             </button>

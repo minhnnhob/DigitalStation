@@ -49,7 +49,8 @@ const fetchArtworkUser = createAsyncThunk(
 
 const fetchArtwprkOfUser = createAsyncThunk(
   "artwork/fetchArtworkOfUser",
-  async (id) => {
+  async (id,{rejectWithValue}) => {
+    console.log(id)
     try {
       const response = await axios.get(
         `http://localhost:4000/api/artworks/${id}`,
@@ -59,7 +60,7 @@ const fetchArtwprkOfUser = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
-      return console.error(error);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
@@ -103,6 +104,47 @@ const createArtwork = createAsyncThunk(
   }
 );
 
+const updateArtwork = createAsyncThunk(
+  "artwork/updateArtwork",
+  async (formData, { rejectWithValue }) => {
+    console.log(formData.artworkId);
+    try {
+      const response = await axios.patch(
+        `http://localhost:4000/api/artworks/${formData.artworkId}`,
+        formData.formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+const deleteArtwork = createAsyncThunk(
+  "artwork/deleteArtwork",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await axios.delete(
+        `http://localhost:4000/api/artworks/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 // Slice definition
 const artworkState = createSlice({
   name: "artwork",
@@ -137,6 +179,7 @@ const artworkState = createSlice({
       .addCase(fetchArtwork.fulfilled, (state, action) => {
         state.loading = false;
         state.artworks = action.payload;
+   
       })
       .addCase(fetchArtwork.rejected, (state, action) => {
         state.loading = false;
@@ -184,15 +227,49 @@ const artworkState = createSlice({
         state.loading = false;
         state.error = action.payload;
       });
+
+    builder
+      .addCase(deleteArtwork.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteArtwork.fulfilled, (state, action) => {
+        state.loading = false;
+        state.artworks = state.artworks.filter(
+          (artwork) => artwork._id !== action.payload
+        );
+      })
+      .addCase(deleteArtwork.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    builder
+      .addCase(updateArtwork.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateArtwork.fulfilled, (state, action) => {
+        state.loading = false;
+        state.artworks = action.payload
+        console.log(action.payload);
+      })
+      .addCase(updateArtwork.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
 export default artworkState.reducer;
-export const { updateArtwork, deleteArtwork } = artworkState.actions;
+
+
 export {
   fetchArtworks,
   fetchArtworkUser,
   fetchArtwprkOfUser,
   fetchArtwork,
   createArtwork,
+  deleteArtwork,
+  updateArtwork,
 };

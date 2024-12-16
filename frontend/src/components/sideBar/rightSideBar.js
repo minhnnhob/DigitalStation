@@ -9,7 +9,7 @@ import {
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 
-const RightSidebar = ({ userInfor, isCollapsed, toggleCollapse }) => {
+const RightSidebar = ({ userInfor, isCollapsed, toggleCollapse, onUser }) => {
   if (!userInfor) return null;
 
   return (
@@ -39,7 +39,9 @@ const RightSidebar = ({ userInfor, isCollapsed, toggleCollapse }) => {
         <img
           src={userInfor.profilePicture}
           alt={userInfor.name}
-          className={`rounded-full object-cover    ${isCollapsed ? "w-8 h-8" : "w-40 h-40"}`}
+          className={`rounded-full object-cover    ${
+            isCollapsed ? "w-8 h-8" : "w-40 h-40"
+          }`}
         />
         {!isCollapsed && (
           <h2 className="text-3xl font-black"> {userInfor.name} </h2>
@@ -62,19 +64,21 @@ const RightSidebar = ({ userInfor, isCollapsed, toggleCollapse }) => {
       )}
 
       {/* Edit Profile Button */}
-      <div
-        className={` flex justify-center items-center mb-4 bg-gray-700 text-white  rounded-md ${
-          isCollapsed ? " h-10 w-full] " : "w-full py-1"
-        }`}
-        onClick={() => {
-          window.location.href = "/profile";
-        }}
-      >
-        <button>
-          <FontAwesomeIcon icon={faPen} />
-        </button>
-        {!isCollapsed && <p>Edit Profile</p>}
-      </div>
+      {!onUser && (
+        <div
+          className={` flex justify-center items-center mb-4 bg-gray-700 text-white  rounded-md ${
+            isCollapsed ? " h-10 w-full] " : "w-full py-1"
+          }`}
+          onClick={() => {
+            window.location.href = "/profile";
+          }}
+        >
+          <button>
+            <FontAwesomeIcon icon={faPen} />
+          </button>
+          {!isCollapsed && <p>Edit Profile</p>}
+        </div>
+      )}
 
       {/* contact */}
       {!isCollapsed && (
