@@ -95,3 +95,17 @@ Contributions are welcome! Please follow these steps to contribute:
 DEMO:
 
 ![Screenshot 2024-12-26 154731](https://github.com/user-attachments/assets/ec078eac-e4cf-4b31-9e33-accb6ba880fe)
+![image](https://github.com/user-attachments/assets/82235867-a15b-4cef-b996-6189365a4252)
+![image](https://github.com/user-attachments/assets/80fe656d-6c67-49ca-bfd3-eff87de7b6c1)
+![image](https://github.com/user-attachments/assets/2c490ab6-4687-405d-8ff1-9cdd890f555d)
+![image](https://github.com/user-attachments/assets/8cd0ba67-039b-4667-8c3d-7430bb07ab53)
+![image](https://github.com/user-attachments/assets/5e2a1ec9-3769-4f3f-bd5d-82fd59079a57)
+![image](https://github.com/user-attachments/assets/71205238-3ffa-4159-8e96-5aa24638b502)
+![image](https://github.com/user-attachments/assets/dfcc54b6-cb45-49d8-9618-f0d92f0c4ecd)
+![image](https://github.com/user-attachments/assets/b79abd28-b209-48be-b47d-ddff9d38aed1)
+
+
+
+
+
+
