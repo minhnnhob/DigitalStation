@@ -90,3 +90,8 @@ Contributions are welcome! Please follow these steps to contribute:
 4. Commit your changes (git commit -m 'Add some feature').
 5. Push to the branch (git push origin feature/your-feature).
 6. Open a pull request.
+
+
+DEMO:
+
+![Screenshot 2024-12-26 154731](https://github.com/user-attachments/assets/ec078eac-e4cf-4b31-9e33-accb6ba880fe)
